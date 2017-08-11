@@ -2,43 +2,51 @@ package com.yaskovdev.sandbox.jms;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 public class App {
 
     public static void main(String[] args) throws Exception {
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
         Thread.sleep(1000);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
         Thread.sleep(1000);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldProducer(), false);
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldProducer());
         Thread.sleep(1000);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldConsumer(), false);
-        thread(new HelloWorldProducer(), false);
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldConsumer());
+        thread(new HelloWorldProducer());
     }
 
-    public static void thread(Runnable runnable, boolean daemon) {
+    public static void thread(Runnable runnable) {
         Thread brokerThread = new Thread(runnable);
-        brokerThread.setDaemon(daemon);
         brokerThread.start();
     }
 
@@ -46,7 +54,7 @@ public class App {
         public void run() {
             try {
                 // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
 
                 // Create a Connection
                 Connection connection = connectionFactory.createConnection();
@@ -83,9 +91,7 @@ public class App {
     public static class HelloWorldConsumer implements Runnable, ExceptionListener {
         public void run() {
             try {
-
-                // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
 
                 // Create a Connection
                 Connection connection = connectionFactory.createConnection();
@@ -123,9 +129,7 @@ public class App {
         }
 
         public synchronized void onException(JMSException ex) {
-            System.out.println("JMS Exception occurred.  Shutting down client.");
+            System.out.println("JMS Exception occurred. Shutting down client.");
         }
     }
 }
-
-
