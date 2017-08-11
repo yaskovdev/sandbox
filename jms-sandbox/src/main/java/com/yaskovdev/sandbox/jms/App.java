@@ -88,7 +88,7 @@ public class App {
         }
     }
 
-    public static class HelloWorldConsumer implements Runnable, ExceptionListener {
+    public static class HelloWorldConsumer implements Runnable {
         public void run() {
             try {
                 ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
@@ -97,7 +97,7 @@ public class App {
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
 
-                connection.setExceptionListener(this);
+                connection.setExceptionListener(new LoggingExceptionListener());
 
                 // Create a Session
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -126,10 +126,6 @@ public class App {
                 System.out.println("Caught: " + e);
                 e.printStackTrace();
             }
-        }
-
-        public synchronized void onException(JMSException ex) {
-            System.out.println("JMS Exception occurred. Shutting down client.");
         }
     }
 }
