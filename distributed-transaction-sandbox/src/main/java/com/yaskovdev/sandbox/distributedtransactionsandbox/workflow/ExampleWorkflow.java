@@ -68,6 +68,7 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
     public NextAction createEvent(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
         System.out.println("Notification: " + notification);
+        jdbcClient.createEvent(notification);
         return moveToState(sendNotification, "Event created, going to send notification");
     }
 
@@ -75,6 +76,7 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
     public NextAction sendNotification(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
         System.out.println("Notification: " + notification);
+        jmsClient.sendNotification(notification);
         return moveToState(done, "Notification sent, going to done");
     }
 

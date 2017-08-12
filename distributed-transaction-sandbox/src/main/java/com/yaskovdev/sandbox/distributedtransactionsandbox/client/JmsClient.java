@@ -1,5 +1,6 @@
 package com.yaskovdev.sandbox.distributedtransactionsandbox.client;
 
+import com.yaskovdev.sandbox.distributedtransactionsandbox.exception.CannotSendNotificationException;
 import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -38,9 +40,8 @@ public class JmsClient {
 
             session.close();
             connection.close();
-        } catch (Exception e) {
-            System.out.println("Caught: " + e);
-            e.printStackTrace();
+        } catch (final JMSException e) {
+            throw new CannotSendNotificationException(e);
         }
     }
 }
