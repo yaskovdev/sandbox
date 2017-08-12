@@ -11,19 +11,19 @@ import io.nflow.engine.workflow.definition.WorkflowStateType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.createEvent;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.done;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.error;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.sendNotification;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.createEvent;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.done;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.error;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.sendNotification;
 import static io.nflow.engine.workflow.definition.NextAction.moveToState;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.start;
 
 @Component
-public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
+public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotificationWorkflow.State> {
 
-    public static final String TYPE = "repeatingWorkflow";
+    public static final String TYPE = "createNotificationWorkflow";
 
     public static final String VAR_NOTIFICATION = "VAR_NOTIFICATION";
 
@@ -58,7 +58,7 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
     }
 
     @Autowired
-    public ExampleWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
+    public CreateNotificationWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
         super(TYPE, createEvent, error);
         this.jdbcClient = jdbcClient;
         this.jmsClient = jmsClient;

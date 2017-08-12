@@ -1,13 +1,11 @@
 package com.yaskovdev.sandbox.distributedtransactionsandbox.manager;
 
 import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow;
+import com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow;
 import io.nflow.engine.service.WorkflowInstanceService;
 import io.nflow.engine.workflow.instance.WorkflowInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 public class NotificationManager {
@@ -24,9 +22,8 @@ public class NotificationManager {
 
     public void createNotification(final Notification notification) {
         workflowInstances.insertWorkflowInstance(workflowInstanceFactory.newWorkflowInstanceBuilder()
-                .setType(ExampleWorkflow.TYPE)
-                .setExternalId(UUID.randomUUID().toString())
-                .putStateVariable(ExampleWorkflow.VAR_NOTIFICATION, notification)
+                .setType(CreateNotificationWorkflow.TYPE)
+                .putStateVariable(CreateNotificationWorkflow.VAR_NOTIFICATION, notification)
                 .build());
     }
 }
