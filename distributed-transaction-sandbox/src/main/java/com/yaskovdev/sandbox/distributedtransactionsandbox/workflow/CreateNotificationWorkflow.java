@@ -6,6 +6,7 @@ import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
 import io.nflow.engine.workflow.definition.NextAction;
 import io.nflow.engine.workflow.definition.StateExecution;
 import io.nflow.engine.workflow.definition.WorkflowDefinition;
+import io.nflow.engine.workflow.definition.WorkflowSettings;
 import io.nflow.engine.workflow.definition.WorkflowState;
 import io.nflow.engine.workflow.definition.WorkflowStateType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,9 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
 
     @Autowired
     public CreateNotificationWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
-        super(TYPE, createEvent, error);
+        super(TYPE, createEvent, error, new WorkflowSettings.Builder()
+                .setMinErrorTransitionDelay(10000)
+                .build());
         this.jdbcClient = jdbcClient;
         this.jmsClient = jmsClient;
         permit(createEvent, sendNotification);
