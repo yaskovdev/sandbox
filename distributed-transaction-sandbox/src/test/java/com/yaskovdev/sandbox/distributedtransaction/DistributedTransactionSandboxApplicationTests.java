@@ -1,4 +1,4 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox;
+package com.yaskovdev.sandbox.distributedtransaction;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

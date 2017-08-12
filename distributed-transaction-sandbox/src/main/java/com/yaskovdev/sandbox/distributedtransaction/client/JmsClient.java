@@ -1,7 +1,7 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.client;
+package com.yaskovdev.sandbox.distributedtransaction.client;
 
-import com.yaskovdev.sandbox.distributedtransactionsandbox.exception.CannotSendNotificationException;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
+import com.yaskovdev.sandbox.distributedtransaction.exception.CannotSendNotificationException;
+import com.yaskovdev.sandbox.distributedtransaction.model.Notification;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;

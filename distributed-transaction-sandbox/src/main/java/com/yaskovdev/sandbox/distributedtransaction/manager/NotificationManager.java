@@ -1,7 +1,7 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.manager;
+package com.yaskovdev.sandbox.distributedtransaction.manager;
 
-import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow;
+import com.yaskovdev.sandbox.distributedtransaction.model.Notification;
+import com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow;
 import io.nflow.engine.service.WorkflowInstanceService;
 import io.nflow.engine.workflow.instance.WorkflowInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;

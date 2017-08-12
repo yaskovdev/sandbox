@@ -1,8 +1,8 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.workflow;
+package com.yaskovdev.sandbox.distributedtransaction.workflow;
 
-import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JdbcClient;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JmsClient;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
+import com.yaskovdev.sandbox.distributedtransaction.client.JdbcClient;
+import com.yaskovdev.sandbox.distributedtransaction.client.JmsClient;
+import com.yaskovdev.sandbox.distributedtransaction.model.Notification;
 import io.nflow.engine.workflow.definition.NextAction;
 import io.nflow.engine.workflow.definition.StateExecution;
 import io.nflow.engine.workflow.definition.WorkflowDefinition;
@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.createEvent;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.done;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.error;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.CreateNotificationWorkflow.State.sendNotification;
+import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.createEvent;
+import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.done;
+import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.error;
+import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.sendNotification;
 import static io.nflow.engine.workflow.definition.NextAction.moveToState;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
@@ -66,6 +66,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     public CreateNotificationWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
         super(TYPE, createEvent, error, new WorkflowSettings.Builder()
                 .setMinErrorTransitionDelay(10000)
+                .setMaxRetries(5)
                 .build());
         this.jdbcClient = jdbcClient;
         this.jmsClient = jmsClient;
@@ -94,12 +95,12 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     @SuppressWarnings("unused")
     public void done(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        logger.info("Notification: " + notification + " processing done");
+        logger.info("Notification " + notification + " processing done");
     }
 
     @SuppressWarnings("unused")
     public void error(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        logger.info("Notification: " + notification + " processing error");
+        logger.info("Notification " + notification + " processing error");
     }
 }

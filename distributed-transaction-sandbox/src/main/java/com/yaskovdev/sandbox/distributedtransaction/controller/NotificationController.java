@@ -1,7 +1,7 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.controller;
+package com.yaskovdev.sandbox.distributedtransaction.controller;
 
-import com.yaskovdev.sandbox.distributedtransactionsandbox.manager.NotificationManager;
-import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
+import com.yaskovdev.sandbox.distributedtransaction.manager.NotificationManager;
+import com.yaskovdev.sandbox.distributedtransaction.model.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

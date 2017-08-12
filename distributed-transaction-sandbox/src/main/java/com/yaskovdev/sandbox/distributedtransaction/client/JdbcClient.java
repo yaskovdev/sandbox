@@ -1,6 +1,6 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.client;
+package com.yaskovdev.sandbox.distributedtransaction.client;
 
-import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
+import com.yaskovdev.sandbox.distributedtransaction.model.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;

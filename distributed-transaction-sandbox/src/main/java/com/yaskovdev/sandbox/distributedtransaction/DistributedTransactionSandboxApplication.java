@@ -1,4 +1,4 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox;
+package com.yaskovdev.sandbox.distributedtransaction;
 
 import io.nflow.engine.internal.config.EngineConfiguration;
 import org.springframework.boot.SpringApplication;

@@ -1,4 +1,4 @@
-package com.yaskovdev.sandbox.distributedtransactionsandbox.model;
+package com.yaskovdev.sandbox.distributedtransaction.model;
 
 public class Notification {
 
