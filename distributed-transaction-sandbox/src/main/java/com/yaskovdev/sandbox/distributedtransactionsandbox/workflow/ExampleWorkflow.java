@@ -45,6 +45,7 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
 
     public ExampleWorkflow() {
         super(TYPE, repeat, error);
+        permit(repeat, repeat);
     }
 
     @SuppressWarnings("unused")
