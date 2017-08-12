@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.createEvent;
-import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.done;
 import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.error;
 import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.sendNotification;
+import static com.yaskovdev.sandbox.distributedtransaction.workflow.CreateNotificationWorkflow.State.success;
 import static io.nflow.engine.workflow.definition.NextAction.moveToState;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
@@ -40,7 +40,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
 
         createEvent(start, "Event is persisted to database"),
         sendNotification(normal, "Notification is sent to a message queue"),
-        done(end, "Notification creation is finished"),
+        success(end, "Notification creation is finished successfully"),
         error(end, "Error state");
 
         private final WorkflowStateType type;
@@ -72,7 +72,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
         this.jmsClient = jmsClient;
         permit(createEvent, sendNotification);
         permit(createEvent, error);
-        permit(sendNotification, done);
+        permit(sendNotification, success);
         permit(sendNotification, error);
     }
 
@@ -89,18 +89,18 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
         logger.info("Going to send " + notification + " to a message queue");
         jmsClient.sendNotification(notification);
-        return moveToState(done, "Notification sent, going to done");
+        return moveToState(success, "Notification sent, going to success");
     }
 
     @SuppressWarnings("unused")
-    public void done(final StateExecution execution) {
+    public void success(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        logger.info("Notification " + notification + " processing done");
+        logger.info("Notification " + notification + " processing success");
     }
 
     @SuppressWarnings("unused")
     public void error(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        logger.info("Notification " + notification + " processing error");
+        logger.error("Notification " + notification + " processing error");
     }
 }

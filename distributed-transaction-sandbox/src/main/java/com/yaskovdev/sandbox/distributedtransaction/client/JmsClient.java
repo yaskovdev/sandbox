@@ -37,7 +37,7 @@ public class JmsClient {
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
             final String text = "Got " + notification + " from: " + currentThread().getName() + " : " + hashCode();
-            TextMessage message = session.createTextMessage(text);
+            final TextMessage message = session.createTextMessage(text);
 
             logger.info("Sent message: " + message.hashCode() + " : " + currentThread().getName());
             producer.send(message);
