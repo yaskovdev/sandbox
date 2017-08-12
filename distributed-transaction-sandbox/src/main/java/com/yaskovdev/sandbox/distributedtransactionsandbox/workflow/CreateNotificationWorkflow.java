@@ -9,6 +9,7 @@ import io.nflow.engine.workflow.definition.WorkflowDefinition;
 import io.nflow.engine.workflow.definition.WorkflowSettings;
 import io.nflow.engine.workflow.definition.WorkflowState;
 import io.nflow.engine.workflow.definition.WorkflowStateType;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,9 +21,12 @@ import static io.nflow.engine.workflow.definition.NextAction.moveToState;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.start;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotificationWorkflow.State> {
+
+    private static final Logger logger = getLogger(CreateNotificationWorkflow.class);
 
     public static final String TYPE = "createNotificationWorkflow";
 
@@ -74,7 +78,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     @SuppressWarnings("unused")
     public NextAction createEvent(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        System.out.println("Notification: " + notification);
+        logger.info("Going to create event for " + notification);
         jdbcClient.createEvent(notification);
         return moveToState(sendNotification, "Event created, going to send notification");
     }
@@ -82,7 +86,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     @SuppressWarnings("unused")
     public NextAction sendNotification(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        System.out.println("Notification: " + notification);
+        logger.info("Going to send " + notification + " to a message queue");
         jmsClient.sendNotification(notification);
         return moveToState(done, "Notification sent, going to done");
     }
@@ -90,12 +94,12 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     @SuppressWarnings("unused")
     public void done(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        System.out.println("Notification: " + notification + " processing done");
+        logger.info("Notification: " + notification + " processing done");
     }
 
     @SuppressWarnings("unused")
     public void error(final StateExecution execution) {
         final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
-        System.out.println("Notification: " + notification + " processing error");
+        logger.info("Notification: " + notification + " processing error");
     }
 }
