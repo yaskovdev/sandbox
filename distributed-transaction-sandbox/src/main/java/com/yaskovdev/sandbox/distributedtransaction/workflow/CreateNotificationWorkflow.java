@@ -9,6 +9,8 @@ import io.nflow.engine.workflow.definition.WorkflowDefinition;
 import io.nflow.engine.workflow.definition.WorkflowSettings;
 import io.nflow.engine.workflow.definition.WorkflowState;
 import io.nflow.engine.workflow.definition.WorkflowStateType;
+import io.nflow.engine.workflow.instance.WorkflowInstance;
+import io.nflow.engine.workflow.instance.WorkflowInstanceFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,12 +30,11 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
 
     private static final Logger logger = getLogger(CreateNotificationWorkflow.class);
 
-    public static final String TYPE = "createNotificationWorkflow";
+    private static final String TYPE = "createNotificationWorkflow";
+    private static final String VAR_NOTIFICATION = "VAR_NOTIFICATION";
 
-    public static final String VAR_NOTIFICATION = "VAR_NOTIFICATION";
-
+    private final WorkflowInstanceFactory workflowInstanceFactory;
     private final JdbcClient jdbcClient;
-
     private final JmsClient jmsClient;
 
     public enum State implements WorkflowState {
@@ -63,11 +64,13 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     }
 
     @Autowired
-    public CreateNotificationWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
+    public CreateNotificationWorkflow(final WorkflowInstanceFactory workflowInstanceFactory,
+            final JdbcClient jdbcClient, final JmsClient jmsClient) {
         super(TYPE, createEvent, error, new WorkflowSettings.Builder()
                 .setMinErrorTransitionDelay(10000)
                 .setMaxRetries(5)
                 .build());
+        this.workflowInstanceFactory = workflowInstanceFactory;
         this.jdbcClient = jdbcClient;
         this.jmsClient = jmsClient;
         permit(createEvent, sendNotification);
@@ -75,6 +78,15 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
         permit(sendNotification, success);
         permit(sendNotification, error);
     }
+
+    public WorkflowInstance newInstanceWith(final Notification notification) {
+        return workflowInstanceFactory.newWorkflowInstanceBuilder()
+                .setType(TYPE).putStateVariable(VAR_NOTIFICATION, notification).build();
+    }
+
+    //
+    // States Handlers (note that they are public and have the same names as the states in the enum above)
+    //
 
     @SuppressWarnings("unused")
     public NextAction createEvent(final StateExecution execution) {
