@@ -8,6 +8,8 @@ import io.nflow.engine.workflow.definition.StateExecution;
 import io.nflow.engine.workflow.definition.WorkflowDefinition;
 import io.nflow.engine.workflow.definition.WorkflowState;
 import io.nflow.engine.workflow.definition.WorkflowStateType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.createEvent;
 import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.done;
@@ -18,6 +20,7 @@ import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.start;
 
+@Component
 public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
 
     public static final String TYPE = "repeatingWorkflow";
@@ -54,6 +57,7 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
         }
     }
 
+    @Autowired
     public ExampleWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
         super(TYPE, createEvent, error);
         this.jdbcClient = jdbcClient;
