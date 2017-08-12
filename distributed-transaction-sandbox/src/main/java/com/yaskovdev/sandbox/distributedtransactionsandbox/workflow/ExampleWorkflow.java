@@ -1,28 +1,39 @@
 package com.yaskovdev.sandbox.distributedtransactionsandbox.workflow;
 
+import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JdbcClient;
+import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JmsClient;
+import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
 import io.nflow.engine.workflow.definition.NextAction;
 import io.nflow.engine.workflow.definition.StateExecution;
 import io.nflow.engine.workflow.definition.WorkflowDefinition;
 import io.nflow.engine.workflow.definition.WorkflowState;
 import io.nflow.engine.workflow.definition.WorkflowStateType;
 
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.createEvent;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.done;
 import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.error;
-import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.repeat;
-import static io.nflow.engine.workflow.definition.NextAction.moveToStateAfter;
-import static io.nflow.engine.workflow.definition.WorkflowStateType.manual;
+import static com.yaskovdev.sandbox.distributedtransactionsandbox.workflow.ExampleWorkflow.State.sendNotification;
+import static io.nflow.engine.workflow.definition.NextAction.moveToState;
+import static io.nflow.engine.workflow.definition.WorkflowStateType.end;
+import static io.nflow.engine.workflow.definition.WorkflowStateType.normal;
 import static io.nflow.engine.workflow.definition.WorkflowStateType.start;
-import static org.joda.time.DateTime.now;
 
 public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
 
     public static final String TYPE = "repeatingWorkflow";
 
-    public static final String VAR_COUNTER = "VAR_COUNTER";
+    public static final String VAR_NOTIFICATION = "VAR_NOTIFICATION";
+
+    private final JdbcClient jdbcClient;
+
+    private final JmsClient jmsClient;
 
     public enum State implements WorkflowState {
 
-        repeat(start, "Repeating state"),
-        error(manual, "Error state");
+        createEvent(start, "Event is persisted to database"),
+        sendNotification(normal, "Notification is sent to a message queue"),
+        done(end, "Notification creation is finished"),
+        error(end, "Error state");
 
         private final WorkflowStateType type;
         private final String description;
@@ -43,15 +54,39 @@ public class ExampleWorkflow extends WorkflowDefinition<ExampleWorkflow.State> {
         }
     }
 
-    public ExampleWorkflow() {
-        super(TYPE, repeat, error);
-        permit(repeat, repeat);
+    public ExampleWorkflow(final JdbcClient jdbcClient, final JmsClient jmsClient) {
+        super(TYPE, createEvent, error);
+        this.jdbcClient = jdbcClient;
+        this.jmsClient = jmsClient;
+        permit(createEvent, sendNotification);
+        permit(createEvent, error);
+        permit(sendNotification, done);
+        permit(sendNotification, error);
     }
 
     @SuppressWarnings("unused")
-    public NextAction repeat(final StateExecution execution) {
-        System.out.println("Counter: " + execution.getVariable(VAR_COUNTER));
-        execution.setVariable(VAR_COUNTER, execution.getVariable(VAR_COUNTER, Integer.class) + 1);
-        return moveToStateAfter(repeat, now().plusSeconds(10), "Next iteration");
+    public NextAction createEvent(final StateExecution execution) {
+        final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
+        System.out.println("Notification: " + notification);
+        return moveToState(sendNotification, "Event created, going to send notification");
+    }
+
+    @SuppressWarnings("unused")
+    public NextAction sendNotification(final StateExecution execution) {
+        final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
+        System.out.println("Notification: " + notification);
+        return moveToState(done, "Notification sent, going to done");
+    }
+
+    @SuppressWarnings("unused")
+    public void done(final StateExecution execution) {
+        final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
+        System.out.println("Notification: " + notification + " processing done");
+    }
+
+    @SuppressWarnings("unused")
+    public void error(final StateExecution execution) {
+        final Notification notification = execution.getVariable(VAR_NOTIFICATION, Notification.class);
+        System.out.println("Notification: " + notification + " processing error");
     }
 }
