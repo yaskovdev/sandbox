@@ -2,19 +2,30 @@ package com.yaskovdev.sandbox.distributedtransactionsandbox.model;
 
 public class Notification {
 
-    private final long id;
-    private final String content;
+    private String type;
+    private String name;
 
-    public Notification(long id, String content) {
-        this.id = id;
-        this.content = content;
+    private Notification() {
     }
 
-    public long getId() {
-        return id;
+    public Notification(final String type, final String name) {
+        this.type = type;
+        this.name = name;
     }
 
-    public String getContent() {
-        return content;
+    public String getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Notification{" +
+                "type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

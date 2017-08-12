@@ -4,6 +4,7 @@ import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JdbcClient;
 import com.yaskovdev.sandbox.distributedtransactionsandbox.client.JmsClient;
 import com.yaskovdev.sandbox.distributedtransactionsandbox.model.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +24,9 @@ public class NotificationController {
     }
 
     @RequestMapping(method = POST, path = "/notifications")
-    public Notification createNotification() {
-        jdbcClient.createEvent();
-        jmsClient.sendNotification();
-        return new Notification(123, "Content");
+    public Notification createNotification(@RequestBody final Notification notification) {
+        jdbcClient.createEvent(notification);
+        jmsClient.sendNotification(notification);
+        return notification;
     }
 }

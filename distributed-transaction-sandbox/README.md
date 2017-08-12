@@ -1,1 +1,1 @@
-curl -X POST http://localhost:8080/notifications
+curl -H "Content-Type: application/json" --data '{"type":"Some Type", "name":"Some Name2"}' http://localhost:8080/notifications
