@@ -20,8 +20,7 @@ public class NotificationController {
     }
 
     @RequestMapping(method = POST, path = "/notifications")
-    public Notification createNotification(@RequestBody final Notification notification) {
+    public void createNotification(@RequestBody final Notification notification) {
         notificationManager.createNotification(notification);
-        return notification;
     }
 }
