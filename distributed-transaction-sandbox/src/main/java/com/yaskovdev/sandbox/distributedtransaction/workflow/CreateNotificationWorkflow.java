@@ -74,9 +74,7 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
         this.jdbcClient = jdbcClient;
         this.jmsClient = jmsClient;
         permit(createEvent, sendNotification);
-        permit(createEvent, error);
         permit(sendNotification, success);
-        permit(sendNotification, error);
     }
 
     public WorkflowInstance newInstanceWith(final Notification notification) {
