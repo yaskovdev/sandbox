@@ -37,9 +37,9 @@ public class CreateNotificationWorkflow extends WorkflowDefinition<CreateNotific
     private final JdbcClient jdbcClient;
     private final JmsClient jmsClient;
 
-    public enum State implements WorkflowState {
+    enum State implements WorkflowState {
 
-        createEvent(start, "Event is persisted to database"),
+        createEvent(start, "Event is persisted to a database"),
         sendNotification(normal, "Notification is sent to a message queue"),
         success(end, "Notification creation is finished successfully"),
         error(end, "Error state");
