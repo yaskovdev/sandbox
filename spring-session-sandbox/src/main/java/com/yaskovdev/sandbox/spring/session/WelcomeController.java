@@ -17,67 +17,40 @@
 package com.yaskovdev.sandbox.spring.session;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.Enumeration;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 @Controller
-@SessionAttributes("myRequestObject")
+@SessionAttributes("message")
 public class WelcomeController {
 
-    @ModelAttribute("myRequestObject")
-    public MyCommandBean addStuffToRequestScope() {
-        System.out.println("Inside of addStuffToRequestScope");
-        return new MyCommandBean("Hello World", 42);
-    }
-
     @GetMapping("/")
-    public String welcome(Map<String, Object> model) {
-        model.put("time", new Date());
+    public String welcome(final Map<String, Object> model) {
         model.put("message", "Some Message");
         return "welcome";
     }
 
-    @RequestMapping("/foo")
-    public String foo(Map<String, Object> model) {
-        throw new RuntimeException("Foo");
+    @RequestMapping("/summary")
+    public String requestHandlingMethod() {
+        return "summary";
     }
 
-    @RequestMapping("/dosomething")
-    public String requestHandlingMethod(Model model, HttpServletRequest request, HttpSession session) {
-        System.out.println("Inside of dosomething handler method");
+    @RequestMapping(method = POST, path = "/notifications")
+    @ResponseBody
+    public void performLongRunningOperation() throws InterruptedException {
+        Thread.sleep(5000);
+    }
 
-        System.out.println("--- Model data ---");
-        Map modelMap = model.asMap();
-        for (Object modelKey : modelMap.keySet()) {
-            Object modelValue = modelMap.get(modelKey);
-            System.out.println(modelKey + " -- " + modelValue);
-        }
-
-        System.out.println("=== Request data ===");
-        Enumeration<String> reqEnum = request.getAttributeNames();
-        while (reqEnum.hasMoreElements()) {
-            String s = reqEnum.nextElement();
-            System.out.println(s);
-            System.out.println("==" + request.getAttribute(s));
-        }
-
-        System.out.println("*** Session data ***");
-        Enumeration<String> e = session.getAttributeNames();
-        while (e.hasMoreElements()) {
-            String s = e.nextElement();
-            System.out.println(s);
-            System.out.println("**" + session.getAttribute(s));
-        }
-
-        return "summary";
+    @RequestMapping(method = POST, path = "/cancel")
+    @ResponseBody
+    public void cancel(final SessionStatus sessionStatus) {
+        sessionStatus.setComplete();
     }
 }
