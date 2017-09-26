@@ -1,11 +1,10 @@
+package warmup;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
-/**
- * Created by Sergey on 03.09.2017.
- */
 public class BirthdayCakeCandles {
-    static int birthdayCakeCandles(int n, int[] heights) {
+    private static int birthdayCakeCandles(int n, int[] heights) {
         Arrays.sort(heights);
         int result = 0;
         int max = heights[heights.length - 1];

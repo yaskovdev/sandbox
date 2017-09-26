@@ -1,8 +1,7 @@
+package warmup;
+
 import java.util.Scanner;
 
-/**
- * Created by Sergey on 03.09.2017.
- */
 public class PlusMinus {
 
     public static void main(String[] args) {

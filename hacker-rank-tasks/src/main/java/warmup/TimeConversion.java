@@ -1,10 +1,9 @@
+package warmup;
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by Sergey on 03.09.2017.
- */
 public class TimeConversion {
 
     private static String timeConversion(String time) {
