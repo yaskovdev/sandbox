@@ -13,11 +13,11 @@ public class JourneyToTheMoon {
 
     private static class Graph {
 
+        private final int numberOfAstronauts;
         private final Map<Integer, Set<Integer>> matrix;
-        private final int size;
 
-        private Graph(final int size) {
-            this.size = size;
+        private Graph(int numberOfAstronauts) {
+            this.numberOfAstronauts = numberOfAstronauts;
             this.matrix = new HashMap<Integer, Set<Integer>>();
         }
 
@@ -38,18 +38,22 @@ public class JourneyToTheMoon {
         }
 
         List<Integer> powersOfGroups() {
-            final Set<Integer> elements = new HashSet<Integer>();
-            for (int i = 0; i < size; i++) {
-                elements.add(i);
-            }
-            final List<Integer> result = new ArrayList<Integer>(size);
+            final Set<Integer> elements = new HashSet<Integer>(matrix.keySet());
+            final List<Integer> result = new ArrayList<Integer>(elements.size());
             while (!elements.isEmpty()) {
                 final Integer elementOfGroup = elements.iterator().next();
                 final int before = elements.size();
                 deleteGroup(elementOfGroup, elements);
                 result.add(before - elements.size());
             }
+//            for (int i = 0; i < numberOfAstronauts - matrix.keySet().size(); i++) {
+//                result.add(1);
+//            }
             return result;
+        }
+
+        int leftSize() {
+            return numberOfAstronauts - matrix.keySet().size();
         }
 
         private void deleteGroup(final int element, final Set<Integer> elements) {
@@ -85,14 +89,18 @@ public class JourneyToTheMoon {
         long combinations = 0;
         final List<Integer> powersOfGroups = graph.powersOfGroups();
 
+        final long n = graph.leftSize();
+
         for (int i = 0; i < powersOfGroups.size(); i++) {
             int result = 0;
             final Integer powerOfGroup = powersOfGroups.get(i);
             for (int j = i + 1; j < powersOfGroups.size(); j++) {
                 result += powerOfGroup * powersOfGroups.get(j);
             }
+            result += powerOfGroup * n;
             combinations += result;
         }
+        combinations += n * (n - 1) / 2;
 
         System.out.println(combinations);
     }
