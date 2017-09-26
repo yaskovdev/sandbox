@@ -14,7 +14,7 @@ public class JourneyToTheMoon {
         private final List<Set<Integer>> matrix;
 
         private Graph(final int size) {
-            matrix = new ArrayList<Set<Integer>>();
+            matrix = new ArrayList<Set<Integer>>(size);
             for (int i = 0; i < size; i++) {
                 matrix.add(new HashSet<Integer>());
             }
@@ -26,34 +26,31 @@ public class JourneyToTheMoon {
         }
 
         List<Integer> powersOfGroups() {
-            final Set<Integer> potentialGroups = new HashSet<Integer>();
-            for (int i = 0; i < matrix.size(); i++) {
-                potentialGroups.add(i);
+            final int size = matrix.size();
+            final Set<Integer> elements = new HashSet<Integer>();
+            for (int i = 0; i < size; i++) {
+                elements.add(i);
             }
-            final List<Integer> result = new ArrayList<Integer>();
-            while (!potentialGroups.isEmpty()) {
-                final Integer potentialGroup = potentialGroups.iterator().next();
-                final HashSet<Integer> visited = new HashSet<Integer>();
-                powerOfGroup(potentialGroup, visited);
-                final int powerOfGroup = visited.size();
-                potentialGroups.removeAll(visited);
-                result.add(powerOfGroup);
+            final List<Integer> result = new ArrayList<Integer>(size);
+            while (!elements.isEmpty()) {
+                final Integer elementOfGroup = elements.iterator().next();
+                final int before = elements.size();
+                deleteGroup(elementOfGroup, elements);
+                result.add(before - elements.size());
             }
             return result;
         }
 
-        private int powerOfGroup(int element, Set<Integer> visited) {
-            int result = 1;
-            visited.add(element);
+        private void deleteGroup(final int element, final Set<Integer> elements) {
+            elements.remove(element);
             for (final Integer neighbor : neighboursOf(element)) {
-                if (!visited.contains(neighbor)) {
-                    result += powerOfGroup(neighbor, visited);
+                if (elements.contains(neighbor)) {
+                    deleteGroup(neighbor, elements);
                 }
             }
-            return result;
         }
 
-        private Set<Integer> neighboursOf(int element) {
+        private Set<Integer> neighboursOf(final int element) {
             return matrix.get(element);
         }
     }
