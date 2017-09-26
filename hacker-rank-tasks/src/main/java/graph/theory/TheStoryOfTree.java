@@ -1,8 +1,11 @@
 package graph.theory;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -44,7 +47,20 @@ public class TheStoryOfTree {
         }
     }
 
+    private static class Game {
+        List<Pair> tree;
+        List<Pair> guesses;
+        int minimumWinningScore;
+
+        Game(List<Pair> tree, List<Pair> guesses, int minimumWinningScore) {
+            this.tree = tree;
+            this.guesses = guesses;
+            this.minimumWinningScore = minimumWinningScore;
+        }
+    }
+
     public static void main(String[] args) {
+        final List<Game> games = new ArrayList<Game>();
         final Scanner in = new Scanner(System.in);
         int numberOfGames = in.nextInt();
         for (int game = 0; game < numberOfGames; game++) {
@@ -64,32 +80,71 @@ public class TheStoryOfTree {
                 int v = in.nextInt();
                 guesses.add(new Pair(u, v));
             }
+            games.add(new Game(tree, guesses, minimumWinningScore));
+        }
 
-            System.out.println(probabilityToWinTheGame(tree, guesses, minimumWinningScore));
+        for (Game game : games) {
+            System.out.println(probabilityToWinTheGame(game));
         }
     }
 
-    private static String probabilityToWinTheGame(List<Pair> tree, List<Pair> guesses, int minimumWinningScore) {
-        final Set<Integer> possibleRoots = possibleRootsOf(tree);
-        int numerator = 0;
-        final int denominator = possibleRoots.size();
-        for (int root : possibleRoots) {
-            final List<Pair> allParentOfRelationships = allParentOfRelationships(root, tree);
+    private static String probabilityToWinTheGame(final Game game) {
+        final Set<Integer> rootsToCheck = possibleRootsOf(game.tree);
+        final int denominator = rootsToCheck.size();
+        int totalWins = 0;
+        while (!rootsToCheck.isEmpty()) {
+            final Integer root = rootsToCheck.iterator().next();
+            final List<Integer> childrenOfRoot = childrenOf(root, game.tree);
+            totalWins += totalWins(game, root, childrenOfRoot, rootsToCheck);
+            rootsToCheck.remove(root);
+            rootsToCheck.removeAll(childrenOfRoot);
+        }
+        return reduceFraction(totalWins, denominator);
+    }
 
-            int points = 0;
-            for (final Pair guess : guesses) {
-                if (isCorrect(guess, allParentOfRelationships)) {
-                    points++;
+    private static int totalWins(final Game game, final Integer root, final List<Integer> childrenOfRoot, Set<Integer> rootsToCheck) {
+        int totalWins = 0;
+        final Set<Pair> relationships = allRelationships(root, game.tree);
+        if (wouldWin(game, relationships)) {
+            totalWins++;
+        }
+
+        for (final Integer child : childrenOfRoot) {
+            if (rootsToCheck.contains(child)) {
+                final Set<Pair> updatedRelationships = updateRelationships(root, child, relationships);
+                if (wouldWin(game, updatedRelationships)) {
+                    totalWins++;
                 }
             }
-            if (points >= minimumWinningScore) {
-                numerator++;
-            }
         }
-        return numerator + "/" + denominator;
+
+        return totalWins;
     }
 
-    private static boolean isCorrect(Pair guess, List<Pair> allParentOfRelationships) {
+    private static Set<Pair> updateRelationships(Integer oldRoot, Integer newRoot, Set<Pair> oldRelationships) {
+        final Set<Pair> newRelationships = new HashSet<Pair>(oldRelationships);
+        newRelationships.remove(new Pair(oldRoot, newRoot));
+        newRelationships.add(new Pair(newRoot, oldRoot));
+        return newRelationships;
+    }
+
+    private static boolean wouldWin(final Game game, final Set<Pair> relationships) {
+        int points = 0;
+        for (final Pair guess : game.guesses) {
+            if (isCorrect(guess, relationships)) {
+                points++;
+            }
+        }
+        return points >= game.minimumWinningScore;
+    }
+
+    private static String reduceFraction(int numerator, int denominator) {
+        final BigInteger gcd = BigInteger.valueOf(numerator).gcd(BigInteger.valueOf(denominator));
+        final int gcdValue = gcd.intValue();
+        return (numerator / gcdValue) + "/" + (denominator / gcdValue);
+    }
+
+    private static boolean isCorrect(Pair guess, Set<Pair> allParentOfRelationships) {
         return allParentOfRelationships.contains(guess);
     }
 
@@ -102,20 +157,23 @@ public class TheStoryOfTree {
         return result;
     }
 
-    private static List<Pair> allParentOfRelationships(int root, List<Pair> tree) {
-        final List<Pair> relationships = new ArrayList<Pair>();
-        allParentOfRelationships(relationships, root, tree);
-        return relationships;
-    }
-
-    private static void allParentOfRelationships(List<Pair> relationships, int node, List<Pair> tree) {
-        for (final Integer child : childrenOf(node, tree)) {
-            final Pair parentOf = new Pair(node, child);
-            relationships.add(parentOf);
-            final List<Pair> treeWithoutRelationship = new ArrayList<Pair>(tree);
-            treeWithoutRelationship.remove(parentOf);
-            allParentOfRelationships(relationships, child, treeWithoutRelationship);
+    private static Set<Pair> allRelationships(int root, List<Pair> tree) {
+        final Queue<Integer> queue = new LinkedList<Integer>();
+        final Set<Integer> visited = new HashSet<Integer>();
+        queue.add(root);
+        visited.add(root);
+        final Set<Pair> result = new HashSet<Pair>();
+        while (!queue.isEmpty()) {
+            final int head = queue.remove();
+            for (final Integer child : childrenOf(head, tree)) {
+                if (!visited.contains(child)) {
+                    result.add(new Pair(head, child));
+                    visited.add(child);
+                    queue.add(child);
+                }
+            }
         }
+        return result;
     }
 
     private static List<Integer> childrenOf(int node, List<Pair> tree) {
