@@ -36,37 +36,10 @@ public class JourneyToTheMoon {
                 final HashSet<Integer> visited = new HashSet<Integer>();
                 powerOfGroup(potentialGroup, visited);
                 final int powerOfGroup = visited.size();
-
-                if (powerOfGroup == 0) {
-                    final Set<Integer> allElementsWithoutGroup = findElementsWithoutGroup();
-                    result.add(allElementsWithoutGroup.size());
-                    potentialGroups.removeAll(allElementsWithoutGroup);
-                } else {
-                    potentialGroups.removeAll(visited);
-                    result.add(powerOfGroup);
-                }
+                potentialGroups.removeAll(visited);
+                result.add(powerOfGroup);
             }
             return result;
-        }
-
-        private Set<Integer> findElementsWithoutGroup() {
-            final Set<Integer> result = new HashSet<Integer>();
-            for (int i = 0; i < matrix.length; i++) {
-                int[] row = matrix[i];
-                if (allZeros(row)) {
-                    result.add(i);
-                }
-            }
-            return result;
-        }
-
-        private boolean allZeros(int[] row) {
-            for (int i : row) {
-                if (row[i] != 0) {
-                    return false;
-                }
-            }
-            return true;
         }
 
         private int powerOfGroup(int element, Set<Integer> visited) {
