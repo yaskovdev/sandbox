@@ -11,12 +11,12 @@ public class JourneyToTheMoon {
 
     private static class Graph {
 
-        private final List<List<Integer>> matrix;
+        private final List<Set<Integer>> matrix;
 
         private Graph(final int size) {
-            matrix = new ArrayList<List<Integer>>();
+            matrix = new ArrayList<Set<Integer>>();
             for (int i = 0; i < size; i++) {
-                matrix.add(new ArrayList<Integer>());
+                matrix.add(new HashSet<Integer>());
             }
         }
 
@@ -45,7 +45,7 @@ public class JourneyToTheMoon {
         private int powerOfGroup(int element, Set<Integer> visited) {
             int result = 1;
             visited.add(element);
-            for (Integer neighbor : neighboursOf(element)) {
+            for (final Integer neighbor : neighboursOf(element)) {
                 if (!visited.contains(neighbor)) {
                     result += powerOfGroup(neighbor, visited);
                 }
@@ -53,7 +53,7 @@ public class JourneyToTheMoon {
             return result;
         }
 
-        private List<Integer> neighboursOf(int element) {
+        private Set<Integer> neighboursOf(int element) {
             return matrix.get(element);
         }
     }
