@@ -2,48 +2,68 @@ package graph.theory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 public class JourneyToTheMoon {
 
-    private static class Astronaut {
-        int id;
-        Set<Astronaut> compatriots = new HashSet<Astronaut>();
-
-        Astronaut(int id) {
-            this.id = id;
-        }
-
-        @Override
-        public String toString() {
-            return "" + id;
-        }
-    }
-
     private static class Graph {
-        Map<Integer, Astronaut> astronauts = new HashMap<Integer, Astronaut>();
+
+        private final int[][] matrix;
+
+        private final List<Integer> groups;
+
+        private Graph(final int size) {
+            matrix = new int[size][size];
+            for (int[] row : matrix) {
+                Arrays.fill(row, 0);
+            }
+            groups = new ArrayList<Integer>(size);
+            for (int i = 0; i < size; i++) {
+                groups.add(i);
+            }
+        }
 
         void connect(int a, int b) {
-            final Astronaut first = astronauts.get(a);
-            final Astronaut second = astronauts.get(b);
-            first.compatriots.add(second);
-            second.compatriots.add(first);
+            matrix[a][b] = matrix[b][a] = 1;
+            if (groups.contains(a)) {
+                groups.remove((Integer) a);
+            } else if (groups.contains(b)) {
+                groups.remove((Integer) b);
+            }
         }
 
-        void makeAstronautsWithoutCountryCompatriotsOfOneCountry() {
-            Astronaut lastAstronautWithoutCountry = null;
-            for (final Integer integer : astronauts.keySet()) {
-                final Astronaut astronaut = astronauts.get(integer);
-                if (astronaut.compatriots.isEmpty()) {
-                    if (lastAstronautWithoutCountry != null) {
-                        connect(lastAstronautWithoutCountry.id, astronaut.id);
-                    }
-                    lastAstronautWithoutCountry = astronaut;
+        List<Integer> powersOfGroups() {
+            final List<Integer> result = new ArrayList<Integer>(groups.size()); // TODO: +1?
+            for (Integer group : groups) {
+                result.add(powerOfGroup(group, new HashSet<Integer>()));
+            }
+            return result;
+        }
+
+        private int powerOfGroup(int element, Set<Integer> visited) {
+            int result = 1;
+            visited.add(element);
+            for (Integer neighbor : neighboursOf(element)) {
+                if (!visited.contains(neighbor)) {
+                    result += powerOfGroup(neighbor, visited);
                 }
             }
+            return result;
+        }
+
+        private List<Integer> neighboursOf(int element) {
+            final int[] row = this.matrix[element];
+            final List<Integer> result = new ArrayList<Integer>(row.length);
+            for (int i = 0; i < row.length; i++) {
+                if (row[i] == 1) {
+                    result.add(i);
+                }
+            }
+            return result;
         }
     }
 
@@ -52,10 +72,7 @@ public class JourneyToTheMoon {
         String[] temp = bfr.readLine().split(" ");
         int numberOfAstronauts = Integer.parseInt(temp[0]);
 
-        Graph graph = new Graph();
-        for (int i = 0; i < numberOfAstronauts; i++) {
-            graph.astronauts.put(i, new Astronaut(i));
-        }
+        Graph graph = new Graph(numberOfAstronauts);
         int I = Integer.parseInt(temp[1]);
 
 
@@ -66,11 +83,17 @@ public class JourneyToTheMoon {
             graph.connect(a, b);
         }
 
-        graph.makeAstronautsWithoutCountryCompatriotsOfOneCountry();
-
         long combinations = 0;
+        final List<Integer> powersOfGroups = graph.powersOfGroups();
 
-        // Compute the final answer - the number of combinations
+        for (int i = 0; i < powersOfGroups.size(); i++) {
+            int result = 0;
+            final Integer powerOfGroup = powersOfGroups.get(i);
+            for (int j = i + 1; j < powersOfGroups.size(); j++) {
+                result += powerOfGroup * powersOfGroups.get(j);
+            }
+            combinations += result;
+        }
 
         System.out.println(combinations);
     }
