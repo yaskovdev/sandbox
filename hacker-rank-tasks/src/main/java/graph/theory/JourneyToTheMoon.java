@@ -46,9 +46,6 @@ public class JourneyToTheMoon {
                 deleteGroup(elementOfGroup, elements);
                 result.add(before - elements.size());
             }
-//            for (int i = 0; i < numberOfAstronauts - matrix.keySet().size(); i++) {
-//                result.add(1);
-//            }
             return result;
         }
 
