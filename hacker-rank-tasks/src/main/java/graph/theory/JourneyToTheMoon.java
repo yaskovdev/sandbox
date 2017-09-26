@@ -14,34 +14,59 @@ public class JourneyToTheMoon {
 
         private final int[][] matrix;
 
-        private final List<Integer> groups;
-
         private Graph(final int size) {
             matrix = new int[size][size];
             for (int[] row : matrix) {
                 Arrays.fill(row, 0);
             }
-            groups = new ArrayList<Integer>(size);
-            for (int i = 0; i < size; i++) {
-                groups.add(i);
-            }
         }
 
         void connect(int a, int b) {
             matrix[a][b] = matrix[b][a] = 1;
-            if (groups.contains(a)) {
-                groups.remove((Integer) a);
-            } else if (groups.contains(b)) {
-                groups.remove((Integer) b);
-            }
         }
 
         List<Integer> powersOfGroups() {
-            final List<Integer> result = new ArrayList<Integer>(groups.size()); // TODO: +1?
-            for (Integer group : groups) {
-                result.add(powerOfGroup(group, new HashSet<Integer>()));
+            final Set<Integer> potentialGroups = new HashSet<Integer>();
+            for (int i = 0; i < matrix.length; i++) {
+                potentialGroups.add(i);
+            }
+            final List<Integer> result = new ArrayList<Integer>();
+            while (!potentialGroups.isEmpty()) {
+                final Integer potentialGroup = potentialGroups.iterator().next();
+                final HashSet<Integer> visited = new HashSet<Integer>();
+                powerOfGroup(potentialGroup, visited);
+                final int powerOfGroup = visited.size();
+
+                if (powerOfGroup == 0) {
+                    final Set<Integer> allElementsWithoutGroup = findElementsWithoutGroup();
+                    result.add(allElementsWithoutGroup.size());
+                    potentialGroups.removeAll(allElementsWithoutGroup);
+                } else {
+                    potentialGroups.removeAll(visited);
+                    result.add(powerOfGroup);
+                }
             }
             return result;
+        }
+
+        private Set<Integer> findElementsWithoutGroup() {
+            final Set<Integer> result = new HashSet<Integer>();
+            for (int i = 0; i < matrix.length; i++) {
+                int[] row = matrix[i];
+                if (allZeros(row)) {
+                    result.add(i);
+                }
+            }
+            return result;
+        }
+
+        private boolean allZeros(int[] row) {
+            for (int i : row) {
+                if (row[i] != 0) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private int powerOfGroup(int element, Set<Integer> visited) {
