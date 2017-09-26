@@ -3,7 +3,6 @@ package graph.theory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,22 +11,23 @@ public class JourneyToTheMoon {
 
     private static class Graph {
 
-        private final int[][] matrix;
+        private final List<List<Integer>> matrix;
 
         private Graph(final int size) {
-            matrix = new int[size][size];
-            for (int[] row : matrix) {
-                Arrays.fill(row, 0);
+            matrix = new ArrayList<List<Integer>>();
+            for (int i = 0; i < size; i++) {
+                matrix.add(new ArrayList<Integer>());
             }
         }
 
         void connect(int a, int b) {
-            matrix[a][b] = matrix[b][a] = 1;
+            matrix.get(a).add(b);
+            matrix.get(b).add(a);
         }
 
         List<Integer> powersOfGroups() {
             final Set<Integer> potentialGroups = new HashSet<Integer>();
-            for (int i = 0; i < matrix.length; i++) {
+            for (int i = 0; i < matrix.size(); i++) {
                 potentialGroups.add(i);
             }
             final List<Integer> result = new ArrayList<Integer>();
@@ -54,14 +54,7 @@ public class JourneyToTheMoon {
         }
 
         private List<Integer> neighboursOf(int element) {
-            final int[] row = this.matrix[element];
-            final List<Integer> result = new ArrayList<Integer>(row.length);
-            for (int i = 0; i < row.length; i++) {
-                if (row[i] == 1) {
-                    result.add(i);
-                }
-            }
-            return result;
+            return matrix.get(element);
         }
     }
 
