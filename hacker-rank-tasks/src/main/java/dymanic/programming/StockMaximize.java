@@ -6,47 +6,31 @@ package dymanic.programming;
 public class StockMaximize {
 
     private static class Situation {
-        int day;
         int money;
         int stocks;
 
-        public Situation(final int day, final int money, final int stocks) {
-            this.day = day;
-            this.money = money;
-            this.stocks = stocks;
-        }
-
-        public Situation(final int money, final int stocks) {
+        Situation(final int money, final int stocks) {
             this.money = money;
             this.stocks = stocks;
         }
     }
 
-    int[] prices = new int[0];
+    private static int[] prices = {1, 3, 1, 2};
 
     public static void main(String[] args) {
-
+        final Situation situation = optimalSituationForDay(3);
+        System.out.println(situation.money);
     }
 
-    public void situation(int day, int money, int stocks) {
-
-    }
-
-    Situation optimalSituationForDay(int today) {
+    private static Situation optimalSituationForDay(int today) {
+        if (today == -1) {
+            return new Situation(0, 0);
+        }
         Situation optimalYesterdaySituation = optimalSituationForDay(today - 1);
         return situationWithMaximumMoney(optimalYesterdaySituation, new Situation(optimalYesterdaySituation.money - prices[today], optimalYesterdaySituation.stocks + 1), new Situation(optimalYesterdaySituation.money + optimalYesterdaySituation.stocks * prices[today], 0));
     }
 
-    Situation bestSituationAfter(final Situation situation) {
-        final int today = situation.day;
-        final int yesterday = today - 1;
-        final int money = situation.money;
-        final int stocks = situation.stocks;
-        return situationWithMaximumMoney(bestSituationAfter(new Situation(yesterday, money, stocks)),
-                bestSituationAfter(new Situation(yesterday, money - prices[today], stocks + 1)), bestSituationAfter(new Situation(yesterday, money + stocks * prices[today], 0)));
-    }
-
-    Situation situationWithMaximumMoney(final Situation first, final Situation second, final Situation third) {
+    private static Situation situationWithMaximumMoney(final Situation first, final Situation second, final Situation third) {
         if (first.money > second.money) {
             return first.money > third.money ? first : third;
         } else {
