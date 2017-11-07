@@ -1,4 +1,4 @@
-package hackerrank;
+package atlassian;
 
 import java.util.ArrayList;
 import java.util.Arrays;

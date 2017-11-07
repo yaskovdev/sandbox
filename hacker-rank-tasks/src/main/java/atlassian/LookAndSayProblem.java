@@ -1,4 +1,4 @@
-package hackerrank;
+package atlassian;
 
 /**
  * Created by sergei.iaskov on 9/30/2017.
