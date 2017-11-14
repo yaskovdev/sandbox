@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+<p>Please print the below phrase in the text area</p>
+<p style="display: none">Now ask the second person to print</p>
+<p>I would love with fashion and go home.</p>
+<textarea id="textArea" rows="8" cols="100"></textarea>
+<script type="text/javascript">
+  const experiments = [];
+  let presses = [];
+
+  const finish = function (presses) {
+    const normalizedPresses = [];
+    for (const time of presses) {
+      normalizedPresses.push(time - presses[0]);
+    }
+    const timeOfPrinting = normalizedPresses[normalizedPresses.length - 1];
+    experiments.push({speed: normalizedPresses.length / timeOfPrinting * 1000 * 60});
+  };
+
+  const distance = function (firstExperiment, secondExperiment) {
+    return Math.abs(firstExperiment.speed - secondExperiment.speed);
+  };
+
+  const $textArea = $('#textArea');
+
+  $textArea.keydown(function () {
+    presses.push(new Date().getTime());
+    if (presses.length > 35) {
+      finish(presses);
+      $textArea.prop('disabled', true);
+      setTimeout(function () {
+        $textArea.val('');
+        $textArea.prop('disabled', false);
+      }, 3000);
+      presses = [];
+      if (experiments.length > 2) {
+        const lastExperiment = experiments[experiments.length - 1];
+        if (distance(experiments[0], lastExperiment) < distance(experiments[1], lastExperiment)) {
+          alert('That was the first person');
+        } else {
+          alert('That was the second person');
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
