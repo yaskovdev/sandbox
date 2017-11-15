@@ -4,51 +4,63 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by sergei.iaskov on 9/30/2017.
- */
+import static java.util.Arrays.asList;
+
 public class Validate {
 
     public static void main(String[] args) {
-        System.out.println(validate("|name|address|~n|Patrick|patrick@test.com|pat@test.com|~n|Annie|annie@test.com|~n|Zoe|~n"));
+//        System.out.println(validate("|name|address|~n|Patrick|patrick@test.com|pat@test.com|~n|Annie|annie@test.com|~n|Zoe|~n"));
 //        System.out.println(validate("|name|address|~n|Patrick|patrick@test.com|pat@test.com|~n|Annie||annie@test.com|~n"));
+        final String s = "name~||address";
+        final String replaced = s.replace("~|", Character.toString('\u0000'));
+        final List<String> split = new ArrayList<>(Arrays.asList(replaced.split("\\|")));
+        for (int i = 0; i < split.size(); i++) {
+            final String string = split.get(i);
+            split.set(i, string.replace(Character.toString('\u0000'), "~|"));
+        }
+
+        System.out.println(split);
     }
 
-    static String validate(String input) {
-        final String[] lines = input.split("~n");
-        final List<String> linesList = Arrays.asList(lines);
-        final String headerLine = lines[0];
-        final String[] headerFields = headerLine.substring(1, headerLine.length() - 1).split("\\|");
-        final List<String> header = new ArrayList<>(Arrays.asList(headerFields));
-        boolean error = false;
-        int numberOfFields = 0;
-        int numberOfRecords = 0;
-        int numberOfEmptyFields = 0;
-        boolean headersFixed = false;
-        for (String record : linesList.subList(1, linesList.size())) {
-            final String[] fields = record.substring(1, record.length() - 1).split("\\|");
-            numberOfRecords++;
-            if (!record.startsWith("|") || !record.endsWith("|")) {
-                error = true;
+    private static String validate(final String input) {
+        final ValidationResult validationResult = new ValidationResult();
+        validateCharacters(input, validationResult);
+
+        final List<String> lines = asList(input.split("~n"));
+
+        for (int i = 0; i < lines.size(); i++) {
+            final String line = lines.get(i);
+            validateStartAndEnd(line, validationResult);
+
+            if (i == 0) {
+                validateHeader(line, validationResult);
             }
-            numberOfFields = fields.length;
-            if (!headersFixed && fields.length > header.size()) {
-                final String lastHeader = header.get(header.size() - 1);
-                for (int i = 0; i < fields.length - header.size(); i++) {
-                    header.add(lastHeader + "_" + (i + 1));
-                }
-                headersFixed = true;
-            }
-            for (String field : fields) {
-                if (field.isEmpty()) {
-                    numberOfEmptyFields++;
-                }
+            System.out.println(line);
+        }
+
+        return "";
+    }
+
+    private static void validateHeader(final String header, final ValidationResult validationResult) {
+
+    }
+
+    private static void validateCharacters(final String input, final ValidationResult validationResult) {
+        for (final char character : input.toCharArray()) {
+            if (!validCharacter(character)) {
+                validationResult.errorHappened();
+                return;
             }
         }
-        return error ? "0:0:0:format_error" : numberOfRecords + ":" + numberOfFields + ":" + numberOfEmptyFields + ":" + header.get(header.size() - 1);
     }
 
-    static boolean validCharacter(char character) {
+    private static void validateStartAndEnd(final String line, final ValidationResult validationResult) {
+        if (!line.startsWith("|") || !line.endsWith("|")) {
+            validationResult.errorHappened();
+        }
+    }
+
+    private static boolean validCharacter(char character) {
         return character >= 32 && character <= 126;
     }
 }
