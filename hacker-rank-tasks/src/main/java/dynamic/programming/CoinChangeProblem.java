@@ -1,4 +1,4 @@
-package dymanic.programming;
+package dynamic.programming;
 
 import java.util.Arrays;
 import java.util.List;

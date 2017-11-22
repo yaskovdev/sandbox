@@ -1,4 +1,4 @@
-package dymanic.programming;
+package dynamic.programming;
 
 /**
  * Created by Sergey on 28.09.2017.
