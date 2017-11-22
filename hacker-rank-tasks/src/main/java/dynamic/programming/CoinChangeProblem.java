@@ -1,10 +1,40 @@
 package dynamic.programming;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class CoinChangeProblem {
+
+    private static final Map<Key, Long> cache = new HashMap<>();
+
+    private static class Key {
+
+        final long amount;
+        final List<Long> coins;
+
+        private Key(final long amount, final List<Long> coins) {
+            this.amount = amount;
+            this.coins = coins;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final Key key = (Key) o;
+            return amount == key.amount &&
+                    Objects.equals(coins, key.coins);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(amount, coins);
+        }
+    }
 
     public static void main(String[] args) {
         final Scanner in = new Scanner(System.in);
@@ -19,13 +49,21 @@ public class CoinChangeProblem {
     }
 
     private static long ways(final long amount, final List<Long> coins) {
-        if (amount < 0 || coins.isEmpty()) {
-            return 0;
-        } else if (amount == 0) {
-            return 1;
+        final Key key = new Key(amount, coins);
+        final Long cachedWays = cache.get(key);
+        if (cachedWays == null) {
+            if (amount < 0 || coins.isEmpty()) {
+                return 0;
+            } else if (amount == 0) {
+                return 1;
+            } else {
+                final long coin = head(coins);
+                final long ways = ways(amount - coin, coins) + ways(amount, tail(coins));
+                cache.put(key, ways);
+                return ways;
+            }
         } else {
-            final long coin = head(coins);
-            return ways(amount - coin, coins) + ways(amount, tail(coins));
+            return cachedWays;
         }
     }
 
