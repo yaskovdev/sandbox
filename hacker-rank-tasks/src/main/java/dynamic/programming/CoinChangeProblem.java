@@ -8,24 +8,24 @@ public class CoinChangeProblem {
 
     public static void main(String[] args) {
         final Scanner in = new Scanner(System.in);
-        int n = in.nextInt();
-        int m = in.nextInt();
-        Long[] c = new Long[m];
-        for (int i = 0; i < m; i++) {
-            c[i] = in.nextLong();
+        final int amount = in.nextInt();
+        final int numberOfCoins = in.nextInt();
+        final Long[] coins = new Long[numberOfCoins];
+        for (int i = 0; i < numberOfCoins; i++) {
+            coins[i] = in.nextLong();
         }
-        long ways = ways(n, Arrays.asList(c));
+        final long ways = ways(amount, Arrays.asList(coins));
         System.out.println(ways);
     }
 
-    private static long ways(final long n, final List<Long> coins) {
-        if (coins.isEmpty()) {
+    private static long ways(final long amount, final List<Long> coins) {
+        if (amount < 0 || coins.isEmpty()) {
             return 0;
-        } else if (n == 0) {
+        } else if (amount == 0) {
             return 1;
         } else {
             final long coin = head(coins);
-            return (n % coin == 0 ? 1 : 0) + ways(n - coin, tail(coins));
+            return ways(amount - coin, coins) + ways(amount, tail(coins));
         }
     }
 
