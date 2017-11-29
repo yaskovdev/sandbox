@@ -1,8 +1,6 @@
 package recursion;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 public class ThePowerSum {
@@ -11,39 +9,40 @@ public class ThePowerSum {
 //        final Scanner scanner = new Scanner(System.in);
 //        final int number = scanner.nextInt();
 //        final int power = scanner.nextInt();
-        System.out.println(ways(100, Collections.<Integer>emptyList()));
+        System.out.println(solve(100, 0));
     }
 
-    private static int solve(final int number, final int power) {
-        return sqrt(number);
+    private static long solve(final long number, final long power) {
+        final List<Long> coins = new ArrayList<>();
+        for (int i = 1; i <= sqrt(number); i++) {
+            coins.add(sq(i));
+        }
+        return ways(number, coins);
     }
 
-    private static int sq(final int number) {
-        return (int) Math.pow(number, 2);
-    }
-
-    private static int sqrt(final int number) {
-        return (int) Math.pow(number, 1.0 / 2);
-    }
-
-    private static int ways(final int number, final List<Integer> elements) {
-        if (hasDuplicates(elements)) {
-            return 0;
-        } else if (number == 0) {
+    private static long ways(final long number, final List<Long> coins) {
+        if (number == 0) {
             return 1;
+        } else if (number < 0 || coins.isEmpty()) {
+            return 0;
         } else {
-            final int m = sqrt(number);
-            return ways(number - sq(m), concat(elements, m)) + ways(number - sq(m - 1), concat(elements, m - 1));
+            return ways(number - head(coins), tail(coins)) + ways(number, tail(coins));
         }
     }
 
-    private static List<Integer> concat(final List<Integer> elements, final int m) {
-        final List<Integer> result = new ArrayList<>(elements);
-        result.add(m);
-        return result;
+    private static long sqrt(final long number) {
+        return (long) Math.pow(number, 1.0 / 2);
     }
 
-    private static boolean hasDuplicates(final List<Integer> list) {
-        return new HashSet<>(list).size() < list.size();
+    private static long sq(final long number) {
+        return (long) Math.pow(number, 2);
+    }
+
+    private static long head(final List<Long> list) {
+        return list.get(0);
+    }
+
+    private static List<Long> tail(final List<Long> list) {
+        return list.subList(1, list.size());
     }
 }
