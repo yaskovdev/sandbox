@@ -2,20 +2,24 @@ package recursion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
+/**
+ * https://www.hackerrank.com/challenges/the-power-sum/problem
+ */
 public class ThePowerSum {
 
     public static void main(final String[] args) {
-//        final Scanner scanner = new Scanner(System.in);
-//        final int number = scanner.nextInt();
-//        final int power = scanner.nextInt();
-        System.out.println(solve(100, 0));
+        final Scanner scanner = new Scanner(System.in);
+        final int number = scanner.nextInt();
+        final int power = scanner.nextInt();
+        System.out.println(solve(number, power));
     }
 
     private static long solve(final long number, final long power) {
         final List<Long> coins = new ArrayList<>();
-        for (int i = 1; i <= sqrt(number); i++) {
-            coins.add(sq(i));
+        for (int i = 1; i <= root(number, power); i++) {
+            coins.add(pow(i, power));
         }
         return ways(number, coins);
     }
@@ -30,12 +34,12 @@ public class ThePowerSum {
         }
     }
 
-    private static long sqrt(final long number) {
-        return (long) Math.pow(number, 1.0 / 2);
+    private static long root(final long number, final long power) {
+        return (long) Math.pow(number, 1.0 / power);
     }
 
-    private static long sq(final long number) {
-        return (long) Math.pow(number, 2);
+    private static long pow(final long number, final long power) {
+        return (long) Math.pow(number, power);
     }
 
     private static long head(final List<Long> list) {
