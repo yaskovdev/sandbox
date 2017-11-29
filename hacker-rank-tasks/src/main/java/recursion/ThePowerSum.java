@@ -10,25 +10,23 @@ public class ThePowerSum {
 //        final Scanner scanner = new Scanner(System.in);
 //        final int number = scanner.nextInt();
 //        final int power = scanner.nextInt();
-        System.out.println(solve(10, Collections.<Integer>emptyList()));
+        System.out.println(solve(100, Collections.<Integer>emptyList()));
     }
 
     private static int solve(final int number, final int power) {
-        return squrt(number);
+        return sqrt(number);
     }
 
-    private static int squrt(final int number) {
+    private static int sqrt(final int number) {
         return (int) Math.pow(number, 1.0 / 2);
     }
 
-    private static boolean solve(final int number, final List<Integer> elements) {
-        if (number == 0) {
-            return true;
-        } else if (number == 1) {
-            return !elements.contains(number);
+    private static int solve(final int number, final List<Integer> elements) {
+        if (number == 0 || number == 1) {
+            return 1;
         } else {
-            final int m = squrt(number);
-            return solve(number - (int) Math.pow(m, 2), concat(elements, m));
+            final int m = sqrt(number);
+            return elements.contains(m) ? 0 : solve(number - (int) Math.pow(m, 2), concat(elements, m));
         }
     }
 
