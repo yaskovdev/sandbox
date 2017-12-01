@@ -30,7 +30,7 @@ public class BaseAtlassian {
     }
 
     private static Map<Long, Character> map() {
-        final HashMap<Long, Character> map = new HashMap<>();
+        final Map<Long, Character> map = new HashMap<>();
         map.put(0L, '0');
         map.put(1L, 'a');
         map.put(2L, 't');
