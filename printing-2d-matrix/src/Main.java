@@ -1,5 +1,8 @@
 import java.util.Scanner;
 
+/**
+ * Answer to the https://stackoverflow.com/questions/47132064/printing-2d-matrix-in-a-given-format question.
+ */
 public class Main {
 
     public static void main(final String[] args) {
@@ -38,7 +41,7 @@ public class Main {
     private static void print(final int[][] matrix) {
         for (final int[] row : matrix) {
             for (final int val : row) {
-                System.out.printf("%-3d", val);
+                System.out.printf("%-5d", val);
             }
             System.out.println();
         }
