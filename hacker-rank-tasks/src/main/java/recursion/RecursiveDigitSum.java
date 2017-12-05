@@ -17,24 +17,19 @@ public class RecursiveDigitSum {
     }
 
     private static int superDigit(final String n, final int k) {
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < k; i++) {
-            builder.append(n);
-        }
-        final String number = builder.toString();
-        return Integer.parseInt(superDigit(number));
+        return Integer.parseInt(superDigit("" + sumOfDigits(n) * k));
     }
 
     private static String superDigit(final String number) {
-        return number.length() == 1 ? number : superDigit(sumOfDigits(number));
+        return number.length() == 1 ? number : superDigit("" + sumOfDigits(number));
     }
 
-    private static String sumOfDigits(final String number) {
-        int result = 0;
+    private static long sumOfDigits(final String number) {
+        long result = 0;
         final char[] chars = number.toCharArray();
         for (final char theChar : chars) {
-            result += Integer.parseInt(Character.toString(theChar));
+            result += Long.parseLong(Character.toString(theChar));
         }
-        return "" + result;
+        return result;
     }
 }
