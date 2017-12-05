@@ -24,13 +24,13 @@ public class ThePowerSum {
         return ways(number, coins);
     }
 
-    private static long ways(final long number, final List<Long> coins) {
+    private static long ways(final long number, final List<Long> numbers) {
         if (number == 0) {
             return 1;
-        } else if (number < 0 || coins.isEmpty()) {
+        } else if (number < 0 || numbers.isEmpty()) {
             return 0;
         } else {
-            return ways(number - head(coins), tail(coins)) + ways(number, tail(coins));
+            return ways(number - head(numbers), tail(numbers)) + ways(number, tail(numbers));
         }
     }
 
