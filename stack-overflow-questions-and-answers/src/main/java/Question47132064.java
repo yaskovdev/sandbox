@@ -1,9 +1,9 @@
 import java.util.Scanner;
 
 /**
- * Answer to the https://stackoverflow.com/questions/47132064/printing-2d-matrix-in-a-given-format question.
+ * https://stackoverflow.com/questions/47132064/printing-2d-matrix-in-a-given-format
  */
-public class Main {
+public class Question47132064 {
 
     public static void main(final String[] args) {
         final Scanner scanner = new Scanner(System.in);
