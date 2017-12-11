@@ -7,6 +7,7 @@
 <input type="text" class="form-control" id="n2">
 <br>
 <button type="button" id="myBtn" class="btn btn-success">Add</button>
-<script type="text/javascript" src="<spring:url value="/resources/js/cloudnet.js"/>"></script>
+<spring:url var="js" value="/resources/js/cloudnet.js"/>
+<script type="text/javascript" src="${js}"></script>
 <%-- <button type="submit" class="btn btn-primary" href="<c:url value="/addItem.jsp"/>">Click</button> --%>
 </div>
