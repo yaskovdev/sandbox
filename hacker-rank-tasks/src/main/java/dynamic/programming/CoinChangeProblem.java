@@ -36,7 +36,7 @@ public class CoinChangeProblem {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final Scanner in = new Scanner(System.in);
         final int amount = in.nextInt();
         final int numberOfCoins = in.nextInt();
