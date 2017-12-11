@@ -8,6 +8,7 @@
 <br>
 <button type="button" id="myBtn" class="btn btn-success">Add</button>
 <spring:url var="js" value="/resources/js/cloudnet.js"/>
+<script>var context = "${pageContext.request.contextPath}"</script>
 <script type="text/javascript" src="${js}"></script>
 <%-- <button type="submit" class="btn btn-primary" href="<c:url value="/addItem.jsp"/>">Click</button> --%>
 </div>
