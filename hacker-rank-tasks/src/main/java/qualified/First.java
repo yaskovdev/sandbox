@@ -41,15 +41,20 @@ public class First {
         assertEquals("8-#-123dskf3  ___ ", testedObject().mask("8-3-123dskf3  ___ "));
     }
 
+    @Test
+    public void test8() {
+        assertEquals("A###-####-####-ABCD", testedObject().mask("A234-2345-3456-ABCD"));
+    }
+
     private static First testedObject() {
         return new First();
     }
 
-    public String mask(final String input) {
-        final int totalNumberOfDigits = totalNumberOfDigits(input);
-        final StringBuilder builder = new StringBuilder(input.length());
+    public String mask(final String creditCardNumber) {
+        final int totalNumberOfDigits = totalNumberOfDigitsIn(creditCardNumber);
+        final StringBuilder builder = new StringBuilder(creditCardNumber.length());
         int digitsPassed = -1;
-        for (final char character : input.toCharArray()) {
+        for (final char character : creditCardNumber.toCharArray()) {
             if (Character.isDigit(character)) {
                 digitsPassed++;
                 final int digitsLeft = totalNumberOfDigits - digitsPassed;
@@ -62,7 +67,7 @@ public class First {
         return builder.toString();
     }
 
-    private static int totalNumberOfDigits(String input) {
+    private static int totalNumberOfDigitsIn(final String input) {
         int totalNumberOfDigits = 0;
         for (final char character : input.toCharArray()) {
             if (Character.isDigit(character)) {
