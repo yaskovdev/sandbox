@@ -38,7 +38,7 @@ public class First {
 
     @Test
     public void test2() {
-        assertEquals("8-3-12#dskf3  ___ ", testedObject().mask("8-3-123dskf3  ___ "));
+        assertEquals("8-#-123dskf3  ___ ", testedObject().mask("8-3-123dskf3  ___ "));
     }
 
     private static First testedObject() {
@@ -46,27 +46,29 @@ public class First {
     }
 
     public String mask(final String input) {
-        int digitsFromBeginningSoFar = 0;
-        char lastDigit = 0;
-        int lastDigitIndex = -1;
+        final int totalNumberOfDigits = totalNumberOfDigits(input);
         final StringBuilder builder = new StringBuilder(input.length());
-        final char[] charArray = input.toCharArray();
-        for (int i = 0; i < charArray.length; i++) {
-            final char character = charArray[i];
+        int digitsPassed = -1;
+        for (final char character : input.toCharArray()) {
             if (Character.isDigit(character)) {
-                digitsFromBeginningSoFar++;
-                lastDigitIndex = i;
-                lastDigit = character;
-                builder.append(digitsFromBeginningSoFar <= 4 ? character : "#");
+                digitsPassed++;
+                final int digitsLeft = totalNumberOfDigits - digitsPassed;
+                builder.append(digitsPassed > 0 && digitsLeft > 4 ? '#' : character);
             } else {
                 builder.append(character);
             }
         }
 
-        if (lastDigitIndex > -1) {
-            builder.setCharAt(lastDigitIndex, lastDigit);
-        }
-
         return builder.toString();
+    }
+
+    private static int totalNumberOfDigits(String input) {
+        int totalNumberOfDigits = 0;
+        for (final char character : input.toCharArray()) {
+            if (Character.isDigit(character)) {
+                totalNumberOfDigits++;
+            }
+        }
+        return totalNumberOfDigits;
     }
 }
