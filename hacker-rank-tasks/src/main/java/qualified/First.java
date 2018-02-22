@@ -27,6 +27,11 @@ public class First {
     }
 
     @Test
+    public void test9() {
+        assertEquals("1#3?45", testedObject().mask("123?45"));
+    }
+
+    @Test
     public void test6() {
         assertEquals("", testedObject().mask(""));
     }
@@ -38,7 +43,7 @@ public class First {
 
     @Test
     public void test2() {
-        assertEquals("8-#-123dskf3  ___ ", testedObject().mask("8-3-123dskf3  ___ "));
+        assertEquals("8-#-###dskf#  ___ ", testedObject().mask("8-3-123dskf3  ___ "));
     }
 
     @Test
@@ -51,29 +56,11 @@ public class First {
     }
 
     public String mask(final String creditCardNumber) {
-        final int totalNumberOfDigits = totalNumberOfDigitsIn(creditCardNumber);
         final StringBuilder builder = new StringBuilder(creditCardNumber.length());
-        int digitsPassed = -1;
-        for (final char character : creditCardNumber.toCharArray()) {
-            if (Character.isDigit(character)) {
-                digitsPassed++;
-                final int digitsLeft = totalNumberOfDigits - digitsPassed;
-                builder.append(digitsPassed > 0 && digitsLeft > 4 ? '#' : character);
-            } else {
-                builder.append(character);
-            }
+        for (int i = 0; i < creditCardNumber.length(); i++) {
+            final char character = creditCardNumber.charAt(i);
+            builder.append(i > 0 && i < creditCardNumber.length() - 4 && Character.isDigit(character) ? '#' : character);
         }
-
         return builder.toString();
-    }
-
-    private static int totalNumberOfDigitsIn(final String input) {
-        int totalNumberOfDigits = 0;
-        for (final char character : input.toCharArray()) {
-            if (Character.isDigit(character)) {
-                totalNumberOfDigits++;
-            }
-        }
-        return totalNumberOfDigits;
     }
 }
