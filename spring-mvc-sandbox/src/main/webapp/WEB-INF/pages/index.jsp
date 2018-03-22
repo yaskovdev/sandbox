@@ -1,14 +1,8 @@
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<br>
-<label for="n1">first number:</label>
-<input type="text" class="form-control" id="n1">
-<label for="n2">second number:</label>
-<input type="text" class="form-control" id="n2">
-<br>
-<button type="button" id="myBtn" class="btn btn-success">Add</button>
-<spring:url var="js" value="/resources/js/cloudnet.js"/>
-<script>var context = "${pageContext.request.contextPath}"</script>
-<script type="text/javascript" src="${js}"></script>
-<%-- <button type="submit" class="btn btn-primary" href="<c:url value="/addItem.jsp"/>">Click</button> --%>
-</div>
+<form:form action="${pageContext.request.contextPath}/insurances" modelAttribute="form" method="post">
+    <fmt:formatDate var="date" value="${form.insuranceStartDate}" pattern="dd.MM.yyyy"/>
+    <form:input path="insuranceStartDate" type="text" value="${date}" required="required"/>
+    <input type="submit" value="Submit">
+</form:form>
