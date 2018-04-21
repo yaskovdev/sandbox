@@ -2,7 +2,7 @@ package com.yaskovdev.sandbox.spring.data;
 
 import com.yaskovdev.sandbox.spring.data.model.Role;
 
-public interface RoleService {
+interface RoleService {
 
     Role createRole(final Role role);
 

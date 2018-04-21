@@ -12,12 +12,12 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.Collections.emptySet;
 
 @Service
-public class RoleServiceImpl implements RoleService {
+class RoleServiceImpl implements RoleService {
 
     private final RoleRepository repository;
 
     @Autowired
-    public RoleServiceImpl(final RoleRepository repository) {
+    RoleServiceImpl(final RoleRepository repository) {
         this.repository = repository;
     }
 
