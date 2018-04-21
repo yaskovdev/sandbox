@@ -44,7 +44,7 @@ public class Privilege {
     }
 
     @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id")
     @JsonIgnore
     public Role getRole() {
         return role;

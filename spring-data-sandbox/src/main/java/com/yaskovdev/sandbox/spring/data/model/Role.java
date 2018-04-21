@@ -42,7 +42,7 @@ public class Role {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     public Set<Privilege> getPrivileges() {
         return privileges;
     }
