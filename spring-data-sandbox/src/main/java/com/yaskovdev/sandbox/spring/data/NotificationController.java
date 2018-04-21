@@ -19,6 +19,7 @@ class NotificationController {
 
     @PostMapping("/roles")
     Role createRole(@RequestBody final Role role) {
+        restoreManyToOneMapping(role);
         return repository.save(role);
     }
 
@@ -27,6 +28,11 @@ class NotificationController {
         final Role existing = repository.findOneByCode(code);
         existing.setName(role.getName());
         existing.setPrivileges(role.getPrivileges());
+        restoreManyToOneMapping(role);
         return repository.save(existing);
+    }
+
+    private static void restoreManyToOneMapping(final Role role) {
+        role.getPrivileges().forEach(p -> p.setRole(role));
     }
 }

@@ -1,5 +1,7 @@
 package com.yaskovdev.sandbox.spring.data.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -42,7 +44,8 @@ public class Privilege {
     }
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", nullable = false)
+    @JsonIgnore
     public Role getRole() {
         return role;
     }
