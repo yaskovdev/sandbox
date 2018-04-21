@@ -12,16 +12,9 @@ import java.util.Set;
 public class Role {
 
     private Integer id;
+    private String code;
     private String name;
     private Set<Privilege> privileges;
-
-    public Role() {
-
-    }
-
-    public Role(String name) {
-        this.name = name;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,6 +24,14 @@ public class Role {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(final String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -53,8 +54,8 @@ public class Role {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(String.format(
-                "Category[id=%d, name='%s']%n",
-                id, name));
+                "Role[id=%d, code='%s', name='%s']%n",
+                id, code, name));
         if (privileges != null) {
             for (Privilege privilege : privileges) {
                 result.append(String.format(

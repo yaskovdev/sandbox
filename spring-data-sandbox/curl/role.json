@@ -1,11 +1,12 @@
 {
-  "name": "New Name",
+  "name": "Old Name",
+  "code": "CODE",
   "privileges": [
     {
-      "name": "STILL_MONEY"
+      "name": "MAKE_MONEY"
     },
     {
-      "name": "KILL_PEOPLE"
+      "name": "RESPECT_PEOPLE"
     }
   ]
 }

@@ -17,9 +17,14 @@ class NotificationController {
         this.repository = repository;
     }
 
-    @PostMapping("/roles/{id}")
-    Role updateRole(@PathVariable("id") final Integer id, @RequestBody final Role role) {
-        final Role existing = repository.getOne(id);
+    @PostMapping("/roles")
+    Role createRole(@RequestBody final Role role) {
+        return repository.save(role);
+    }
+
+    @PostMapping("/roles/{code}")
+    Role updateRole(@PathVariable("code") final String code, @RequestBody final Role role) {
+        final Role existing = repository.findOneByCode(code);
         existing.setName(role.getName());
         existing.setPrivileges(role.getPrivileges());
         return repository.save(existing);

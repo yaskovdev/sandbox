@@ -11,21 +11,9 @@ import javax.persistence.ManyToOne;
 public class Privilege {
 
     private Integer id;
+    private String code;
     private String name;
     private Role role;
-
-    public Privilege() {
-
-    }
-
-    public Privilege(String name) {
-        this.name = name;
-    }
-
-    public Privilege(String name, Role role) {
-        this.name = name;
-        this.role = role;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,6 +23,14 @@ public class Privilege {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(final String code) {
+        this.code = code;
     }
 
     public String getName() {
