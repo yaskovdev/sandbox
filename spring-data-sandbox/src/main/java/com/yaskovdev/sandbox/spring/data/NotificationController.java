@@ -1,38 +1,27 @@
 package com.yaskovdev.sandbox.spring.data;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.yaskovdev.sandbox.spring.data.model.Role;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 
-import java.util.Map;
-
-@Controller
+@RestController
 @SessionAttributes("message")
 class NotificationController {
 
-    @GetMapping("/")
-    String index(final Map<String, Object> model) {
-        model.put("message", "Some Message");
-        return "index";
+    private final RoleRepository repository;
+
+    NotificationController(final RoleRepository repository) {
+        this.repository = repository;
     }
 
-    @GetMapping("/summary")
-    String requestHandlingMethod() {
-        return "summary";
-    }
-
-    @PostMapping("/notifications")
-    @ResponseBody
-    void performLongRunningOperation() throws InterruptedException {
-        Thread.sleep(5000);
-    }
-
-    @PostMapping("/cancel")
-    @ResponseBody
-    void cancel(final SessionStatus sessionStatus) {
-        sessionStatus.setComplete();
+    @PostMapping("/roles/{id}")
+    Role updateRole(@PathVariable("id") final Integer id, @RequestBody final Role role) {
+        final Role existing = repository.getOne(id);
+        existing.setName(role.getName());
+        existing.setPrivileges(role.getPrivileges());
+        return repository.save(existing);
     }
 }

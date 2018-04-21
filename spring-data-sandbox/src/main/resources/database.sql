@@ -9,6 +9,9 @@ CREATE TABLE privilege (
   name    VARCHAR(40)
 );
 
-INSERT INTO role VALUES (2000, 'ROLE_ADMIN');
-INSERT INTO privilege VALUES (5000, 2000, 'PRIVILEGE_CREATE_USER');
-INSERT INTO privilege VALUES (5001, 2000, 'PRIVILEGE_DELETE_USER');
+delete from privilege;
+delete from role;
+
+INSERT INTO role (id, name) VALUES (2000, 'ROLE_ADMIN');
+INSERT INTO privilege (id, role_id, name) VALUES (5000, 2000, 'PRIVILEGE_CREATE_USER');
+INSERT INTO privilege (id, role_id, name) VALUES (5001, 2000, 'PRIVILEGE_DELETE_USER');

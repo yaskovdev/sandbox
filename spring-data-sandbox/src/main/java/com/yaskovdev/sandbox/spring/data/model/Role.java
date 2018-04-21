@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 public class Role {
 
-    private int id;
+    private Integer id;
     private String name;
     private Set<Privilege> privileges;
 
@@ -25,11 +25,11 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

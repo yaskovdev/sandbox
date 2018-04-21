@@ -1,0 +1,11 @@
+{
+  "name": "New Name",
+  "privileges": [
+    {
+      "name": "STILL_MONEY"
+    },
+    {
+      "name": "KILL_PEOPLE"
+    }
+  ]
+}
