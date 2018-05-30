@@ -1,0 +1,12 @@
+{
+  "name": "Old Name",
+  "code": "CODE",
+  "privileges": [
+    {
+      "name": "MAKE_MONEY"
+    },
+    {
+      "name": "RESPECT_PEOPLE"
+    }
+  ]
+}
