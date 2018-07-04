@@ -2,13 +2,13 @@ package days14.bitwise;
 
 import days14.Node;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class GetBit {
 
     public static void main(String[] args) {
-        final List<Node> nodes = Collections.emptyList();
+        final Collection<Node> nodes = Collections.emptyList();
         for (Node node : nodes) {
             process(node);
         }
