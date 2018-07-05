@@ -7,6 +7,9 @@ import java.util.Arrays;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * 1.1 (page 90)
+ */
 public class HasAllUnique {
 
     @Test
