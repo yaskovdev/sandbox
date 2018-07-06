@@ -32,6 +32,11 @@ public class HasAllUnique {
         assertFalse(hasAllUnique("ЫЫ"));
     }
 
+    @Test
+    public void test5() {
+        assertFalse(hasAllUnique("abdefb"));
+    }
+
     private static boolean hasAllUnique(final String s) {
         final char[] chars = s.toCharArray();
         Arrays.sort(chars);
