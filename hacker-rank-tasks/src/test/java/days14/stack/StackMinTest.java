@@ -13,6 +13,8 @@ public class StackMinTest {
         stack.push(5);
         stack.push(-100);
         stack.push(9);
-        assertEquals(-100, stack.min());
+        stack.pop();
+        stack.pop();
+        assertEquals(3, stack.min());
     }
 }
