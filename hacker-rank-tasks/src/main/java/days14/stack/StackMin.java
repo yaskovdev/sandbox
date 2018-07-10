@@ -3,16 +3,14 @@ package days14.stack;
 /**
  * 3.2
  */
-public class StackMin<T> {
+public class StackMin {
 
     private final int[] elements = new int[100];
     private int index = 0;
-    private int min = Integer.MAX_VALUE;
 
     public void push(int value) {
         elements[index] = value;
         index++;
-        min = Math.min(min, value);
     }
 
     public int pop() {
@@ -25,6 +23,10 @@ public class StackMin<T> {
     }
 
     public int min() {
-        return min;
+        int candidate = Integer.MAX_VALUE;
+        for (int i = 0; i < index; i++) {
+            candidate = Math.min(candidate, elements[i]);
+        }
+        return candidate;
     }
 }
