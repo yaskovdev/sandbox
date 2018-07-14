@@ -1,21 +1,22 @@
-package days14;
+package days14.string;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * 1.3
+ * 1.3 (page 90)
  */
 public class Urlify {
 
     @Test
     public void test0() {
-        Assert.assertEquals("Mr%20John%20Smith", urlify("Mr John Smith    ", 13));
+        assertEquals("Mr%20John%20Smith", urlify("Mr John Smith    ", 13));
     }
 
     @Test
     public void test1() {
-        Assert.assertEquals("ab%20c%20", urlify("ab c     ", 5));
+        assertEquals("ab%20c%20", urlify("ab c     ", 5));
     }
 
     private String urlify(String string, int length) {
