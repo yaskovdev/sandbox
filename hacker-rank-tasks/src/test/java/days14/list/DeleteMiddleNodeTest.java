@@ -10,7 +10,7 @@ public class DeleteMiddleNodeTest {
     public void test1() {
         final Node node = new Node(3, new Node(4, new Node(5, null)));
         final Node list = new Node(1, new Node(2, node));
-        new DeleteMiddleNode().delete(list, node);
+        new DeleteMiddleNode().delete(node);
         assertEquals("[1, 2, 4, 5]", new TextOf(list).toString());
     }
 }

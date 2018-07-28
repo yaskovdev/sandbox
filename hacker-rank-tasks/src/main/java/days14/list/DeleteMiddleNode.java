@@ -5,11 +5,8 @@ package days14.list;
  */
 public class DeleteMiddleNode {
 
-    public void delete(final Node list, final Node node) {
-        Node p = list;
-        while (p.next != node) {
-            p = p.next;
-        }
-        p.next = node.next;
+    public void delete(final Node node) {
+        node.data = node.next.data;
+        node.next = node.next.next;
     }
 }
