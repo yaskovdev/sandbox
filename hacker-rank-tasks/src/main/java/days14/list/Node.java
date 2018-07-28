@@ -12,6 +12,6 @@ class Node {
 
     @Override
     public String toString() {
-        return data + "";
+        return "" + data;
     }
 }
