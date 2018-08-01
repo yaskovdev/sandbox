@@ -18,7 +18,7 @@ class RoleChangedService {
 
 	@Transactional
 	public void onRoleChanged(final String code) {
-		Role resource = roleRepository.findOneByCode(code);
+		Role resource = roleRepository.findOneAndLockByCode(code);
 		resource.setName(null);
 		roleRepository.saveAndFlush(resource);
 	}
