@@ -8,12 +8,12 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 @SpringBootApplication
 public class SpringDataSandboxApplication extends SpringBootServletInitializer {
 
-    @Override
-    protected SpringApplicationBuilder configure(final SpringApplicationBuilder application) {
-        return application.sources(SpringDataSandboxApplication.class);
-    }
+	@Override
+	protected SpringApplicationBuilder configure(final SpringApplicationBuilder application) {
+		return application.sources(SpringDataSandboxApplication.class);
+	}
 
-    public static void main(final String[] args) throws Exception {
-        SpringApplication.run(SpringDataSandboxApplication.class, args);
-    }
+	public static void main(final String[] args) {
+		SpringApplication.run(SpringDataSandboxApplication.class, args);
+	}
 }
