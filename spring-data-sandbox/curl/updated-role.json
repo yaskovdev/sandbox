@@ -2,7 +2,12 @@
   "name": "New Name",
   "privileges": [
     {
-      "name": "STILL_MONEY"
+      "code": "MAKE_MONEY",
+      "name": "MAKE_MONEY"
+    },
+    {
+      "code": "STEAL_MONEY",
+      "name": "STEAL_MONEY"
     }
   ]
 }

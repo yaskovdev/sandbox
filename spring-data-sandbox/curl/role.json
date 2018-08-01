@@ -3,9 +3,11 @@
   "code": "CODE",
   "privileges": [
     {
+      "code": "MAKE_MONEY",
       "name": "MAKE_MONEY"
     },
     {
+      "code": "RESPECT_PEOPLE",
       "name": "RESPECT_PEOPLE"
     }
   ]

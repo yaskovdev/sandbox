@@ -1,0 +1,1 @@
+This package contains solutions of problems from [this tutorial](https://www.hackerrank.com/domains/tutorials/cracking-the-coding-interview). 
