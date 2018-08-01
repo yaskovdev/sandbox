@@ -10,7 +10,7 @@ import com.yaskovdev.sandbox.spring.transaction.model.Role;
 
 interface RoleRepository extends JpaRepository<Role, Integer> {
 
-	@Transactional
+	@Transactional(readOnly = true)
 	Role findOneByCode(final String code);
 
 	@Lock(PESSIMISTIC_WRITE)
