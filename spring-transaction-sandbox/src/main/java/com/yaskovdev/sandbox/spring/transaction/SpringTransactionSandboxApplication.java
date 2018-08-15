@@ -6,14 +6,14 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class SpringDataSandboxApplication extends SpringBootServletInitializer {
+public class SpringTransactionSandboxApplication extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(final SpringApplicationBuilder application) {
-		return application.sources(SpringDataSandboxApplication.class);
+		return application.sources(SpringTransactionSandboxApplication.class);
 	}
 
 	public static void main(final String[] args) {
-		SpringApplication.run(SpringDataSandboxApplication.class, args);
+		SpringApplication.run(SpringTransactionSandboxApplication.class, args);
 	}
 }
