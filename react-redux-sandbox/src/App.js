@@ -1,21 +1,28 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import './App.css'
+import {bindActionCreators} from "redux"
+import {connect} from "react-redux"
+import {loginAction} from "./actions/userActions"
 
-class App extends Component {
-  render() {
+const App = (props) => {
+    const {user, login} = props
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+        <div className="App">
+            Logged in: {user.loggedIn ? 'true' : 'false'}
+            <input type={'button'} onClick={() => login(user)} value={'Login'}/>
+        </div>
+    )
 }
 
-export default App;
+const mapStateToProps = state => ({
+    user: state.user.user
+})
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+    login: (user) => dispatch => {
+        dispatch(loginAction())
+        console.log('user.loggedIn after loginAction dispatching is', user.loggedIn)
+    }
+}, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
