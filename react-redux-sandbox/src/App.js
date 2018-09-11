@@ -19,7 +19,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => bindActionCreators({
-    login: (user) => dispatch => {
+    login: user => dispatch => {
         dispatch(loginAction())
         console.log('user.loggedIn after loginAction dispatching is', user.loggedIn)
     }
