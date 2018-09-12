@@ -6,10 +6,19 @@ public class EditDistance {
         if (first.length() == second.length()) {
             return differInExactlyOneCharacter(first, second);
         } else if (Math.abs(first.length() - second.length()) == 1) {
-            return first.contains(second) || second.contains(first);
+            return first.length() > second.length() ? substring(first, second) : substring(second, first);
         } else {
             return false;
         }
+    }
+
+    private boolean substring(final String longer, final String shorter) {
+        for (char character : shorter.toCharArray()) {
+            if (!longer.contains(character + "")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean differInExactlyOneCharacter(final String first, final String second) {
