@@ -23,4 +23,9 @@ public class Problem301Test {
     public void test4() {
         System.out.println(new Problem301().removeInvalidParentheses("))(p(((())"));
     }
+
+    @Test
+    public void test5() {
+        System.out.println(new Problem301().removeInvalidParentheses("()(((((((()"));
+    }
 }

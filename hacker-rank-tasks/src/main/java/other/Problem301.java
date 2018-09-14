@@ -2,43 +2,46 @@ package other;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-public class Problem301 {
+class Problem301 {
 
-    private final Set<String> solutions = new TreeSet<>((first, second) -> {
-        final int difference = second.length() - first.length();
-        return difference == 0 ? first.compareTo(second) : difference;
-    });
-
-    List<String> removeInvalidParentheses(String s) {
-        solve(s);
-        final int length = solutions.iterator().next().length();
-        return solutions.stream().filter(solution -> solution.length() == length).collect(Collectors.toList());
-    }
-
-    private void solve(String input) {
-        if (isValid(input)) {
-            solutions.add(input);
-        } else {
-            final List<String> candidates = withoutOne(input);
-            for (final String s : candidates) {
-                solve(s);
+    List<String> removeInvalidParentheses(String input) {
+        final Set<String> visited = new HashSet<>();
+        final Set<String> solutions = new HashSet<>();
+        final Queue<String> queue = new LinkedList<>();
+        queue.add(input);
+        visited.add(input);
+        while (!queue.isEmpty()) {
+            final String candidate = queue.remove();
+            if (isValid(candidate)) {
+                solutions.add(candidate);
+            } else if (solutions.isEmpty()) {
+                for (String c : withoutOneBracket(candidate)) {
+                    if (!visited.contains(c)) {
+                        queue.add(c);
+                        visited.add(c);
+                    }
+                }
             }
         }
+        return new ArrayList<>(solutions);
     }
 
-    private static List<String> withoutOne(String input) {
+    private static List<String> withoutOneBracket(String input) {
         if (input.isEmpty()) {
             return Collections.emptyList();
         } else {
             final List<String> outputs = new ArrayList<>();
             for (int i = 0; i < input.length(); i++) {
-                outputs.add(input.substring(0, i) + input.substring(i + 1));
+                if (input.charAt(i) == '(' || input.charAt(i) == ')') {
+                    outputs.add(input.substring(0, i) + input.substring(i + 1));
+                }
             }
             return outputs;
         }
