@@ -8,6 +8,31 @@ import static org.junit.Assert.assertTrue;
 public class Problem10Test {
 
     @Test
+    public void test8() {
+        assertTrue(new Problem10().isMatch("mississippi", "mississippi"));
+    }
+
+    @Test
+    public void test9() {
+        assertFalse(new Problem10().isMatch("mississippi", "messesseppe"));
+    }
+
+    @Test
+    public void test10() {
+        assertFalse(new Problem10().isMatch("missis", "mississ"));
+    }
+
+    @Test
+    public void test11() {
+        assertFalse(new Problem10().isMatch("mississ", "missis"));
+    }
+
+    @Test
+    public void test12() {
+        assertTrue(new Problem10().isMatch("mississippi", "m.ssissi..i"));
+    }
+
+    @Test
     public void test1() {
         assertFalse(new Problem10().isMatch("mississippi", "mis*is*p*."));
     }
@@ -40,5 +65,20 @@ public class Problem10Test {
     @Test
     public void test7() {
         assertTrue(new Problem10().isMatch("aaa", "a*a"));
+    }
+
+    @Test
+    public void test13() {
+        assertTrue(new Problem10().isMatch("aaab", "a*b"));
+    }
+
+    @Test
+    public void test14() {
+        assertFalse(new Problem10().isMatch("", "c*ab"));
+    }
+
+    @Test
+    public void test15() {
+        assertFalse(new Problem10().isMatch("acaabbaccbbacaabbbb", "a*.*b*.*a*aa*a*"));
     }
 }
