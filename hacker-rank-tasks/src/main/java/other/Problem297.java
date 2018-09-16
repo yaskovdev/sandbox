@@ -5,6 +5,9 @@ public class Problem297 {
     int index = 0;
 
     String serialize(TreeNode n) {
+        if (n == null) {
+            return "null";
+        }
         final StringBuilder builder = new StringBuilder();
         builder.append("(")
                 .append(n.val)
@@ -40,11 +43,16 @@ public class Problem297 {
     }
 
     private int deserializeValue(String string) {
+        int k = 1;
+        if (string.charAt(index) == '-') {
+            k = -1;
+            index++;
+        }
         StringBuilder result = new StringBuilder();
         while (Character.isDigit(string.charAt(index))) {
             result.append(string.charAt(index));
             index++;
         }
-        return Integer.parseInt(result.toString());
+        return k * Integer.parseInt(result.toString());
     }
 }

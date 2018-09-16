@@ -2,6 +2,7 @@ package other;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -19,5 +20,11 @@ public class Problem438Test {
     public void test2() {
         final List<Integer> indexes = new Problem438().findAnagrams("abab", "ab");
         assertEquals(asList(0, 1, 2), indexes);
+    }
+
+    @Test
+    public void test3() {
+        final List<Integer> indexes = new Problem438().findAnagrams("", "a");
+        assertEquals(Collections.emptyList(), indexes);
     }
 }
