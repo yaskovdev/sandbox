@@ -31,4 +31,9 @@ public class Problem680Test {
     public void test5() {
         assertFalse(new Problem680().validPalindrome("abc"));
     }
+
+    @Test
+    public void test6() {
+        assertTrue(new Problem680().validPalindrome("ccd"));
+    }
 }
