@@ -1,11 +1,10 @@
 package other;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Queue;
 
 class Problem56 {
 
@@ -40,37 +39,28 @@ class Problem56 {
     }
 
     List<Interval> merge(List<Interval> input) {
-        if (input.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Set<IntervalWithEquals> intervals = new HashSet<>();
+        List<Interval> output = new ArrayList<>();
+        Queue<Integer> events = new LinkedList<>();
         for (Interval interval : input) {
-            intervals.add(new IntervalWithEquals(interval.start, interval.end));
+            events.add(interval.start);
+            events.add(interval.end);
         }
-        while (true) {
-            Set<IntervalWithEquals> intermediate = new HashSet<>();
-            int before = intervals.size();
-            for (IntervalWithEquals interval : intervals) {
-                Set<IntervalWithEquals> overlapping = intersect(intervals, interval);
-                IntervalWithEquals merged = merge(overlapping);
-                intermediate.add(merged);
+        while (!events.isEmpty()) {
+            final Integer event = events.remove();
+            final List<Interval> overlapping = intersect(output, event);
+            if (overlapping.size() > 1) {
+                final Interval merge = mergeOverlapping(overlapping);
+                events.add(merge.start);
+                events.add(merge.end);
             }
-            intervals = intermediate;
-            if (intervals.size() == before) {
-                break;
-            }
-        }
-        List<Interval> output = new ArrayList<>(intervals.size());
-        for (IntervalWithEquals interval : intervals) {
-            output.add(new Interval(interval.start, interval.end));
         }
         return output;
     }
 
-    private IntervalWithEquals merge(Set<IntervalWithEquals> overlapping) {
+    private Interval mergeOverlapping(List<Interval> overlapping) {
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
-        for (IntervalWithEquals interval : overlapping) {
+        for (Interval interval : overlapping) {
             if (interval.start < min) {
                 min = interval.start;
             }
@@ -78,16 +68,13 @@ class Problem56 {
                 max = interval.end;
             }
         }
-        return new IntervalWithEquals(min, max);
+        return new Interval(min, max);
     }
 
-    private Set<IntervalWithEquals> intersect(Set<IntervalWithEquals> intervals, IntervalWithEquals interval) {
-        Set<IntervalWithEquals> intersect = new HashSet<>();
-        for (IntervalWithEquals candidate : intervals) {
-            if (candidate.start <= interval.start && candidate.end >= interval.start
-                    || candidate.start <= interval.end && candidate.end >= interval.end
-                    || candidate.start >= interval.start && candidate.end <= interval.end
-                    || candidate.start <= interval.start && candidate.end >= interval.end) {
+    private List<Interval> intersect(List<Interval> intervals, int event) {
+        List<Interval> intersect = new ArrayList<>();
+        for (Interval candidate : intervals) {
+            if (candidate.start <= event && candidate.end >= event) {
                 intersect.add(candidate);
             }
         }
