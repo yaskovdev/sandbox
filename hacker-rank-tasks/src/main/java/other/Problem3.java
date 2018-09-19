@@ -6,26 +6,23 @@ import java.util.Set;
 class Problem3 {
 
     int lengthOfLongestSubstring(String s) {
-        String result = "";
-        for (int i = 0; i < s.length(); i++) {
-            for (int j = i; j < s.length(); j++) {
-                final String candidate = s.substring(i, j + 1);
-                if (hasNoRepeatingCharacters(candidate)) {
-                    if (candidate.length() > result.length()) {
-                        result = candidate;
-                    }
-                }
+        int i = 0;
+        int j = 0;
+        int record = 0;
+        final Set<Character> buffer = new HashSet<>();
+        while (true) {
+            while (j < s.length() && !buffer.contains(s.charAt(j))) {
+                buffer.add(s.charAt(j));
+                j++;
+            }
+            record = Math.max(record, j - i);
+            if (j == s.length()) {
+                return record;
+            }
+            while (buffer.contains(s.charAt(j))) {
+                buffer.remove(s.charAt(i));
+                i++;
             }
         }
-        return result.length();
-    }
-
-    private boolean hasNoRepeatingCharacters(final String string) {
-        final Set<Character> set = new HashSet<>();
-        final char[] array = string.toCharArray();
-        for (final char c : array) {
-            set.add(c);
-        }
-        return set.size() == array.length;
     }
 }
