@@ -2,7 +2,7 @@ package other;
 
 class Problem277 extends Relation {
 
-    int findCelebrity(int n) {
+    public int findCelebrity(int n) {
         final boolean[][] matrix = new boolean[n][n];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) {
