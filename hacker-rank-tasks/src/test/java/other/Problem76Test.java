@@ -21,4 +21,9 @@ public class Problem76Test {
         assertEquals("", new Problem76().minWindow("ab", "A"));
     }
 
+    @Test
+    public void test4() {
+        assertEquals("ba", new Problem76().minWindow("acbab", "ab"));
+    }
+
 }
