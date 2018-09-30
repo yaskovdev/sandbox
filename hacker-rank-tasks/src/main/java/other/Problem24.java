@@ -8,16 +8,25 @@ class Problem24 {
         } else {
             ListNode p = head;
             ListNode q = head.next;
-            ListNode newHead = q;
 
-            while (q != null) {
-                p.next = q.next;
+            if (q.next == null) {
+                p.next = null;
                 q.next = p;
-                p = p.next;
-                if (p == null) {
-                    break;
-                }
+                return q;
+            }
+
+            ListNode newHead = q;
+            while (q != null && q.next != null) {
+                p.next = q.next.next == null ? q.next : q.next.next;
+                ListNode t = q.next;
+                q.next = p;
+                p = t;
                 q = p.next;
+            }
+
+            if (q != null) {
+                p.next = null;
+                q.next = p;
             }
 
             return newHead;
