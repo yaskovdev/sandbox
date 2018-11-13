@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript Error Handling</title>
+</head>
+<body>
+
+<script>
+	window.onerror = function (message, file, line, column, error) {
+		console.log(error.stack);
+	};
+
+	const run = () => {
+        const value = null;
+
+        if (value.exists) {
+            console.log(exists);
+        }
+    };
+
+	run();
+</script>
+</body>
+</html>
