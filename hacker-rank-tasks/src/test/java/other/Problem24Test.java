@@ -17,4 +17,10 @@ public class Problem24Test {
         final ListNode head = new Problem24().swapPairs(node(1, node(2, node(3, null))));
         System.out.println(head);
     }
+
+    @Test
+    public void test3() {
+        final ListNode head = new Problem24().swapPairs(node(1, node(2, null)));
+        System.out.println(head);
+    }
 }
