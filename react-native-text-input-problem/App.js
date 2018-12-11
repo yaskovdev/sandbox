@@ -8,7 +8,7 @@ export default class App extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <TextInput style={{borderColor: '#000'}} value={this.state.value} onChangeText={value => this.setState({value})}/>
+                <TextInput value={this.state.value} onChangeText={value => this.setState({value})}/>
             </View>
         );
     }
