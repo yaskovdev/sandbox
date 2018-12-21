@@ -23,25 +23,27 @@ class Problem42 {
 	}
 
 	private static int countHolesAtLevel(final int[] elevation, final int level) {
-		int result = 0;
-		int count = 0;
-
-		boolean hole = false;
-
-		for (final Integer height : elevation) {
-			if (height >= level) {
-				if (hole) {
-					hole = false;
-					result += count;
-					count = 0;
-				} else {
-					hole = true;
-				}
-			} else if (hole) {
-				count++;
+		int i;
+		for (i = 0; i < elevation.length; i++) {
+			if (elevation[i] >= level) {
+				break;
 			}
 		}
 
-		return result;
+		int j;
+		for (j = elevation.length - 1; j >= 0; j--) {
+			if (elevation[j] >= level) {
+				break;
+			}
+		}
+
+		int count = 0;
+
+		for (int k = i; k <= j; k++) {
+			if (elevation[k] < level) {
+				count++;
+			}
+		}
+		return count;
 	}
 }
