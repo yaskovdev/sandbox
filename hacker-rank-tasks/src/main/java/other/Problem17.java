@@ -15,7 +15,7 @@ class Problem17 {
 		List<String> result = Collections.singletonList("");
 
 		for (final char digit : digits.toCharArray()) {
-			List<String> newResult = new ArrayList<>();
+			final List<String> newResult = new ArrayList<>();
 			for (final String combination : result) {
 				final List<Character> letters = map.get(digit);
 				for (final Character letter : letters) {
