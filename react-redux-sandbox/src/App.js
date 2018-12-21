@@ -20,6 +20,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => bindActionCreators({
     login: user => dispatch => {
+		const value = null
+		if (value.exists) {
+			console.log('value exists')
+		}
         dispatch(loginAction())
         console.log('user.loggedIn after loginAction dispatching is', user.loggedIn)
     }
