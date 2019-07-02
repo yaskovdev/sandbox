@@ -1,6 +1,6 @@
 package com.yaskovdev.sandbox.locked.skip;
 
-import com.yaskovdev.sandbox.locked.skip.model.Role;
+import com.yaskovdev.sandbox.locked.skip.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,24 +8,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-class RoleChangedServiceImpl implements RoleChangedService {
+class TaskChangedServiceImpl implements TaskChangedService {
 
-	private static final Logger logger = LoggerFactory.getLogger(RoleServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
-	private final RoleRepository roleRepository;
+	private final TaskRepository taskRepository;
 
 	@Autowired
-	RoleChangedServiceImpl(final RoleRepository roleRepository) {
-		this.roleRepository = roleRepository;
+	TaskChangedServiceImpl(final TaskRepository taskRepository) {
+		this.taskRepository = taskRepository;
 	}
 
 	@Override
 	@Transactional
 	public void onRoleChanged(final String code) {
 		logger.info("Going to read for the second time");
-		Role resource = roleRepository.findOneAndLockByCode(code);
+		Task resource = taskRepository.findOneAndLockByCode(code);
 		resource.setName(null);
 		logger.info("Going to update");
-		roleRepository.saveAndFlush(resource);
+		taskRepository.saveAndFlush(resource);
 	}
 }

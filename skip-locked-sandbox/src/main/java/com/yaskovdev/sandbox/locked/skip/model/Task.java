@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 
 @Entity
-public class Role {
+public class Task {
 
 	private Integer id;
 	private String code;
@@ -57,7 +57,7 @@ public class Role {
 	@Override
 	public String toString() {
 		return String.format(
-				"Role[id=%d, code='%s', name='%s']%n",
+				"Task[id=%d, code='%s', name='%s']%n",
 				id, code, name);
 	}
 }

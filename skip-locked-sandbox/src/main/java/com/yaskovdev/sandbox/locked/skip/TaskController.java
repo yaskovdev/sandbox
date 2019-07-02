@@ -1,6 +1,6 @@
 package com.yaskovdev.sandbox.locked.skip;
 
-import com.yaskovdev.sandbox.locked.skip.model.Role;
+import com.yaskovdev.sandbox.locked.skip.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,22 +9,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class RoleController {
+class TaskController {
 
-	private final RoleService service;
+	private final TaskService service;
 
 	@Autowired
-	RoleController(final RoleService service) {
+	TaskController(final TaskService service) {
 		this.service = service;
 	}
 
 	@PostMapping("/roles")
-	Role createRole(@RequestBody final Role role) {
-		return service.createRole(role);
+	Task createRole(@RequestBody final Task task) {
+		return service.createRole(task);
 	}
 
 	@GetMapping("/roles/{code}/issue")
-	Role reproduceIssue(@PathVariable("code") final String code) {
+	Task reproduceIssue(@PathVariable("code") final String code) {
 		return service.reproduceIssue(code);
 	}
 }

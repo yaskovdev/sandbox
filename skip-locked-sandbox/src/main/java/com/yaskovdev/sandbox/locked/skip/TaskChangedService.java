@@ -1,6 +1,6 @@
 package com.yaskovdev.sandbox.locked.skip;
 
-public interface RoleChangedService {
+public interface TaskChangedService {
 
 	void onRoleChanged(String code);
 }
