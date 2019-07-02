@@ -4,7 +4,7 @@ import com.yaskovdev.sandbox.locked.skip.model.Task;
 
 interface TaskService {
 
-    Task createRole(Task task);
+    Task createTask(Task task);
 
-    Task reproduceIssue(final String code);
+    Task reproduceIssue();
 }

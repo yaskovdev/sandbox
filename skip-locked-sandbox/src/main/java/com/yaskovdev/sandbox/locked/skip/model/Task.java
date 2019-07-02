@@ -1,63 +1,56 @@
 package com.yaskovdev.sandbox.locked.skip.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yaskovdev.sandbox.locked.skip.TaskStatus;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Version;
+import java.time.LocalDateTime;
+
+import static javax.persistence.EnumType.STRING;
 
 @Entity
 public class Task {
 
-	private Integer id;
-	private String code;
-	private String name;
-	private Long version;
+    private Integer id;
+    private String code;
+    private TaskStatus status;
+    private LocalDateTime created;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public void setCode(final String code) {
-		this.code = code;
-	}
+    public void setCode(final String code) {
+        this.code = code;
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Enumerated(STRING)
+    public TaskStatus getStatus() {
+        return status;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
 
-	@Version
-	@Column(precision = 18, nullable = false)
-	@JsonIgnore
-	public Long getVersion() {
-		return version;
-	}
+    public LocalDateTime getCreated() {
+        return created;
+    }
 
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
-	@Override
-	public String toString() {
-		return String.format(
-				"Task[id=%d, code='%s', name='%s']%n",
-				id, code, name);
-	}
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
 }

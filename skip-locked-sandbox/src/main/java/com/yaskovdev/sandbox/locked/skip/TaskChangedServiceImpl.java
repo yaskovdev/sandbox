@@ -10,22 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class TaskChangedServiceImpl implements TaskChangedService {
 
-	private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
-	private final TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-	@Autowired
-	TaskChangedServiceImpl(final TaskRepository taskRepository) {
-		this.taskRepository = taskRepository;
-	}
+    @Autowired
+    TaskChangedServiceImpl(final TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
-	@Override
-	@Transactional
-	public void onRoleChanged(final String code) {
-		logger.info("Going to read for the second time");
-		Task resource = taskRepository.findOneAndLockByCode(code);
-		resource.setName(null);
-		logger.info("Going to update");
-		taskRepository.saveAndFlush(resource);
-	}
+    @Override
+    @Transactional
+    public Task onRoleChanged() {
+        return taskRepository.findOldestAndLockWithoutQueryDslAndLock();
+    }
 }
