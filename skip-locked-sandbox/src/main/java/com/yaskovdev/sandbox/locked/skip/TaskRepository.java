@@ -5,6 +5,4 @@ import com.yaskovdev.sandbox.locked.skip.model.Task;
 interface TaskRepository {
 
     Task findOldestAndLock();
-
-    Task findOldestAndLockWithoutQueryDslAndLock();
 }

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class TaskChangedServiceImpl implements TaskChangedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskChangedServiceImpl.class);
 
     private final TaskRepository taskRepository;
 
@@ -22,6 +22,7 @@ class TaskChangedServiceImpl implements TaskChangedService {
     @Override
     @Transactional
     public Task onRoleChanged() {
-        return taskRepository.findOldestAndLockWithoutQueryDslAndLock();
+        logger.info("Going to find oldest and lock");
+        return taskRepository.findOldestAndLock();
     }
 }
