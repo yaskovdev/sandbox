@@ -11,7 +11,7 @@ public class Main {
 
 	private final static String TOKEN_2 = "";
 
-	public static void main(final String[] args) throws InterruptedException {
+	public static void main(final String... args) throws InterruptedException {
 		final CloseableHttpClient client = HttpClients.createDefault();
 
 		final User client1 = new User(client, request(TOKEN_1));
