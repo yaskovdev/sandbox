@@ -33,9 +33,7 @@ public class SubmitTaskCommand implements Command {
 	@Override
 	public ExecutionResult execute(final Context context) {
 		System.out.println("Submitting task " + context.getTask());
-
-		final String json = client.execute(request(context.getJwt(), context.getTask()), new SimpleResponseHandler());
-
+		client.execute(request(context.getJwt(), context.getTask()), new SimpleResponseHandler());
 		return CONTINUE;
 	}
 

@@ -11,10 +11,10 @@ import org.apache.http.util.EntityUtils;
 public class SimpleResponseHandler implements ResponseHandler<String> {
 
 	@Override
-	public String handleResponse(HttpResponse response) throws IOException {
+	public String handleResponse(final HttpResponse response) throws IOException {
 		int status = response.getStatusLine().getStatusCode();
 		if (status >= 200 && status < 300) {
-			HttpEntity entity = response.getEntity();
+			final HttpEntity entity = response.getEntity();
 			return entity == null ? null : EntityUtils.toString(entity);
 		} else {
 			throw new ClientProtocolException("unexpected response status: " + status);
