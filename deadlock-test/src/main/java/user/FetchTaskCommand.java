@@ -31,8 +31,8 @@ public class FetchTaskCommand implements Command {
 	@SneakyThrows
 	@Override
 	public ExecutionResult execute(final Context context) {
-		System.out.println("Fetching task");
-		final String json = client.execute(request(context.getJwt()), new SimpleResponseHandler());
+		System.out.println("User " + context.getUsername() + " is fetching task");
+		final String json = client.execute(request(context.getJwt()), new CountingDeadlockResponseHandler(mapper));
 		final Task task = mapper.readValue(json, Task.class);
 
 		if (isNull(task.getId())) {

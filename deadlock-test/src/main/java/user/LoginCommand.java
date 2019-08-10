@@ -43,7 +43,7 @@ public class LoginCommand implements Command {
 		return request;
 	}
 
-	private AuthRequest map(final String username) {
+	private static AuthRequest map(final String username) {
 		return AuthRequest.builder().username(username).password("whatever").build();
 	}
 }

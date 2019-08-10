@@ -32,8 +32,8 @@ public class SubmitTaskCommand implements Command {
 	@SneakyThrows
 	@Override
 	public ExecutionResult execute(final Context context) {
-		System.out.println("Submitting task " + context.getTask());
-		client.execute(request(context.getJwt(), context.getTask()), new SimpleResponseHandler());
+		System.out.println("User " + context.getUsername() + " is submitting task " + context.getTask());
+		client.execute(request(context.getJwt(), context.getTask()), new CountingDeadlockResponseHandler(mapper));
 		return CONTINUE;
 	}
 
