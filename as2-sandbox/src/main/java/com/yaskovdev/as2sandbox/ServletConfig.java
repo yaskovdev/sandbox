@@ -18,7 +18,9 @@ public class ServletConfig {
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean() {
-        final ServletRegistrationBean<AS2ReceiveServlet> bean = new ServletRegistrationBean<>(new AS2ReceiveServlet(), "/as2");
+        final AS2ReceiveServlet servlet = new AS2ReceiveServlet();
+        AS2WebAppListener.staticInit(servlet.getServletContext());
+        final ServletRegistrationBean<AS2ReceiveServlet> bean = new ServletRegistrationBean<>(servlet, "/as2");
         bean.setInitParameters(of("as2-servlet-config-filename", "config/config.xml"));
         return bean;
     }
