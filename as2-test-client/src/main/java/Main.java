@@ -10,12 +10,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 public class Main {
 
-	private static final String HOST = "localhost:8117";
+	private static final String PROTOCOL = "https";
+	private static final String HOST = "test-ins-gw.post.ee";
 
 	@SneakyThrows
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		try (final CloseableHttpClient client = createDefault()) {
-			final HttpPost request = new HttpPost(format("http://%s/pyas2/as2receive", HOST));
+			final HttpPost request = new HttpPost(format("%s://%s/pyas2/as2receive", PROTOCOL, HOST));
 			request.setHeader("Content-type", "application/pkcs7-mime; smime-type=enveloped-data");
 			request.setHeader("Subject", "AS2 Data Message Request");
 			request.setHeader("Message-ID", "<003780288263670635@as2.eu.gxsics.com>");
