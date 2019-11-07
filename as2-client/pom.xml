@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.yaskovdev</groupId>
-	<artifactId>as2-server</artifactId>
+	<artifactId>as2-client</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>as2-server</name>
+	<name>as2-client</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
