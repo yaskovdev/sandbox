@@ -1,3 +1,5 @@
+# Company B, aka Receiver
+
 `openssl req -x509 -newkey rsa:2048 -sha256 -keyout a_private.pem -out a_public.pem -days 365000`
 1. Enter PEM pass phrase: secret
 2. Verifying - Enter PEM pass phrase: secret
