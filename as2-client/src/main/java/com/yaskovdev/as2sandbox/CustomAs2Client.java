@@ -53,10 +53,10 @@ public class CustomAs2Client {
 		return new AS2ClientSettings()
 				.setKeyStore(PKCS12, new File(KEYSTORE_FILE_NAME), KEYSTORE_PASSWORD)
 				.setSenderData(SENDER_ID, SENDER_EMAIL, SENDER_ID)
+				.setReceiverData(RECEIVER_ID, RECEIVER_ID, RECEIVER_URL)
 				.setEncryptAndSign(CRYPT_3DES, DIGEST_SHA_256)
 				.setCompress(ZLIB, COMPRESS_BEFORE_SIGNING)
 				.setMDNOptions(mdnOptions())
-				.setReceiverData(RECEIVER_ID, RECEIVER_ID, RECEIVER_URL)
 				.setPartnershipName(SENDER_ID + "_" + RECEIVER_ID);
 	}
 
