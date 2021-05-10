@@ -24,7 +24,7 @@ namespace AzureHelloWorldVm
             // First of all, we need to create a resource group where we will add all
             // the resources needed for the virtual machine.
             const string resourceGroupName = "AzureHelloWorldResourceGroup";
-            var region = Region.USWest2;
+            var region = Region.EuropeWest;
             Console.WriteLine($"Creating resource group {resourceGroupName}...");
             var resourceGroup = azure.ResourceGroups.Define(resourceGroupName)
                 .WithRegion(region)
@@ -96,11 +96,11 @@ namespace AzureHelloWorldVm
                 .WithRegion(region)
                 .WithExistingResourceGroup(resourceGroup)
                 .WithExistingPrimaryNetworkInterface(networkInterface)
-                .WithLatestWindowsImage("MicrosoftWindowsServer", "WindowsServer", "2012-R2-Datacenter")
+                .WithLatestWindowsImage("MicrosoftWindowsServer", "WindowsServer", "2019-Datacenter-with-Containers")
                 .WithAdminUsername(adminUser)
                 .WithAdminPassword(adminPassword)
                 .WithComputerName(virtualMachineName)
-                .WithSize(VirtualMachineSizeTypes.StandardDS2V2)
+                .WithSize(VirtualMachineSizeTypes.StandardB1s)
                 // .WithExistingAvailabilitySet() TODO
                 .Create();
         }
