@@ -1,0 +1,20 @@
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  name: ckad-pod
+  labels:
+    type: front-end
+
+spec:
+  securityContext:
+    runAsUser: syaskov
+
+  containers:
+    - name: nginx-container
+      image: nginx
+      securityContext:
+        runAsUser: yaskovdev # will override "syaskov"
+        capabilities: # this is only supported on container leve, not on the pod level :(
+          add: [ "MAC_ADMIN" ]

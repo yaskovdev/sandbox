@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.37.1"/>
+        <PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.37.1" />
     </ItemGroup>
 
     <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-        <Copy SourceFiles="azure-auth.properties" DestinationFolder="$(OutDir)"/>
+        <Copy SourceFiles="azure-auth.properties" DestinationFolder="$(OutDir)" />
     </Target>
 
 </Project>

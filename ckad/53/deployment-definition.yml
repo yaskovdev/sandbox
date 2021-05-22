@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: ckad-deployment
+
+spec:
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        type: front-end
+
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+      serviceAccount: jenkins # if you want to use not default sa (default is very limited, it can only query basic k8s API)
+
+  replicas: 2
+
+  selector:
+    matchLabels:
+      type: front-end

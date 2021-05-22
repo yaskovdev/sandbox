@@ -1,0 +1,14 @@
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+  name: ckad-pod
+
+spec:
+  containers:
+    - name: simple-webapp-color
+      image: mmumshad/simple-webapp-color
+      envFrom:
+        - configMapRef:
+            name: ckad-config # inject the config map into container

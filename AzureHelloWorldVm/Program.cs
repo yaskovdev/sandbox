@@ -91,7 +91,7 @@ namespace AzureHelloWorldVm
                     .WithExistingResourceGroup(resourceGroupName)
                     .Create();
 
-                // Any virtual machine need a network interface for connecting to the virtual network.
+                // Any virtual machine needs a network interface for connecting to the virtual network.
                 var networkInterfaceName = "AzureHelloWorldNetworkInterface" + index;
                 Console.WriteLine($"Creating network interface {networkInterfaceName}...");
                 var networkInterface = azure.NetworkInterfaces.Define(networkInterfaceName)
