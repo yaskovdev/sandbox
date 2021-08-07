@@ -88,6 +88,10 @@ ffmpeg_sandbox_EXTERNAL_OBJECTS =
 
 ffmpeg_sandbox: CMakeFiles/ffmpeg_sandbox.dir/main.cpp.o
 ffmpeg_sandbox: CMakeFiles/ffmpeg_sandbox.dir/build.make
+ffmpeg_sandbox: /usr/local/lib/libavcodec.dylib
+ffmpeg_sandbox: /usr/local/lib/libavformat.dylib
+ffmpeg_sandbox: /usr/local/lib/libavutil.dylib
+ffmpeg_sandbox: /usr/local/lib/libavdevice.dylib
 ffmpeg_sandbox: CMakeFiles/ffmpeg_sandbox.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-sandbox/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ffmpeg_sandbox"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ffmpeg_sandbox.dir/link.txt --verbose=$(VERBOSE)
