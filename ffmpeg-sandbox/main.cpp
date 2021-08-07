@@ -36,17 +36,24 @@ static AVCodecContext *create_codec_context() {
 
 int main() {
     std::cout << "Decoding started..." << std::endl;
-    AVCodecContext *c = create_codec_context();
+    AVCodecContext *context = create_codec_context();
 
-    AVFrame *frame = av_frame_alloc();
-    AVPacket packet;
-    av_init_packet(&packet);
-    packet.size = read_input(&packet.data);
+    AVFrame *decoded_frame = av_frame_alloc();
+    AVPacket encoded_frame;
+    av_init_packet(&encoded_frame);
+    encoded_frame.size = read_input(&encoded_frame.data);
 
     int got_frame;
-    avcodec_decode_video2(c, frame, &got_frame, &packet);
+    avcodec_decode_video2(context, decoded_frame, &got_frame, &encoded_frame);
+
+    std::cout << decoded_frame->width << std::endl;
+    std::cout << decoded_frame->height << std::endl;
+    std::cout << decoded_frame->linesize[0] << std::endl;
+    std::cout << decoded_frame->linesize[1] << std::endl;
+    std::cout << decoded_frame->linesize[2] << std::endl;
+
     if (got_frame) {
-        write_output(frame->data[0], frame->linesize[0], c->width, c->height);
+        write_output(decoded_frame->data[0], decoded_frame->linesize[0], context->width, context->height);
     }
     return 0;
 }
