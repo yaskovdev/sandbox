@@ -26,12 +26,10 @@ static void write_output(unsigned char *buf, int wrap, int xsize, int ysize) {
 }
 
 static AVCodecContext *create_codec_context() {
-    av_register_all();
-    avcodec_register_all();
     AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
-    AVCodecContext *c = avcodec_alloc_context3(codec);
-    avcodec_open2(c, codec, nullptr);
-    return c;
+    AVCodecContext *context = avcodec_alloc_context3(codec);
+    avcodec_open2(context, codec, nullptr);
+    return context;
 }
 
 int main() {
@@ -42,18 +40,20 @@ int main() {
     encoded_frame.size = read_input(&encoded_frame.data);
 
     AVCodecContext *context = create_codec_context();
+    int send_packet_result = avcodec_send_packet(context, &encoded_frame);
+    if (send_packet_result < 0) {
+        exit(send_packet_result);
+    }
     AVFrame *decoded_frame = av_frame_alloc();
-    int got_frame;
-    avcodec_decode_video2(context, decoded_frame, &got_frame, &encoded_frame);
+    int receive_frame_result = avcodec_receive_frame(context, decoded_frame);
 
-    std::cout << decoded_frame->width << std::endl;
-    std::cout << decoded_frame->height << std::endl;
-    std::cout << decoded_frame->linesize[0] << std::endl;
-    std::cout << decoded_frame->linesize[1] << std::endl;
-    std::cout << decoded_frame->linesize[2] << std::endl;
-
-    if (got_frame) {
+    if (receive_frame_result == 0) {
+        std::cout << decoded_frame->width << std::endl;
+        std::cout << decoded_frame->height << std::endl;
+        std::cout << decoded_frame->linesize[0] << std::endl;
+        std::cout << decoded_frame->linesize[1] << std::endl;
+        std::cout << decoded_frame->linesize[2] << std::endl;
         write_output(decoded_frame->data[0], decoded_frame->linesize[0], context->width, context->height);
     }
-    return 0;
+    return receive_frame_result;
 }
