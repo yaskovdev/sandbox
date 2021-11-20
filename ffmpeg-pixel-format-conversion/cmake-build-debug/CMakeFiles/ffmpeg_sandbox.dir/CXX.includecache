@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-sandbox/main.cpp
+/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-pixel-format-conversion/main.cpp
 iostream
 -
 libavformat/avformat.h
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-sandbox/libavformat/avformat.h
+/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-pixel-format-conversion/libavformat/avformat.h
 libavcodec/avcodec.h
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-sandbox/libavcodec/avcodec.h
+/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-pixel-format-conversion/libavcodec/avcodec.h
 libswscale/swscale.h
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-sandbox/libswscale/swscale.h
+/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-pixel-format-conversion/libswscale/swscale.h
 
 /usr/local/include/libavcodec/avcodec.h
 errno.h
