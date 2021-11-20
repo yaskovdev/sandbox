@@ -26,11 +26,44 @@ static void write_output(unsigned char *buf, int wrap, int xsize, int ysize) {
     fclose(f);
 }
 
-static AVCodecContext *create_codec_context() {
-    AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
-    AVCodecContext *context = avcodec_alloc_context3(codec);
-    avcodec_open2(context, codec, nullptr);
+static AVCodecContext *create_decoder_context() {
+    AVCodec *decoder = avcodec_find_decoder(AV_CODEC_ID_H264);
+    AVCodecContext *context = avcodec_alloc_context3(decoder);
+    avcodec_open2(context, decoder, nullptr);
     return context;
+}
+
+static AVCodecContext *create_encoder_context() {
+    AVCodec *encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
+    AVCodecContext *context = avcodec_alloc_context3(encoder);
+    context->width = 1620;
+    context->height = 1080;
+    context->pix_fmt = AV_PIX_FMT_YUVJ420P;
+    context->time_base = (AVRational) {1, 25};
+    avcodec_open2(context, encoder, nullptr);
+    return context;
+}
+
+static void encode(AVCodecContext *enc_ctx, AVFrame *frame) {
+    int ret = avcodec_send_frame(enc_ctx, frame);
+    if (ret < 0) {
+        fprintf(stderr, "error sending a frame for encoding\n");
+        exit(1);
+    }
+
+    while (ret >= 0) {
+        AVPacket *pkt = av_packet_alloc();
+        ret = avcodec_receive_packet(enc_ctx, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+            return;
+        else if (ret < 0) {
+            fprintf(stderr, "error during encoding\n");
+            exit(1);
+        }
+        printf("encoded frame %3" PRId64 " (result=%d, size=%5d)\n", pkt->pts, ret, pkt->size);
+
+        av_packet_unref(pkt);
+    }
 }
 
 int main() {
@@ -40,7 +73,7 @@ int main() {
     av_init_packet(&encoded_frame);
     encoded_frame.size = read_input(&encoded_frame.data);
 
-    AVCodecContext *context = create_codec_context();
+    AVCodecContext *context = create_decoder_context();
     int send_packet_result = avcodec_send_packet(context, &encoded_frame);
     if (send_packet_result < 0) {
         exit(send_packet_result);
@@ -61,6 +94,9 @@ int main() {
         std::cout << "Allocated buffers with " << av_frame_get_buffer(scaled_frame, 0) << std::endl;
         sws_scale(sws_context, decoded_frame->data, decoded_frame->linesize, 0, height, scaled_frame->data, scaled_frame->linesize);
         std::cout << "Converted to pixel format " << scaled_frame->format << std::endl;
+        AVCodecContext *encoder = create_encoder_context();
+        encode(encoder, scaled_frame);
+        encode(encoder, nullptr);
     }
     return receive_frame_result;
 }
