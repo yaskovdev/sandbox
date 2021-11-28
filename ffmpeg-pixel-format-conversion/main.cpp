@@ -45,24 +45,29 @@ static AVCodecContext *create_encoder_context() {
 }
 
 static void encode(AVCodecContext *enc_ctx, AVFrame *frame) {
-    int ret = avcodec_send_frame(enc_ctx, frame);
-    if (ret < 0) {
+    if (avcodec_send_frame(enc_ctx, frame) == 0) {
+        std::cout << "Sent frame for encoding" << std::endl;
+    } else {
         fprintf(stderr, "error sending a frame for encoding\n");
         exit(1);
     }
 
-    while (ret >= 0) {
-        AVPacket *pkt = av_packet_alloc();
-        ret = avcodec_receive_packet(enc_ctx, pkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-            return;
-        else if (ret < 0) {
-            fprintf(stderr, "error during encoding\n");
-            exit(1);
-        }
-        printf("encoded frame %3" PRId64 " (result=%d, size=%5d)\n", pkt->pts, ret, pkt->size);
+    AVPacket *packet = av_packet_alloc();
+    int receive_packet_result = avcodec_receive_packet(enc_ctx, packet);
+    while (receive_packet_result == 0) {
+        printf("encoded frame %3" PRId64 " (result=%d, size=%5d)\n", packet->pts, receive_packet_result, packet->size);
+        av_packet_unref(packet);
+        packet = av_packet_alloc();
+        receive_packet_result = avcodec_receive_packet(enc_ctx, packet);
+    }
 
-        av_packet_unref(pkt);
+    if (receive_packet_result == AVERROR(EAGAIN)) {
+        std::cout << "Waiting for more frames" << std::endl;
+    } else if (receive_packet_result == AVERROR_EOF) {
+        std::cout << "Encoding is finished" << std::endl;
+    } else if (receive_packet_result < 0) {
+        fprintf(stderr, "error during encoding\n");
+        exit(1);
     }
 }
 
