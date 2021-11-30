@@ -26,10 +26,31 @@ static void write_output(unsigned char *buf, int wrap, int xsize, int ysize) {
     fclose(f);
 }
 
+AVPixelFormat concrete_get_format(struct AVCodecContext *s, const enum AVPixelFormat *fmt) {
+    if (fmt == nullptr) {
+        std::cout << "Callback supported decoder formats are unknown" << std::endl;
+    } else {
+        std::cout << "Callback supported decoder formats are:" << std::endl;
+        for (int i = 0; fmt[i] != -1; i++) {
+            std::cout << fmt[i] << std::endl;
+        }
+    }
+    return AV_PIX_FMT_YUV420P;
+}
+
 static AVCodecContext *create_decoder_context() {
     AVCodec *decoder = avcodec_find_decoder(AV_CODEC_ID_H264);
     AVCodecContext *context = avcodec_alloc_context3(decoder);
     avcodec_open2(context, decoder, nullptr);
+    if (decoder->pix_fmts == nullptr) {
+        std::cout << "Supported decoder formats are unknown" << std::endl;
+    } else {
+        std::cout << "Supported decoder formats are:" << std::endl;
+        for (int i = 0; decoder->pix_fmts[i] != -1; i++) {
+            std::cout << decoder->pix_fmts[i] << std::endl;
+        }
+    }
+    context->get_format = concrete_get_format;
     return context;
 }
 
