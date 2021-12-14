@@ -1,0 +1,211 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 2 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6
+// command took 1.47s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6
+// command took 3.18s and exited with 0
+// ***** Done, took 00:00:05 (5.34 sec)   *****
+// Found 2 benchmarks:
+//   Benchmark.ForEachSum: DefaultJob
+//   Benchmark.LinqSum: DefaultJob
+
+// **************************
+// Benchmark: Benchmark.ForEachSum: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "329e7c6d-ce56-4028-8cbc-5943b26b47c6.dll" --benchmarkName "ForEachVsLinqSumPerformance.Benchmark.ForEachSum" --job "Default" --benchmarkId 0 in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.0 (6.0.21.52210), X64 RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 434615.00 ns, 434.6150 us/op
+WorkloadJitting  1: 1 op, 7816994.00 ns, 7.8170 ms/op
+
+OverheadJitting  2: 16 op, 664161.00 ns, 41.5101 us/op
+WorkloadJitting  2: 16 op, 14757984.00 ns, 922.3740 us/op
+
+WorkloadPilot    1: 16 op, 20180263.00 ns, 1.2613 ms/op
+WorkloadPilot    2: 32 op, 37375425.00 ns, 1.1680 ms/op
+WorkloadPilot    3: 64 op, 60934062.00 ns, 952.0947 us/op
+WorkloadPilot    4: 128 op, 100106211.00 ns, 782.0798 us/op
+WorkloadPilot    5: 256 op, 97302600.00 ns, 380.0883 us/op
+WorkloadPilot    6: 512 op, 149034883.00 ns, 291.0838 us/op
+WorkloadPilot    7: 1024 op, 281774531.00 ns, 275.1704 us/op
+WorkloadPilot    8: 2048 op, 559547802.00 ns, 273.2167 us/op
+
+OverheadWarmup   1: 2048 op, 6653.00 ns, 3.2485 ns/op
+OverheadWarmup   2: 2048 op, 5660.00 ns, 2.7637 ns/op
+OverheadWarmup   3: 2048 op, 5442.00 ns, 2.6572 ns/op
+OverheadWarmup   4: 2048 op, 5495.00 ns, 2.6831 ns/op
+OverheadWarmup   5: 2048 op, 5875.00 ns, 2.8687 ns/op
+OverheadWarmup   6: 2048 op, 26721.00 ns, 13.0474 ns/op
+OverheadWarmup   7: 2048 op, 5477.00 ns, 2.6743 ns/op
+OverheadWarmup   8: 2048 op, 5459.00 ns, 2.6655 ns/op
+OverheadWarmup   9: 2048 op, 5832.00 ns, 2.8477 ns/op
+OverheadWarmup  10: 2048 op, 5831.00 ns, 2.8472 ns/op
+
+OverheadActual   1: 2048 op, 10013.00 ns, 4.8892 ns/op
+OverheadActual   2: 2048 op, 7499.00 ns, 3.6616 ns/op
+OverheadActual   3: 2048 op, 7203.00 ns, 3.5171 ns/op
+OverheadActual   4: 2048 op, 7310.00 ns, 3.5693 ns/op
+OverheadActual   5: 2048 op, 6977.00 ns, 3.4067 ns/op
+OverheadActual   6: 2048 op, 7344.00 ns, 3.5859 ns/op
+OverheadActual   7: 2048 op, 7579.00 ns, 3.7007 ns/op
+OverheadActual   8: 2048 op, 7414.00 ns, 3.6201 ns/op
+OverheadActual   9: 2048 op, 7452.00 ns, 3.6387 ns/op
+OverheadActual  10: 2048 op, 6925.00 ns, 3.3813 ns/op
+OverheadActual  11: 2048 op, 7350.00 ns, 3.5889 ns/op
+OverheadActual  12: 2048 op, 7173.00 ns, 3.5024 ns/op
+OverheadActual  13: 2048 op, 12877.00 ns, 6.2876 ns/op
+OverheadActual  14: 2048 op, 7546.00 ns, 3.6846 ns/op
+OverheadActual  15: 2048 op, 8179.00 ns, 3.9937 ns/op
+
+WorkloadWarmup   1: 2048 op, 611003824.00 ns, 298.3417 us/op
+WorkloadWarmup   2: 2048 op, 584019324.00 ns, 285.1657 us/op
+WorkloadWarmup   3: 2048 op, 559268866.00 ns, 273.0805 us/op
+WorkloadWarmup   4: 2048 op, 560859907.00 ns, 273.8574 us/op
+WorkloadWarmup   5: 2048 op, 561129883.00 ns, 273.9892 us/op
+WorkloadWarmup   6: 2048 op, 561583693.00 ns, 274.2108 us/op
+WorkloadWarmup   7: 2048 op, 562712024.00 ns, 274.7617 us/op
+WorkloadWarmup   8: 2048 op, 652437945.00 ns, 318.5732 us/op
+WorkloadWarmup   9: 2048 op, 599225573.00 ns, 292.5906 us/op
+WorkloadWarmup  10: 2048 op, 624632289.00 ns, 304.9962 us/op
+WorkloadWarmup  11: 2048 op, 599341713.00 ns, 292.6473 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 2048 op, 574009206.00 ns, 280.2779 us/op
+WorkloadActual   2: 2048 op, 558643705.00 ns, 272.7752 us/op
+WorkloadActual   3: 2048 op, 561015814.00 ns, 273.9335 us/op
+WorkloadActual   4: 2048 op, 563839725.00 ns, 275.3124 us/op
+WorkloadActual   5: 2048 op, 565318731.00 ns, 276.0345 us/op
+WorkloadActual   6: 2048 op, 575288341.00 ns, 280.9025 us/op
+WorkloadActual   7: 2048 op, 593099186.00 ns, 289.5992 us/op
+WorkloadActual   8: 2048 op, 566410331.00 ns, 276.5675 us/op
+WorkloadActual   9: 2048 op, 557541997.00 ns, 272.2373 us/op
+WorkloadActual  10: 2048 op, 559741182.00 ns, 273.3111 us/op
+WorkloadActual  11: 2048 op, 567558679.00 ns, 277.1283 us/op
+WorkloadActual  12: 2048 op, 577420562.00 ns, 281.9436 us/op
+WorkloadActual  13: 2048 op, 562523785.00 ns, 274.6698 us/op
+WorkloadActual  14: 2048 op, 566001363.00 ns, 276.3679 us/op
+WorkloadActual  15: 2048 op, 566837201.00 ns, 276.7760 us/op
+
+// AfterActualRun
+WorkloadResult   1: 2048 op, 574001792.00 ns, 280.2743 us/op
+WorkloadResult   2: 2048 op, 558636291.00 ns, 272.7716 us/op
+WorkloadResult   3: 2048 op, 561008400.00 ns, 273.9299 us/op
+WorkloadResult   4: 2048 op, 563832311.00 ns, 275.3087 us/op
+WorkloadResult   5: 2048 op, 565311317.00 ns, 276.0309 us/op
+WorkloadResult   6: 2048 op, 575280927.00 ns, 280.8989 us/op
+WorkloadResult   7: 2048 op, 566402917.00 ns, 276.5639 us/op
+WorkloadResult   8: 2048 op, 557534583.00 ns, 272.2337 us/op
+WorkloadResult   9: 2048 op, 559733768.00 ns, 273.3075 us/op
+WorkloadResult  10: 2048 op, 567551265.00 ns, 277.1246 us/op
+WorkloadResult  11: 2048 op, 577413148.00 ns, 281.9400 us/op
+WorkloadResult  12: 2048 op, 562516371.00 ns, 274.6662 us/op
+WorkloadResult  13: 2048 op, 565993949.00 ns, 276.3642 us/op
+WorkloadResult  14: 2048 op, 566829787.00 ns, 276.7724 us/op
+
+// AfterAll
+// Benchmark Process 34604 has exited with code 0.
+
+Mean = 276.299 μs, StdErr = 0.802 μs (0.29%), N = 14, StdDev = 3.000 μs
+Min = 272.234 μs, Q1 = 274.114 μs, Median = 276.198 μs, Q3 = 277.037 μs, Max = 281.940 μs
+IQR = 2.923 μs, LowerFence = 269.730 μs, UpperFence = 281.420 μs
+ConfidenceInterval = [272.915 μs; 279.683 μs] (CI 99.9%), Margin = 3.384 μs (1.22% of Mean)
+Skewness = 0.49, Kurtosis = 1.99, MValue = 2
+
+// **************************
+// Benchmark: Benchmark.LinqSum: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "329e7c6d-ce56-4028-8cbc-5943b26b47c6.dll" --benchmarkName "ForEachVsLinqSumPerformance.Benchmark.LinqSum" --job "Default" --benchmarkId 1 in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.0 (6.0.21.52210), X64 RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 525433.00 ns, 525.4330 us/op
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> System.OverflowException: Arithmetic operation resulted in an overflow.
+   at System.Linq.Enumerable.Sum(IEnumerable`1 source)
+   at ForEachVsLinqSumPerformance.Benchmark.LinqSum() in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/Benchmark.cs:line 35
+   at BenchmarkDotNet.Autogenerated.Runnable_1.WorkloadActionNoUnroll(Int64 invokeCount) in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6/329e7c6d-ce56-4028-8cbc-5943b26b47c6.notcs:line 1223
+   at BenchmarkDotNet.Engines.Engine.RunIteration(IterationData data)
+   at BenchmarkDotNet.Engines.EngineFactory.Jit(Engine engine, Int32 jitIndex, Int32 invokeCount, Int32 unrollFactor)
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_1.Run(IHost host, String benchmarkName) in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6/329e7c6d-ce56-4028-8cbc-5943b26b47c6.notcs:line 900
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/yaskovdev/RiderProjects/DotNetSandbox/ForEachVsLinqSumPerformance/bin/Release/net6.0/329e7c6d-ce56-4028-8cbc-5943b26b47c6/329e7c6d-ce56-4028-8cbc-5943b26b47c6.notcs:line 52
+// AfterAll
+// Benchmark Process 34608 has exited with code 255.
+
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/ForEachVsLinqSumPerformance.Benchmark-report.csv
+  BenchmarkDotNet.Artifacts/results/ForEachVsLinqSumPerformance.Benchmark-report-github.md
+  BenchmarkDotNet.Artifacts/results/ForEachVsLinqSumPerformance.Benchmark-report.html
+
+// * Detailed results *
+Benchmark.ForEachSum: DefaultJob
+Runtime = .NET 6.0.0 (6.0.21.52210), X64 RyuJIT; GC = Concurrent Workstation
+Mean = 276.299 μs, StdErr = 0.802 μs (0.29%), N = 14, StdDev = 3.000 μs
+Min = 272.234 μs, Q1 = 274.114 μs, Median = 276.198 μs, Q3 = 277.037 μs, Max = 281.940 μs
+IQR = 2.923 μs, LowerFence = 269.730 μs, UpperFence = 281.420 μs
+ConfidenceInterval = [272.915 μs; 279.683 μs] (CI 99.9%), Margin = 3.384 μs (1.22% of Mean)
+Skewness = 0.49, Kurtosis = 1.99, MValue = 2
+-------------------- Histogram --------------------
+[270.600 μs ; 283.574 μs) | @@@@@@@@@@@@@@
+---------------------------------------------------
+
+Benchmark.LinqSum: DefaultJob
+Runtime = .NET 6.0.0 (6.0.21.52210), X64 RyuJIT; GC = Concurrent Workstation
+There are not any results runs
+
+// * Summary *
+
+BenchmarkDotNet=v0.13.1, OS=macOS Big Sur 11.1 (20C69) [Darwin 20.2.0]
+Intel Core i7-7820HQ CPU 2.90GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET SDK=6.0.100
+  [Host]     : .NET 6.0.0 (6.0.21.52210), X64 RyuJIT
+  DefaultJob : .NET 6.0.0 (6.0.21.52210), X64 RyuJIT
+
+
+|     Method |     Mean |   Error |  StdDev |
+|----------- |---------:|--------:|--------:|
+| ForEachSum | 276.3 μs | 3.38 μs | 3.00 μs |
+|    LinqSum |       NA |      NA |      NA |
+
+Benchmarks with issues:
+  Benchmark.LinqSum: DefaultJob
+
+// * Hints *
+Outliers
+  Benchmark.ForEachSum: Default -> 1 outlier  was  removed (289.60 μs)
+
+// * Legends *
+  Mean   : Arithmetic mean of all measurements
+  Error  : Half of 99.9% confidence interval
+  StdDev : Standard deviation of all measurements
+  1 μs   : 1 Microsecond (0.000001 sec)
+
+// ***** BenchmarkRunner: End *****
+// ** Remained 0 benchmark(s) to run **
+Run time: 00:00:17 (17.55 sec), executed benchmarks: 2
+
+Global total time: 00:00:22 (22.9 sec), executed benchmarks: 2
+// * Artifacts cleanup *

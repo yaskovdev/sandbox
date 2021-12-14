@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "QU3BcAdx7hUyJY8Id6eeAEsn2/WlF3JBD/1JsX6YfqwkMOFm7wHU9BygAz9qhvyPUO/6cbdBc9VNRUmQNUOowQ==",
+  "success": true,
+  "projectFilePath": "/Users/yaskovdev/dev/git_home/sandbox/DotNetSandbox/AsyncAwait/AsyncAwait.csproj",
+  "expectedPackageFiles": [
+    "/Users/yaskovdev/.nuget/packages/microsoft.netcore.app.host.osx-x64/5.0.12/microsoft.netcore.app.host.osx-x64.5.0.12.nupkg.sha512"
+  ],
+  "logs": []
+}
