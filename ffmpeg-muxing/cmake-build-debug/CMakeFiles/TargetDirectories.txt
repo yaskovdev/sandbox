@@ -1,3 +1,0 @@
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-muxing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-muxing/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/yaskovdev/dev/git_home/sandbox/ffmpeg-muxing/cmake-build-debug/CMakeFiles/ffmpeg_muxing.dir
