@@ -7,13 +7,11 @@
 #IncludeRegexTransform: 
 
 /Users/yaskovdev/dev/git_home/sandbox/ffmpeg-muxing/main.cpp
-stdlib.h
+cstdlib
 -
-stdio.h
+cstdio
 -
-string.h
--
-math.h
+cstring
 -
 libavutil/avassert.h
 -
