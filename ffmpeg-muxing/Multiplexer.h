@@ -66,5 +66,4 @@ private:
     static void close_stream(AVFormatContext *oc, OutputStream *ost);
 };
 
-
 #endif //FFMPEG_MUXING_MULTIPLEXER_H

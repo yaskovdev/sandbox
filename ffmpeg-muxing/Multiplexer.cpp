@@ -94,13 +94,12 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
         return 1;
     }
 
-    while (encode_video || encode_audio) {
-        /* select the stream to encode */
-        if (encode_video && (!encode_audio || av_compare_ts(video_st.next_pts, video_st.enc->time_base, audio_st.next_pts, audio_st.enc->time_base) <= 0)) {
-            encode_video = !write_video_frame(oc, &video_st, get_video_frame(&video_st));
-        } else {
-            encode_audio = !write_audio_frame(oc, &audio_st, get_audio_frame(&audio_st));
-        }
+    while (encode_audio) {
+        encode_audio = !write_audio_frame(oc, &audio_st, get_audio_frame(&audio_st));
+    }
+
+    while (encode_video) {
+        encode_video = !write_video_frame(oc, &video_st, get_video_frame(&video_st));
     }
 
     /* Write the trailer, if any. The trailer must be written before you
