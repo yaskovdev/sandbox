@@ -13,6 +13,8 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
+#define STREAM_FRAME_RATE 25 /* 25 images/s */
+
 typedef struct OutputStream {
     AVStream *st;
     AVCodecContext *enc;
@@ -53,15 +55,9 @@ private:
 
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
-    static AVFrame *get_audio_frame(OutputStream *ost);
-
-    static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height);
+    static AVFrame *generate_audio_frame(OutputStream *ost);
 
     static void open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
-
-    static void fill_yuv_image(AVFrame *pict, int frame_index, int width, int height);
-
-    static AVFrame *get_video_frame(OutputStream *ost);
 
     static void close_stream(AVFormatContext *oc, OutputStream *ost);
 };

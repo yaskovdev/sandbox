@@ -1,4 +1,5 @@
 #include "Multiplexer.h"
+#include "VideoFrameGenerator.h"
 #include <cstdlib>
 #include <cstdio>
 
@@ -15,7 +16,6 @@ extern "C" {
 }
 
 #define STREAM_DURATION   10.0
-#define STREAM_FRAME_RATE 25 /* 25 images/s */
 #define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
 
 #define SCALE_FLAGS SWS_BICUBIC
@@ -95,11 +95,14 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
     }
 
     while (encode_audio) {
-        encode_audio = !write_audio_frame(oc, &audio_st, get_audio_frame(&audio_st));
+        encode_audio = !write_audio_frame(oc, &audio_st, generate_audio_frame(&audio_st));
     }
 
-    while (encode_video) {
-        encode_video = !write_video_frame(oc, &video_st, get_video_frame(&video_st));
+    VideoFrameGenerator generator((AVRational) {1, STREAM_FRAME_RATE}, 352, 288, AV_PIX_FMT_YUV420P, STREAM_DURATION);
+    AVFrame *frame = generator.generate_video_frame();
+    while (frame != nullptr) {
+        write_video_frame(oc, &video_st, frame);
+        frame = generator.generate_video_frame();
     }
 
     /* Write the trailer, if any. The trailer must be written before you
@@ -345,7 +348,7 @@ void Multiplexer::open_audio(const AVCodec *codec, OutputStream *ost, AVDictiona
 
 /* Prepare a 16 bit dummy audio frame of 'frame_size' samples and
  * 'nb_channels' channels. */
-AVFrame *Multiplexer::get_audio_frame(OutputStream *ost) {
+AVFrame *Multiplexer::generate_audio_frame(OutputStream *ost) {
     AVFrame *frame = ost->tmp_frame;
     int j, i, v;
     auto *q = (int16_t *) frame->data[0];
@@ -410,28 +413,6 @@ int Multiplexer::write_audio_frame(AVFormatContext *oc, OutputStream *ost, AVFra
     return write_frame(oc, c, ost->st, frame, ost->tmp_pkt);
 }
 
-AVFrame *Multiplexer::alloc_picture(enum AVPixelFormat pix_fmt, int width, int height) {
-    AVFrame *picture;
-    int ret;
-
-    picture = av_frame_alloc();
-    if (!picture)
-        return nullptr;
-
-    picture->format = pix_fmt;
-    picture->width = width;
-    picture->height = height;
-
-    /* allocate the buffers for the frame data */
-    ret = av_frame_get_buffer(picture, 0);
-    if (ret < 0) {
-        fprintf(stderr, "Could not allocate frame data.\n");
-        exit(1);
-    }
-
-    return picture;
-}
-
 void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg) {
     int ret;
     AVCodecContext *c = ost->enc;
@@ -447,24 +428,7 @@ void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictiona
         exit(1);
     }
 
-    /* allocate and init a re-usable frame */
-    ost->frame = alloc_picture(c->pix_fmt, c->width, c->height);
-    if (!ost->frame) {
-        fprintf(stderr, "Could not allocate video frame\n");
-        exit(1);
-    }
-
-    /* If the output format is not YUV420P, then a temporary YUV420P
-     * picture is needed too. It is then converted to the required
-     * output format. */
     ost->tmp_frame = nullptr;
-    if (c->pix_fmt != AV_PIX_FMT_YUV420P) {
-        ost->tmp_frame = alloc_picture(AV_PIX_FMT_YUV420P, c->width, c->height);
-        if (!ost->tmp_frame) {
-            fprintf(stderr, "Could not allocate temporary picture\n");
-            exit(1);
-        }
-    }
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
@@ -472,67 +436,6 @@ void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictiona
         fprintf(stderr, "Could not copy the stream parameters\n");
         exit(1);
     }
-}
-
-/* Prepare a dummy image. */
-void Multiplexer::fill_yuv_image(AVFrame *pict, int frame_index, int width, int height) {
-    int x, y, i;
-
-    i = frame_index;
-
-    /* Y */
-    for (y = 0; y < height; y++)
-        for (x = 0; x < width; x++)
-            pict->data[0][y * pict->linesize[0] + x] = x + y + i * 3;
-
-    /* Cb and Cr */
-    for (y = 0; y < height / 2; y++) {
-        for (x = 0; x < width / 2; x++) {
-            pict->data[1][y * pict->linesize[1] + x] = 128 + y + i * 2;
-            pict->data[2][y * pict->linesize[2] + x] = 64 + x + i * 5;
-        }
-    }
-}
-
-AVFrame *Multiplexer::get_video_frame(OutputStream *ost) {
-    AVCodecContext *c = ost->enc;
-
-    /* check if we want to generate more frames */
-    if (av_compare_ts(ost->next_pts, c->time_base,
-        STREAM_DURATION, (AVRational) {1, 1}) > 0)
-        return nullptr;
-
-    /* when we pass a frame to the encoder, it may keep a reference to it
-     * internally; make sure we do not overwrite it here */
-    if (av_frame_make_writable(ost->frame) < 0)
-        exit(1);
-
-    if (c->pix_fmt != AV_PIX_FMT_YUV420P) {
-        printf("Codec pixel format is %d, going to change the image pixel format to it", c->pix_fmt);
-        /* as we only generate a YUV420P picture, we must convert it
-         * to the codec pixel format if needed */
-        if (!ost->sws_ctx) {
-            ost->sws_ctx = sws_getContext(c->width, c->height,
-                AV_PIX_FMT_YUV420P,
-                c->width, c->height,
-                c->pix_fmt,
-                SCALE_FLAGS, nullptr, nullptr, nullptr);
-            if (!ost->sws_ctx) {
-                fprintf(stderr, "Could not initialize the conversion context\n");
-                exit(1);
-            }
-        }
-        fill_yuv_image(ost->tmp_frame, ost->next_pts, c->width, c->height);
-        sws_scale(ost->sws_ctx, (const uint8_t *const *) ost->tmp_frame->data,
-            ost->tmp_frame->linesize, 0, c->height, ost->frame->data,
-            ost->frame->linesize);
-    } else {
-        fill_yuv_image(ost->frame, ost->next_pts, c->width, c->height);
-    }
-
-    ost->frame->pts = ost->next_pts++;
-
-    return ost->frame;
 }
 
 /*

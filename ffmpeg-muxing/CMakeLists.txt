@@ -22,6 +22,6 @@ find_library(SWSCALE_LIBRARY swscale)
 find_path(SWRESAMPLE_INCLUDE_DIR libswresample/swresample.h)
 find_library(SWRESAMPLE_LIBRARY swresample)
 
-add_executable(ffmpeg_muxing main.cpp Multiplexer.cpp Multiplexer.h)
+add_executable(ffmpeg_muxing main.cpp Multiplexer.cpp Multiplexer.h VideoFrameGenerator.cpp VideoFrameGenerator.h)
 target_include_directories(ffmpeg_muxing PRIVATE ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${AVDEVICE_INCLUDE_DIR} ${SWSCALE_INCLUDE_DIR} ${SWRESAMPLE_INCLUDE_DIR})
 target_link_libraries(ffmpeg_muxing PRIVATE ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARY} ${SWSCALE_LIBRARY} ${SWRESAMPLE_LIBRARY})
