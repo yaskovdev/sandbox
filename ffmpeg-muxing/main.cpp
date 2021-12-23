@@ -50,8 +50,7 @@ static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
         pkt->stream_index);
 }
 
-static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c,
-    AVStream *st, AVFrame *frame, AVPacket *pkt) {
+static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt) {
     int ret;
 
     // send the frame to the encoder
@@ -90,17 +89,14 @@ static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c,
 }
 
 /* Add an output stream. */
-static void add_stream(OutputStream *ost, AVFormatContext *oc,
-    const AVCodec **codec,
-    enum AVCodecID codec_id) {
+static void add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id) {
     AVCodecContext *c;
     int i;
 
     /* find the encoder */
     *codec = avcodec_find_encoder(codec_id);
     if (!(*codec)) {
-        fprintf(stderr, "Could not find encoder for '%s'\n",
-            avcodec_get_name(codec_id));
+        fprintf(stderr, "Could not find encoder for '%s'\n", avcodec_get_name(codec_id));
         exit(1);
     }
 
@@ -569,8 +565,7 @@ int main(int argc, char **argv) {
     if (!(fmt->flags & AVFMT_NOFILE)) {
         ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
-            fprintf(stderr, "Could not open '%s': %s\n", filename,
-                av_err2str(ret));
+            fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
             return 1;
         }
     }
@@ -578,16 +573,13 @@ int main(int argc, char **argv) {
     /* Write the stream header, if any. */
     ret = avformat_write_header(oc, &opt);
     if (ret < 0) {
-        fprintf(stderr, "Error occurred when opening output file: %s\n",
-            av_err2str(ret));
+        fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
         return 1;
     }
 
     while (encode_video || encode_audio) {
         /* select the stream to encode */
-        if (encode_video &&
-            (!encode_audio || av_compare_ts(video_st.next_pts, video_st.enc->time_base,
-                audio_st.next_pts, audio_st.enc->time_base) <= 0)) {
+        if (encode_video && (!encode_audio || av_compare_ts(video_st.next_pts, video_st.enc->time_base, audio_st.next_pts, audio_st.enc->time_base) <= 0)) {
             encode_video = !write_video_frame(oc, &video_st);
         } else {
             encode_audio = !write_audio_frame(oc, &audio_st);
