@@ -51,8 +51,6 @@ private:
 
     static void add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id);
 
-    static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
-
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
     static AVFrame *generate_audio_frame(OutputStream *ost);
@@ -60,6 +58,8 @@ private:
     static void open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
     static void close_stream(AVFormatContext *oc, OutputStream *ost);
+
+    AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H

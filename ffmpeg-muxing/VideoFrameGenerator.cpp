@@ -1,7 +1,3 @@
-//
-// Created by Sergey Yaskov on 23.12.2021.
-//
-
 #include "VideoFrameGenerator.h"
 
 VideoFrameGenerator::VideoFrameGenerator(AVRational time_base, int width, int height, enum AVPixelFormat pix_fmt, int stream_duration) {
@@ -11,7 +7,7 @@ VideoFrameGenerator::VideoFrameGenerator(AVRational time_base, int width, int he
     this->height = height;
     this->pix_fmt = pix_fmt;
     this->stream_duration = stream_duration;
-    this->frame = alloc_picture(pix_fmt, width, height);
+    this->frame = alloc_picture(pix_fmt, width, height); // TODO: free the frame afterwards
     if (!this->frame) {
         fprintf(stderr, "Could not allocate video frame\n");
         exit(1);

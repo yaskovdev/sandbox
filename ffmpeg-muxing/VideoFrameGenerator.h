@@ -13,7 +13,6 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-
 class VideoFrameGenerator {
 public:
     VideoFrameGenerator(AVRational time_base, int width, int height, enum AVPixelFormat pix_fmt, int stream_duration);
@@ -22,17 +21,16 @@ public:
 
 private:
     int next_pts;
-    AVFrame *frame;
     AVRational time_base;
+    AVFrame *frame;
     int width;
     int height;
     enum AVPixelFormat pix_fmt;
     int stream_duration;
 
-    void fill_yuv_image(AVFrame *pict, int frame_index, int width, int height);
+    static void fill_yuv_image(AVFrame *pict, int frame_index, int width, int height);
 
-    AVFrame *alloc_picture(AVPixelFormat pix_fmt, int width, int height);
+    static AVFrame *alloc_picture(AVPixelFormat pix_fmt, int width, int height);
 };
-
 
 #endif //FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H

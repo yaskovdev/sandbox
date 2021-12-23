@@ -1,5 +1,6 @@
 #include "Multiplexer.h"
 #include "VideoFrameGenerator.h"
+#include "AudioFrameGenerator.h"
 #include <cstdlib>
 #include <cstdio>
 
@@ -41,7 +42,6 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
     const AVCodec *audio_codec, *video_codec;
     int ret;
     int have_video = 0, have_audio = 0;
-    int encode_video = 0, encode_audio = 0;
 
     /* allocate the output media context */
     avformat_alloc_output_context2(&oc, nullptr, nullptr, filename);
@@ -60,12 +60,10 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
         printf("Video codec is %d\n", fmt->video_codec);
         add_stream(&video_st, oc, &video_codec, fmt->video_codec);
         have_video = 1;
-        encode_video = 1;
     }
     if (fmt->audio_codec != AV_CODEC_ID_NONE) {
         add_stream(&audio_st, oc, &audio_codec, fmt->audio_codec);
         have_audio = 1;
-        encode_audio = 1;
     }
 
     /* Now that all the parameters are set, we can open the audio and
@@ -94,16 +92,24 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
         return 1;
     }
 
-    while (encode_audio) {
-        encode_audio = !write_audio_frame(oc, &audio_st, generate_audio_frame(&audio_st));
-    }
+    int sample_rate = 44100;
+    int channels = 2;
+    int channel_layout = 3;
+    int nb_samples = 1024;
+    AudioFrameGenerator audio_frame_generator((AVRational) {1, sample_rate}, channels, STREAM_DURATION, channel_layout, sample_rate, nb_samples);
+    AVFrame *audio_frame;
+    do {
+        audio_frame = audio_frame_generator.generate_audio_frame();
+        write_audio_frame(oc, &audio_st, audio_frame);
+    } while (audio_frame != nullptr);
 
-    VideoFrameGenerator generator((AVRational) {1, STREAM_FRAME_RATE}, 352, 288, AV_PIX_FMT_YUV420P, STREAM_DURATION);
-    AVFrame *frame = generator.generate_video_frame();
-    while (frame != nullptr) {
-        write_video_frame(oc, &video_st, frame);
-        frame = generator.generate_video_frame();
-    }
+    // TODO: duplicates
+    VideoFrameGenerator video_frame_generator((AVRational) {1, STREAM_FRAME_RATE}, 352, 288, AV_PIX_FMT_YUV420P, STREAM_DURATION);
+    AVFrame *video_frame;
+    do {
+        video_frame = video_frame_generator.generate_video_frame();
+        write_video_frame(oc, &video_st, video_frame);
+    } while (video_frame != nullptr);
 
     /* Write the trailer, if any. The trailer must be written before you
      * close the CodecContexts open when you wrote the header; otherwise
@@ -259,34 +265,8 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCod
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 }
 
-AVFrame *Multiplexer::alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples) {
-    AVFrame *frame = av_frame_alloc();
-    int ret;
-
-    if (!frame) {
-        fprintf(stderr, "Error allocating an audio frame\n");
-        exit(1);
-    }
-
-    frame->format = sample_fmt;
-    frame->channel_layout = channel_layout;
-    frame->sample_rate = sample_rate;
-    frame->nb_samples = nb_samples;
-
-    if (nb_samples) {
-        ret = av_frame_get_buffer(frame, 0);
-        if (ret < 0) {
-            fprintf(stderr, "Error allocating an audio buffer\n");
-            exit(1);
-        }
-    }
-
-    return frame;
-}
-
 void Multiplexer::open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg) {
     AVCodecContext *c;
-    int nb_samples;
     int ret;
     AVDictionary *opt = nullptr;
 
@@ -301,21 +281,7 @@ void Multiplexer::open_audio(const AVCodec *codec, OutputStream *ost, AVDictiona
         exit(1);
     }
 
-    /* init signal generator */
-    ost->t = 0;
-    ost->tincr = 2 * M_PI * 110.0 / c->sample_rate;
-    /* increment frequency by 110 Hz per second */
-    ost->tincr2 = 2 * M_PI * 110.0 / c->sample_rate / c->sample_rate;
-
-    if (c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
-        nb_samples = 10000;
-    else
-        nb_samples = c->frame_size;
-
-    ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout,
-        c->sample_rate, nb_samples);
-    ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout,
-        c->sample_rate, nb_samples);
+    if (c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE);
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
@@ -346,28 +312,27 @@ void Multiplexer::open_audio(const AVCodec *codec, OutputStream *ost, AVDictiona
     }
 }
 
-/* Prepare a 16 bit dummy audio frame of 'frame_size' samples and
- * 'nb_channels' channels. */
-AVFrame *Multiplexer::generate_audio_frame(OutputStream *ost) {
-    AVFrame *frame = ost->tmp_frame;
-    int j, i, v;
-    auto *q = (int16_t *) frame->data[0];
+AVFrame *Multiplexer::alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples) {
+    AVFrame *frame = av_frame_alloc();
+    int ret;
 
-    /* check if we want to generate more frames */
-    if (av_compare_ts(ost->next_pts, ost->enc->time_base,
-        STREAM_DURATION, (AVRational) {1, 1}) > 0)
-        return nullptr;
-
-    for (j = 0; j < frame->nb_samples; j++) {
-        v = (int) (sin(ost->t) * 10000);
-        for (i = 0; i < ost->enc->channels; i++)
-            *q++ = v;
-        ost->t += ost->tincr;
-        ost->tincr += ost->tincr2;
+    if (!frame) {
+        fprintf(stderr, "Error allocating an audio frame\n");
+        exit(1);
     }
 
-    frame->pts = ost->next_pts;
-    ost->next_pts += frame->nb_samples;
+    frame->format = sample_fmt;
+    frame->channel_layout = channel_layout;
+    frame->sample_rate = sample_rate;
+    frame->nb_samples = nb_samples;
+
+    if (nb_samples) {
+        ret = av_frame_get_buffer(frame, 0);
+        if (ret < 0) {
+            fprintf(stderr, "Error allocating an audio buffer\n");
+            exit(1);
+        }
+    }
 
     return frame;
 }
@@ -386,9 +351,12 @@ int Multiplexer::write_audio_frame(AVFormatContext *oc, OutputStream *ost, AVFra
     if (frame) {
         /* convert samples from native format to destination codec format, using the resampler */
         /* compute destination number of samples */
-        dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples,
-            c->sample_rate, c->sample_rate, AV_ROUND_UP);
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
         av_assert0(dst_nb_samples == frame->nb_samples);
+
+        if (ost->frame == nullptr) {
+            ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
+        }
 
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
@@ -427,8 +395,6 @@ void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictiona
         fprintf(stderr, "Could not open video codec: %s\n", av_err2str(ret));
         exit(1);
     }
-
-    ost->tmp_frame = nullptr;
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
