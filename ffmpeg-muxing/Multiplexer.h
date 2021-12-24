@@ -50,9 +50,7 @@ typedef struct OutputStream {
 
 class Multiplexer {
 public:
-    Multiplexer();
-
-    void initialize(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config);
+    Multiplexer(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config);
 
     int write_audio_frame(AVFrame *frame);
 
@@ -61,8 +59,8 @@ public:
     void finalize();
 
 private:
-    OutputStream audio_st = {nullptr};
-    OutputStream video_st = {nullptr};
+    OutputStream audio_stream = {};
+    OutputStream video_stream = {};
     AVFormatContext *format_context;
     int has_audio = 0;
     int has_video = 0;

@@ -35,11 +35,9 @@ int main(int argc, char **argv) {
             av_dict_set(&opt, argv[i] + 1, argv[i + 1], 0);
         }
     }
-    Multiplexer multiplexer;
-
     AudioConfig audio_config;
     VideoConfig video_config;
-    multiplexer.initialize(filename, opt, audio_config, video_config);
+    Multiplexer multiplexer(filename, opt, audio_config, video_config);
 
     AudioFrameGenerator audio_frame_generator = create_audio_frame_generator(audio_config);
     AVFrame *audio_frame;

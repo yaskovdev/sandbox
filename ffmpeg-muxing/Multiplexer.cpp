@@ -12,12 +12,9 @@ void Multiplexer::log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt
         pkt->stream_index);
 }
 
-Multiplexer::Multiplexer() {
-
-}
-
-void Multiplexer::initialize(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config) {
-    const AVCodec *audio_codec, *video_codec;
+Multiplexer::Multiplexer(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config) {
+    const AVCodec *audio_codec;
+    const AVCodec *video_codec;
     int ret;
 
     /* allocate the output media context */
@@ -36,21 +33,21 @@ void Multiplexer::initialize(const char *filename, AVDictionary *opt, AudioConfi
     // Add the audio and video streams using the default format codecs and initialize the codecs.
     if (output_format->video_codec != AV_CODEC_ID_NONE) {
         printf("Video codec is %d\n", output_format->video_codec);
-        add_stream(&video_st, format_context, &video_codec, output_format->video_codec, audio_config, video_config);
+        add_stream(&video_stream, format_context, &video_codec, output_format->video_codec, audio_config, video_config);
         has_video = 1;
     }
     if (output_format->audio_codec != AV_CODEC_ID_NONE) {
-        add_stream(&audio_st, format_context, &audio_codec, output_format->audio_codec, audio_config, video_config);
+        add_stream(&audio_stream, format_context, &audio_codec, output_format->audio_codec, audio_config, video_config);
         has_audio = 1;
     }
 
     /* Now that all the parameters are set, we can open the audio and
      * video codecs and allocate the necessary encode buffers. */
     if (has_video)
-        open_video(video_codec, &video_st, opt);
+        open_video(video_codec, &video_stream, opt);
 
     if (has_audio)
-        open_audio(audio_codec, &audio_st, opt);
+        open_audio(audio_codec, &audio_stream, opt);
 
     av_dump_format(format_context, 0, filename, 1);
 
@@ -284,39 +281,39 @@ int Multiplexer::write_audio_frame(AVFrame *frame) {
     int ret;
     int dst_nb_samples;
 
-    c = audio_st.enc;
+    c = audio_stream.enc;
 
     if (frame) {
         /* convert samples from native format to destination codec format, using the resampler */
         /* compute destination number of samples */
-        dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_st.swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_stream.swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
         av_assert0(dst_nb_samples == frame->nb_samples);
 
-        if (audio_st.frame == nullptr) {
-            audio_st.frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
+        if (audio_stream.frame == nullptr) {
+            audio_stream.frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
         }
 
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
          * make sure we do not overwrite it here
          */
-        ret = av_frame_make_writable(audio_st.frame);
+        ret = av_frame_make_writable(audio_stream.frame);
         if (ret < 0)
             exit(1);
 
         /* convert to destination format */
-        ret = swr_convert(audio_st.swr_ctx, audio_st.frame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
+        ret = swr_convert(audio_stream.swr_ctx, audio_stream.frame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
         if (ret < 0) {
             fprintf(stderr, "Error while converting\n");
             exit(1);
         }
-        frame = audio_st.frame;
+        frame = audio_stream.frame;
 
-        frame->pts = av_rescale_q(audio_st.samples_count, (AVRational) {1, c->sample_rate}, c->time_base);
-        audio_st.samples_count += dst_nb_samples;
+        frame->pts = av_rescale_q(audio_stream.samples_count, (AVRational) {1, c->sample_rate}, c->time_base);
+        audio_stream.samples_count += dst_nb_samples;
     }
 
-    return write_frame(format_context, c, audio_st.st, frame, audio_st.tmp_pkt);
+    return write_frame(format_context, c, audio_stream.st, frame, audio_stream.tmp_pkt);
 }
 
 void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg) {
@@ -347,7 +344,7 @@ void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictiona
 * return 1 when encoding is finished, 0 otherwise
 */
 int Multiplexer::write_video_frame(AVFrame *frame) {
-    return write_frame(format_context, video_st.enc, video_st.st, frame, video_st.tmp_pkt);
+    return write_frame(format_context, video_stream.enc, video_stream.st, frame, video_stream.tmp_pkt);
 }
 
 void Multiplexer::finalize() {
@@ -359,9 +356,9 @@ void Multiplexer::finalize() {
 
     /* Close each codec. */
     if (has_video)
-        close_stream(&video_st);
+        close_stream(&video_stream);
     if (has_audio)
-        close_stream(&audio_st);
+        close_stream(&audio_stream);
 
     if (!(format_context->oformat->flags & AVFMT_NOFILE))
         /* Close the output file. */
