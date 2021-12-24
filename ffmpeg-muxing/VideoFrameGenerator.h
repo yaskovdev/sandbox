@@ -1,6 +1,8 @@
 #ifndef FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H
 #define FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H
 
+#include "Multiplexer.h"
+
 extern "C" {
 #include <libavutil/avassert.h>
 #include <libavutil/channel_layout.h>
@@ -15,7 +17,7 @@ extern "C" {
 
 class VideoFrameGenerator {
 public:
-    VideoFrameGenerator(AVRational time_base, int width, int height, enum AVPixelFormat pix_fmt, int stream_duration);
+    VideoFrameGenerator(VideoConfig config, int stream_duration);
 
     AVFrame *generate_video_frame();
 

@@ -1,14 +1,14 @@
 #include "AudioFrameGenerator.h"
 
-AudioFrameGenerator::AudioFrameGenerator(AVRational time_base, int channels, int stream_duration, uint64_t channel_layout, int sample_rate, int nb_samples) {
+AudioFrameGenerator::AudioFrameGenerator(AudioConfig config, int stream_duration) {
     this->next_pts = 0;
-    this->time_base = time_base;
-    this->channels = channels;
+    this->time_base = config.time_base;
+    this->channels = config.channels;
     this->stream_duration = stream_duration;
     this->t = 0;
-    this->tincr = 2 * M_PI * 110.0 / sample_rate;
-    this->tincr2 = 2 * M_PI * 110.0 / sample_rate / sample_rate;
-    this->frame = alloc_audio_frame(channel_layout, sample_rate, nb_samples);
+    this->tincr = 2 * M_PI * 110.0 / config.sample_rate;
+    this->tincr2 = 2 * M_PI * 110.0 / config.sample_rate / config.sample_rate;
+    this->frame = alloc_audio_frame(config.channel_layout, config.sample_rate, config.nb_samples);
 }
 
 /* Prepare a 16 bit dummy audio frame of 'frame_size' samples and 'nb_channels' channels. */

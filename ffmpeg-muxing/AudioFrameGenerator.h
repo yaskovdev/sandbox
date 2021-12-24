@@ -1,13 +1,15 @@
 #ifndef FFMPEG_MUXING_AUDIOFRAMEGENERATOR_H
 #define FFMPEG_MUXING_AUDIOFRAMEGENERATOR_H
 
+#include "Multiplexer.h"
+
 extern "C" {
 #include <libavutil/frame.h>
 }
 
 class AudioFrameGenerator {
 public:
-    AudioFrameGenerator(AVRational time_base, int channels, int stream_duration, uint64_t channel_layout, int sample_rate, int nb_samples);
+    AudioFrameGenerator(AudioConfig config, int stream_duration);
 
     AVFrame *generate_audio_frame();
 

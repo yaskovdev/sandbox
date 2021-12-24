@@ -6,16 +6,6 @@
 
 #define STREAM_DURATION 10.0
 
-AudioFrameGenerator create_audio_frame_generator(AudioConfig config) {
-    AudioFrameGenerator audio_frame_generator(config.time_base, config.channels, STREAM_DURATION, config.channel_layout, config.sample_rate, config.nb_samples);
-    return audio_frame_generator;
-}
-
-VideoFrameGenerator create_video_frame_generator(VideoConfig config) {
-    VideoFrameGenerator video_frame_generator(config.time_base, config.width, config.height, config.pix_fmt, STREAM_DURATION);
-    return video_frame_generator;
-}
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         printf("usage: %s output_file\n"
@@ -39,14 +29,14 @@ int main(int argc, char **argv) {
     VideoConfig video_config;
     Multiplexer multiplexer(filename, opt, audio_config, video_config);
 
-    AudioFrameGenerator audio_frame_generator = create_audio_frame_generator(audio_config);
+    AudioFrameGenerator audio_frame_generator(audio_config, STREAM_DURATION);
     AVFrame *audio_frame;
     do {
         audio_frame = audio_frame_generator.generate_audio_frame();
         multiplexer.write_audio_frame(audio_frame);
     } while (audio_frame != nullptr);
 
-    VideoFrameGenerator video_frame_generator = create_video_frame_generator(video_config);
+    VideoFrameGenerator video_frame_generator(video_config, STREAM_DURATION);
     AVFrame *video_frame;
     do {
         video_frame = video_frame_generator.generate_video_frame();
