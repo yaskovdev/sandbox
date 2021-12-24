@@ -15,6 +15,16 @@ extern "C" {
 
 #define STREAM_FRAME_RATE 25 /* 25 images/s */
 
+typedef struct VideoConfig {
+    AVRational time_base = (AVRational) {1, STREAM_FRAME_RATE};
+    int width = 352;
+    int height = 288;
+    enum AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+    int64_t bit_rate = 400000;
+    /* emit one intra frame every twelve frames at most */
+    int gop_size = 12;
+} VideoConfig;
+
 typedef struct OutputStream {
     AVStream *st;
     AVCodecContext *enc;
@@ -32,7 +42,7 @@ class Multiplexer {
 public:
     Multiplexer();
 
-    void initialize(const char *filename, AVDictionary *opt);
+    void initialize(const char *filename, AVDictionary *opt, VideoConfig video_config);
 
     int write_audio_frame(AVFrame *frame);
 
@@ -51,7 +61,7 @@ private:
 
     static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
 
-    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id);
+    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, VideoConfig video_config);
 
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
@@ -60,7 +70,6 @@ private:
     static void close_stream(OutputStream *ost);
 
     static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
-
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H

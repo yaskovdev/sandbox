@@ -2,8 +2,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-#define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
-
 void Multiplexer::log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
     AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
 
@@ -18,7 +16,7 @@ Multiplexer::Multiplexer() {
 
 }
 
-void Multiplexer::initialize(const char *filename, AVDictionary *opt) {
+void Multiplexer::initialize(const char *filename, AVDictionary *opt, VideoConfig video_config) {
     const AVCodec *audio_codec, *video_codec;
     int ret;
 
@@ -33,16 +31,16 @@ void Multiplexer::initialize(const char *filename, AVDictionary *opt) {
         exit(1);
     }
 
-    const AVOutputFormat *fmt = format_context->oformat;
+    const AVOutputFormat *output_format = format_context->oformat;
 
     // Add the audio and video streams using the default format codecs and initialize the codecs.
-    if (fmt->video_codec != AV_CODEC_ID_NONE) {
-        printf("Video codec is %d\n", fmt->video_codec);
-        add_stream(&video_st, format_context, &video_codec, fmt->video_codec);
+    if (output_format->video_codec != AV_CODEC_ID_NONE) {
+        printf("Video codec is %d\n", output_format->video_codec);
+        add_stream(&video_st, format_context, &video_codec, output_format->video_codec, video_config);
         has_video = 1;
     }
-    if (fmt->audio_codec != AV_CODEC_ID_NONE) {
-        add_stream(&audio_st, format_context, &audio_codec, fmt->audio_codec);
+    if (output_format->audio_codec != AV_CODEC_ID_NONE) {
+        add_stream(&audio_st, format_context, &audio_codec, output_format->audio_codec, video_config);
         has_audio = 1;
     }
 
@@ -57,7 +55,7 @@ void Multiplexer::initialize(const char *filename, AVDictionary *opt) {
     av_dump_format(format_context, 0, filename, 1);
 
     /* open the output file, if needed */
-    if (!(fmt->flags & AVFMT_NOFILE)) {
+    if (!(output_format->flags & AVFMT_NOFILE)) {
         ret = avio_open(&format_context->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
@@ -112,7 +110,7 @@ int Multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
 }
 
 /* Add an output stream. */
-void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id) {
+void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, VideoConfig video_config) {
     AVCodecContext *c;
     int i;
 
@@ -172,19 +170,19 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context,
         case AVMEDIA_TYPE_VIDEO:
             c->codec_id = codec_id;
 
-            c->bit_rate = 400000;
+            c->bit_rate = video_config.bit_rate;
             /* Resolution must be a multiple of two. */
-            c->width = 352;
-            c->height = 288;
+            c->width = video_config.width;
+            c->height = video_config.height;
             /* timebase: This is the fundamental unit of time (in seconds) in terms
              * of which frame timestamps are represented. For fixed-fps content,
              * timebase should be 1/framerate and timestamp increments should be
              * identical to 1. */
-            ost->st->time_base = (AVRational) {1, STREAM_FRAME_RATE};
+            ost->st->time_base = video_config.time_base;
             c->time_base = ost->st->time_base;
 
-            c->gop_size = 12; /* emit one intra frame every twelve frames at most */
-            c->pix_fmt = STREAM_PIX_FMT;
+            c->gop_size = video_config.gop_size;
+            c->pix_fmt = video_config.pix_fmt;
             if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
                 /* just for testing, we also add B-frames */
                 c->max_b_frames = 2;
@@ -193,7 +191,7 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context,
                 /* Needed to avoid using macroblocks in which some coeffs overflow.
                  * This does not happen with normal video, it just happens here as
                  * the motion of the chroma plane does not match the luma plane. */
-                c->mb_decision = 2;
+                c->mb_decision = FF_MB_DECISION_RD;
             }
             break;
 
