@@ -1,10 +1,7 @@
 #include "Multiplexer.h"
-#include "VideoFrameGenerator.h"
-#include "AudioFrameGenerator.h"
 #include <cstdlib>
 #include <cstdio>
 
-#define STREAM_DURATION   10.0
 #define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
 
 void Multiplexer::log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
@@ -21,103 +18,60 @@ Multiplexer::Multiplexer() {
 
 }
 
-int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
-    OutputStream video_st = {nullptr}, audio_st = {nullptr};
-    const AVOutputFormat *fmt;
-    AVFormatContext *oc;
+void Multiplexer::initialize(const char *filename, AVDictionary *opt) {
     const AVCodec *audio_codec, *video_codec;
     int ret;
-    int have_video = 0, have_audio = 0;
 
     /* allocate the output media context */
-    avformat_alloc_output_context2(&oc, nullptr, nullptr, filename);
-    if (!oc) {
+    avformat_alloc_output_context2(&format_context, nullptr, nullptr, filename);
+    if (!format_context) {
         printf("Could not deduce output format from file extension: using MPEG.\n");
-        avformat_alloc_output_context2(&oc, nullptr, "mpeg", filename);
+        avformat_alloc_output_context2(&format_context, nullptr, "mpeg", filename);
     }
-    printf("Output format is %s\n", oc->oformat->name);
-    if (!oc)
-        return 1;
+    printf("Output format is %s\n", format_context->oformat->name);
+    if (!format_context) {
+        exit(1);
+    }
 
-    fmt = oc->oformat;
+    const AVOutputFormat *fmt = format_context->oformat;
 
     // Add the audio and video streams using the default format codecs and initialize the codecs.
     if (fmt->video_codec != AV_CODEC_ID_NONE) {
         printf("Video codec is %d\n", fmt->video_codec);
-        add_stream(&video_st, oc, &video_codec, fmt->video_codec);
-        have_video = 1;
+        add_stream(&video_st, format_context, &video_codec, fmt->video_codec);
+        has_video = 1;
     }
     if (fmt->audio_codec != AV_CODEC_ID_NONE) {
-        add_stream(&audio_st, oc, &audio_codec, fmt->audio_codec);
-        have_audio = 1;
+        add_stream(&audio_st, format_context, &audio_codec, fmt->audio_codec);
+        has_audio = 1;
     }
 
     /* Now that all the parameters are set, we can open the audio and
      * video codecs and allocate the necessary encode buffers. */
-    if (have_video)
+    if (has_video)
         open_video(video_codec, &video_st, opt);
 
-    if (have_audio)
+    if (has_audio)
         open_audio(audio_codec, &audio_st, opt);
 
-    av_dump_format(oc, 0, filename, 1);
+    av_dump_format(format_context, 0, filename, 1);
 
     /* open the output file, if needed */
     if (!(fmt->flags & AVFMT_NOFILE)) {
-        ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE);
+        ret = avio_open(&format_context->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
-            return 1;
+            exit(1);
         }
     }
 
     /* Write the stream header, if any. */
-    ret = avformat_write_header(oc, &opt);
+    ret = avformat_write_header(format_context, &opt);
     if (ret < 0) {
         fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
-        return 1;
+        exit(1);
     }
-
-    int sample_rate = 44100;
-    int channels = 2;
-    int channel_layout = 3;
-    int nb_samples = 1024;
-    AudioFrameGenerator audio_frame_generator((AVRational) {1, sample_rate}, channels, STREAM_DURATION, channel_layout, sample_rate, nb_samples);
-    AVFrame *audio_frame;
-    do {
-        audio_frame = audio_frame_generator.generate_audio_frame();
-        write_audio_frame(oc, &audio_st, audio_frame);
-    } while (audio_frame != nullptr);
-
-    // TODO: duplicates
-    VideoFrameGenerator video_frame_generator((AVRational) {1, STREAM_FRAME_RATE}, 352, 288, AV_PIX_FMT_YUV420P, STREAM_DURATION);
-    AVFrame *video_frame;
-    do {
-        video_frame = video_frame_generator.generate_video_frame();
-        write_video_frame(oc, &video_st, video_frame);
-    } while (video_frame != nullptr);
-
-    /* Write the trailer, if any. The trailer must be written before you
-     * close the CodecContexts open when you wrote the header; otherwise
-     * av_write_trailer() may try to use memory that was freed on
-     * av_codec_close(). */
-    av_write_trailer(oc);
-
-    /* Close each codec. */
-    if (have_video)
-        close_stream(&video_st);
-    if (have_audio)
-        close_stream(&audio_st);
-
-    if (!(fmt->flags & AVFMT_NOFILE))
-        /* Close the output file. */
-        avio_closep(&oc->pb);
-
-    /* free the stream */
-    avformat_free_context(oc);
-    return 0;
 }
-
 
 int Multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt) {
     int ret;
@@ -158,7 +112,7 @@ int Multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
 }
 
 /* Add an output stream. */
-void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id) {
+void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id) {
     AVCodecContext *c;
     int i;
 
@@ -175,12 +129,12 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCod
         exit(1);
     }
 
-    ost->st = avformat_new_stream(oc, nullptr);
+    ost->st = avformat_new_stream(format_context, nullptr);
     if (!ost->st) {
         fprintf(stderr, "Could not allocate stream\n");
         exit(1);
     }
-    ost->st->id = oc->nb_streams - 1;
+    ost->st->id = format_context->nb_streams - 1;
     c = avcodec_alloc_context3(*codec);
     if (!c) {
         fprintf(stderr, "Could not alloc an encoding context\n");
@@ -248,7 +202,7 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCod
     }
 
     /* Some formats want stream headers to be separate. */
-    if (oc->oformat->flags & AVFMT_GLOBALHEADER)
+    if (format_context->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 }
 
@@ -326,44 +280,44 @@ AVFrame *Multiplexer::alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t
  * encode one audio frame and send it to the muxer
  * return 1 when encoding is finished, 0 otherwise
  */
-int Multiplexer::write_audio_frame(AVFormatContext *oc, OutputStream *ost, AVFrame *frame) {
+int Multiplexer::write_audio_frame(AVFrame *frame) {
     AVCodecContext *c;
     int ret;
     int dst_nb_samples;
 
-    c = ost->enc;
+    c = audio_st.enc;
 
     if (frame) {
         /* convert samples from native format to destination codec format, using the resampler */
         /* compute destination number of samples */
-        dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_st.swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
         av_assert0(dst_nb_samples == frame->nb_samples);
 
-        if (ost->frame == nullptr) {
-            ost->frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
+        if (audio_st.frame == nullptr) {
+            audio_st.frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
         }
 
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
          * make sure we do not overwrite it here
          */
-        ret = av_frame_make_writable(ost->frame);
+        ret = av_frame_make_writable(audio_st.frame);
         if (ret < 0)
             exit(1);
 
         /* convert to destination format */
-        ret = swr_convert(ost->swr_ctx, ost->frame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
+        ret = swr_convert(audio_st.swr_ctx, audio_st.frame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
         if (ret < 0) {
             fprintf(stderr, "Error while converting\n");
             exit(1);
         }
-        frame = ost->frame;
+        frame = audio_st.frame;
 
-        frame->pts = av_rescale_q(ost->samples_count, (AVRational) {1, c->sample_rate}, c->time_base);
-        ost->samples_count += dst_nb_samples;
+        frame->pts = av_rescale_q(audio_st.samples_count, (AVRational) {1, c->sample_rate}, c->time_base);
+        audio_st.samples_count += dst_nb_samples;
     }
 
-    return write_frame(oc, c, ost->st, frame, ost->tmp_pkt);
+    return write_frame(format_context, c, audio_st.st, frame, audio_st.tmp_pkt);
 }
 
 void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg) {
@@ -393,8 +347,29 @@ void Multiplexer::open_video(const AVCodec *codec, OutputStream *ost, AVDictiona
 * encode one video frame and send it to the muxer
 * return 1 when encoding is finished, 0 otherwise
 */
-int Multiplexer::write_video_frame(AVFormatContext *oc, OutputStream *ost, AVFrame *frame) {
-    return write_frame(oc, ost->enc, ost->st, frame, ost->tmp_pkt);
+int Multiplexer::write_video_frame(AVFrame *frame) {
+    return write_frame(format_context, video_st.enc, video_st.st, frame, video_st.tmp_pkt);
+}
+
+void Multiplexer::finalize() {
+    /* Write the trailer, if any. The trailer must be written before you
+     * close the CodecContexts open when you wrote the header; otherwise
+     * av_write_trailer() may try to use memory that was freed on
+     * av_codec_close(). */
+    av_write_trailer(format_context);
+
+    /* Close each codec. */
+    if (has_video)
+        close_stream(&video_st);
+    if (has_audio)
+        close_stream(&audio_st);
+
+    if (!(format_context->oformat->flags & AVFMT_NOFILE))
+        /* Close the output file. */
+        avio_closep(&format_context->pb);
+
+    /* free the stream */
+    avformat_free_context(format_context);
 }
 
 void Multiplexer::close_stream(OutputStream *ost) {

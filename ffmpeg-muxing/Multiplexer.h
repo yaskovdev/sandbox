@@ -32,18 +32,26 @@ class Multiplexer {
 public:
     Multiplexer();
 
-    int multiplex(const char *filename, AVDictionary *opt);
+    void initialize(const char *filename, AVDictionary *opt);
 
-    int write_audio_frame(AVFormatContext *oc, OutputStream *ost, AVFrame *frame);
+    int write_audio_frame(AVFrame *frame);
 
-    int write_video_frame(AVFormatContext *oc, OutputStream *ost, AVFrame *frame);
+    int write_video_frame(AVFrame *frame);
+
+    void finalize();
 
 private:
+    OutputStream audio_st = {nullptr};
+    OutputStream video_st = {nullptr};
+    AVFormatContext *format_context;
+    int has_audio = 0;
+    int has_video = 0;
+
     static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
     static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
 
-    static void add_stream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id);
+    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id);
 
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
@@ -52,6 +60,7 @@ private:
     static void close_stream(OutputStream *ost);
 
     static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
+
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H
