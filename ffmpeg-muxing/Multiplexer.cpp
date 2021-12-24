@@ -181,16 +181,6 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context,
 
             c->gop_size = video_config.gop_size;
             c->pix_fmt = video_config.pix_fmt;
-            if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-                /* just for testing, we also add B-frames */
-                c->max_b_frames = 2;
-            }
-            if (c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
-                /* Needed to avoid using macroblocks in which some coeffs overflow.
-                 * This does not happen with normal video, it just happens here as
-                 * the motion of the chroma plane does not match the luma plane. */
-                c->mb_decision = FF_MB_DECISION_RD;
-            }
             break;
 
         default:
