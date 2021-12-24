@@ -4,22 +4,8 @@
 #include <cstdlib>
 #include <cstdio>
 
-extern "C" {
-#include <libavutil/avassert.h>
-#include <libavutil/channel_layout.h>
-#include <libavutil/opt.h>
-#include <libavutil/mathematics.h>
-#include <libavutil/timestamp.h>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-#include <libswresample/swresample.h>
-}
-
 #define STREAM_DURATION   10.0
 #define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
-
-#define SCALE_FLAGS SWS_BICUBIC
 
 void Multiplexer::log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
     AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
@@ -119,9 +105,9 @@ int Multiplexer::multiplex(const char *filename, AVDictionary *opt) {
 
     /* Close each codec. */
     if (have_video)
-        close_stream(oc, &video_st);
+        close_stream(&video_st);
     if (have_audio)
-        close_stream(oc, &audio_st);
+        close_stream(&audio_st);
 
     if (!(fmt->flags & AVFMT_NOFILE))
         /* Close the output file. */
@@ -204,15 +190,15 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCod
 
     switch ((*codec)->type) {
         case AVMEDIA_TYPE_AUDIO:
-            c->sample_fmt = (*codec)->sample_fmts ?
-                            (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
+            c->sample_fmt = (*codec)->sample_fmts ? (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
             c->bit_rate = 64000;
             c->sample_rate = 44100;
             if ((*codec)->supported_samplerates) {
                 c->sample_rate = (*codec)->supported_samplerates[0];
                 for (i = 0; (*codec)->supported_samplerates[i]; i++) {
-                    if ((*codec)->supported_samplerates[i] == 44100)
+                    if ((*codec)->supported_samplerates[i] == 44100) {
                         c->sample_rate = 44100;
+                    }
                 }
             }
             c->channels = av_get_channel_layout_nb_channels(c->channel_layout);
@@ -220,8 +206,9 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *oc, const AVCod
             if ((*codec)->channel_layouts) {
                 c->channel_layout = (*codec)->channel_layouts[0];
                 for (i = 0; (*codec)->channel_layouts[i]; i++) {
-                    if ((*codec)->channel_layouts[i] == AV_CH_LAYOUT_STEREO)
+                    if ((*codec)->channel_layouts[i] == AV_CH_LAYOUT_STEREO) {
                         c->channel_layout = AV_CH_LAYOUT_STEREO;
+                    }
                 }
             }
             c->channels = av_get_channel_layout_nb_channels(c->channel_layout);
@@ -280,8 +267,6 @@ void Multiplexer::open_audio(const AVCodec *codec, OutputStream *ost, AVDictiona
         fprintf(stderr, "Could not open audio codec: %s\n", av_err2str(ret));
         exit(1);
     }
-
-    if (c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE);
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
@@ -412,11 +397,9 @@ int Multiplexer::write_video_frame(AVFormatContext *oc, OutputStream *ost, AVFra
     return write_frame(oc, ost->enc, ost->st, frame, ost->tmp_pkt);
 }
 
-void Multiplexer::close_stream(AVFormatContext *oc, OutputStream *ost) {
+void Multiplexer::close_stream(OutputStream *ost) {
     avcodec_free_context(&ost->enc);
     av_frame_free(&ost->frame);
-    av_frame_free(&ost->tmp_frame);
     av_packet_free(&ost->tmp_pkt);
-    sws_freeContext(ost->sws_ctx);
     swr_free(&ost->swr_ctx);
 }

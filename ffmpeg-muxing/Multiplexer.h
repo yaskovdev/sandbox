@@ -19,18 +19,12 @@ typedef struct OutputStream {
     AVStream *st;
     AVCodecContext *enc;
 
-    /* pts of the next frame that will be generated */
-    int64_t next_pts;
     int samples_count;
 
     AVFrame *frame;
-    AVFrame *tmp_frame;
 
     AVPacket *tmp_pkt;
 
-    float t, tincr, tincr2;
-
-    struct SwsContext *sws_ctx;
     struct SwrContext *swr_ctx;
 } OutputStream;
 
@@ -53,13 +47,11 @@ private:
 
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
-    static AVFrame *generate_audio_frame(OutputStream *ost);
-
     static void open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
-    static void close_stream(AVFormatContext *oc, OutputStream *ost);
+    static void close_stream(OutputStream *ost);
 
-    AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
+    static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H
