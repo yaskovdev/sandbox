@@ -14,6 +14,16 @@ extern "C" {
 }
 
 #define STREAM_FRAME_RATE 25 /* 25 images/s */
+#define STREAM_SAMPLE_RATE 44100
+
+typedef struct AudioConfig {
+    AVRational time_base = (AVRational) {1, STREAM_SAMPLE_RATE};
+    int sample_rate = STREAM_SAMPLE_RATE;
+    int channels = 2;
+    int channel_layout = 3;
+    int nb_samples = 1024;
+    int64_t bit_rate = 64000;
+} AudioConfig;
 
 typedef struct VideoConfig {
     AVRational time_base = (AVRational) {1, STREAM_FRAME_RATE};
@@ -42,7 +52,7 @@ class Multiplexer {
 public:
     Multiplexer();
 
-    void initialize(const char *filename, AVDictionary *opt, VideoConfig video_config);
+    void initialize(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config);
 
     int write_audio_frame(AVFrame *frame);
 
@@ -61,7 +71,8 @@ private:
 
     static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
 
-    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, VideoConfig video_config);
+    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, AudioConfig audio_config,
+        VideoConfig video_config);
 
     static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 

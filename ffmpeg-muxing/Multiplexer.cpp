@@ -16,7 +16,7 @@ Multiplexer::Multiplexer() {
 
 }
 
-void Multiplexer::initialize(const char *filename, AVDictionary *opt, VideoConfig video_config) {
+void Multiplexer::initialize(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config) {
     const AVCodec *audio_codec, *video_codec;
     int ret;
 
@@ -36,11 +36,11 @@ void Multiplexer::initialize(const char *filename, AVDictionary *opt, VideoConfi
     // Add the audio and video streams using the default format codecs and initialize the codecs.
     if (output_format->video_codec != AV_CODEC_ID_NONE) {
         printf("Video codec is %d\n", output_format->video_codec);
-        add_stream(&video_st, format_context, &video_codec, output_format->video_codec, video_config);
+        add_stream(&video_st, format_context, &video_codec, output_format->video_codec, audio_config, video_config);
         has_video = 1;
     }
     if (output_format->audio_codec != AV_CODEC_ID_NONE) {
-        add_stream(&audio_st, format_context, &audio_codec, output_format->audio_codec, video_config);
+        add_stream(&audio_st, format_context, &audio_codec, output_format->audio_codec, audio_config, video_config);
         has_audio = 1;
     }
 
@@ -110,7 +110,8 @@ int Multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
 }
 
 /* Add an output stream. */
-void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, VideoConfig video_config) {
+void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, AudioConfig audio_config,
+    VideoConfig video_config) {
     AVCodecContext *c;
     int i;
 
@@ -143,13 +144,13 @@ void Multiplexer::add_stream(OutputStream *ost, AVFormatContext *format_context,
     switch ((*codec)->type) {
         case AVMEDIA_TYPE_AUDIO:
             c->sample_fmt = (*codec)->sample_fmts ? (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
-            c->bit_rate = 64000;
-            c->sample_rate = 44100;
+            c->bit_rate = audio_config.bit_rate;
+            c->sample_rate = audio_config.sample_rate;
             if ((*codec)->supported_samplerates) {
                 c->sample_rate = (*codec)->supported_samplerates[0];
                 for (i = 0; (*codec)->supported_samplerates[i]; i++) {
-                    if ((*codec)->supported_samplerates[i] == 44100) {
-                        c->sample_rate = 44100;
+                    if ((*codec)->supported_samplerates[i] == audio_config.sample_rate) {
+                        c->sample_rate = audio_config.sample_rate;
                     }
                 }
             }

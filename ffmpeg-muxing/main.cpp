@@ -6,12 +6,8 @@
 
 #define STREAM_DURATION 10.0
 
-AudioFrameGenerator create_audio_frame_generator() {
-    int sample_rate = 44100;
-    int channels = 2;
-    int channel_layout = 3;
-    int nb_samples = 1024;
-    AudioFrameGenerator audio_frame_generator((AVRational) {1, sample_rate}, channels, STREAM_DURATION, channel_layout, sample_rate, nb_samples);
+AudioFrameGenerator create_audio_frame_generator(AudioConfig config) {
+    AudioFrameGenerator audio_frame_generator(config.time_base, config.channels, STREAM_DURATION, config.channel_layout, config.sample_rate, config.nb_samples);
     return audio_frame_generator;
 }
 
@@ -41,17 +37,17 @@ int main(int argc, char **argv) {
     }
     Multiplexer multiplexer;
 
+    AudioConfig audio_config;
     VideoConfig video_config;
-    multiplexer.initialize(filename, opt, video_config);
+    multiplexer.initialize(filename, opt, audio_config, video_config);
 
-    AudioFrameGenerator audio_frame_generator = create_audio_frame_generator();
+    AudioFrameGenerator audio_frame_generator = create_audio_frame_generator(audio_config);
     AVFrame *audio_frame;
     do {
         audio_frame = audio_frame_generator.generate_audio_frame();
         multiplexer.write_audio_frame(audio_frame);
     } while (audio_frame != nullptr);
 
-    // TODO: duplicates
     VideoFrameGenerator video_frame_generator = create_video_frame_generator(video_config);
     AVFrame *video_frame;
     do {
