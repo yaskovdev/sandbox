@@ -13,12 +13,12 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-#define STREAM_FRAME_RATE 25 /* 25 images/s */
-#define STREAM_SAMPLE_RATE 44100
+#define AUDIO_STREAM_SAMPLE_RATE 44100
+#define VIDEO_STREAM_FRAME_RATE 25
 
 typedef struct AudioConfig {
-    AVRational time_base = (AVRational) {1, STREAM_SAMPLE_RATE};
-    int sample_rate = STREAM_SAMPLE_RATE;
+    AVRational time_base = (AVRational) {1, AUDIO_STREAM_SAMPLE_RATE};
+    int sample_rate = AUDIO_STREAM_SAMPLE_RATE;
     int channels = 2;
     int channel_layout = 3;
     int nb_samples = 1024;
@@ -26,7 +26,7 @@ typedef struct AudioConfig {
 } AudioConfig;
 
 typedef struct VideoConfig {
-    AVRational time_base = (AVRational) {1, STREAM_FRAME_RATE};
+    AVRational time_base = (AVRational) {1, VIDEO_STREAM_FRAME_RATE};
     int width = 352;
     int height = 288;
     enum AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
