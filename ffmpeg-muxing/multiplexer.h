@@ -16,26 +16,26 @@ extern "C" {
 #define AUDIO_STREAM_SAMPLE_RATE 44100
 #define VIDEO_STREAM_FRAME_RATE 25
 
-typedef struct AudioConfig {
-    AVRational time_base = (AVRational) {1, AUDIO_STREAM_SAMPLE_RATE};
+typedef struct audio_config {
+    AVRational time_base = AVRational{1, AUDIO_STREAM_SAMPLE_RATE};
     int sample_rate = AUDIO_STREAM_SAMPLE_RATE;
     int channels = 2;
     int channel_layout = 3;
     int nb_samples = 1024;
     int64_t bit_rate = 64000;
-} AudioConfig;
+} audio_config;
 
-typedef struct VideoConfig {
-    AVRational time_base = (AVRational) {1, VIDEO_STREAM_FRAME_RATE};
+typedef struct video_config {
+    AVRational time_base = AVRational{1, VIDEO_STREAM_FRAME_RATE};
     int width = 352;
     int height = 288;
     enum AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
     int64_t bit_rate = 400000;
-    /* emit one intra frame every twelve frames at most */
+    /* emit one intra frame_ every twelve frames at most */
     int gop_size = 12;
-} VideoConfig;
+} video_config;
 
-typedef struct OutputStream {
+typedef struct output_stream {
     AVStream *st;
     AVCodecContext *enc;
 
@@ -48,9 +48,9 @@ typedef struct OutputStream {
     struct SwrContext *swr_ctx;
 } OutputStream;
 
-class Multiplexer {
+class multiplexer {
 public:
-    Multiplexer(const char *filename, AVDictionary *opt, AudioConfig audio_config, VideoConfig video_config);
+    multiplexer(const char *filename, AVDictionary *opt, audio_config audio_config, video_config video_config);
 
     int write_audio_frame(AVFrame *frame);
 
@@ -59,24 +59,24 @@ public:
     void finalize();
 
 private:
-    OutputStream audio_stream = {};
-    OutputStream video_stream = {};
-    AVFormatContext *format_context;
-    int has_audio = 0;
-    int has_video = 0;
+    output_stream audio_stream_ = {};
+    output_stream video_stream_ = {};
+    AVFormatContext *format_context_;
+    int has_audio_ = 0;
+    int has_video_ = 0;
 
     static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
     static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
 
-    static void add_stream(OutputStream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, AudioConfig audio_config,
-        VideoConfig video_config);
+    static void add_stream(output_stream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, audio_config audio_config,
+        video_config video_config);
 
-    static void open_audio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    static void open_audio(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
 
-    static void open_video(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    static void open_video(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
 
-    static void close_stream(OutputStream *ost);
+    static void close_stream(output_stream *ost);
 
     static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
 };

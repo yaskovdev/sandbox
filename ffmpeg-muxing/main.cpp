@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <cstring>
-#include "Multiplexer.h"
-#include "VideoFrameGenerator.h"
-#include "AudioFrameGenerator.h"
+#include "multiplexer.h"
+#include "video_frame_generator.h"
+#include "audio_frame_generator.h"
 
 #define STREAM_DURATION 10.0
 
@@ -25,18 +25,18 @@ int main(int argc, char **argv) {
             av_dict_set(&opt, argv[i] + 1, argv[i + 1], 0);
         }
     }
-    AudioConfig audio_config;
-    VideoConfig video_config;
-    Multiplexer multiplexer(filename, opt, audio_config, video_config);
+    audio_config audio_config;
+    video_config video_config;
+    multiplexer multiplexer(filename, opt, audio_config, video_config);
 
-    AudioFrameGenerator audio_frame_generator(audio_config, STREAM_DURATION);
+    audio_frame_generator audio_frame_generator(audio_config, STREAM_DURATION);
     AVFrame *audio_frame;
     do {
         audio_frame = audio_frame_generator.generate_audio_frame();
         multiplexer.write_audio_frame(audio_frame);
     } while (audio_frame != nullptr);
 
-    VideoFrameGenerator video_frame_generator(video_config, STREAM_DURATION);
+    video_frame_generator video_frame_generator(video_config, STREAM_DURATION);
     AVFrame *video_frame;
     do {
         video_frame = video_frame_generator.generate_video_frame();

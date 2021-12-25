@@ -1,7 +1,7 @@
-#ifndef FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H
-#define FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H
+#ifndef FFMPEG_MUXING_VIDEO_FRAME_GENERATOR_H
+#define FFMPEG_MUXING_VIDEO_FRAME_GENERATOR_H
 
-#include "Multiplexer.h"
+#include "multiplexer.h"
 
 extern "C" {
 #include <libavutil/avassert.h>
@@ -15,24 +15,24 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-class VideoFrameGenerator {
+class video_frame_generator {
 public:
-    VideoFrameGenerator(VideoConfig config, int stream_duration);
+    video_frame_generator(video_config config, int stream_duration);
 
     AVFrame *generate_video_frame();
 
 private:
-    int next_pts;
-    AVRational time_base;
-    AVFrame *frame;
-    int width;
-    int height;
-    enum AVPixelFormat pix_fmt;
-    int stream_duration;
+    int next_pts_;
+    AVRational time_base_;
+    AVFrame *frame_;
+    int width_;
+    int height_;
+    enum AVPixelFormat pix_fmt_;
+    int stream_duration_;
 
     static void fill_yuv_image(AVFrame *pict, int frame_index, int width, int height);
 
     static AVFrame *alloc_picture(AVPixelFormat pix_fmt, int width, int height);
 };
 
-#endif //FFMPEG_MUXING_VIDEOFRAMEGENERATOR_H
+#endif //FFMPEG_MUXING_VIDEO_FRAME_GENERATOR_H
