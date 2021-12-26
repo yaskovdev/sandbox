@@ -6,9 +6,12 @@ class entity {
 public:
     entity();
 
-    void print();
+    void print_name();
 
     ~entity();
+
+private:
+    char const *name_;
 };
 
 

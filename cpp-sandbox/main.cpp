@@ -1,6 +1,5 @@
 #include <iostream>
 #include <chrono>
-#include <sstream>
 #include "entity.h"
 #include <cstdio>
 #include <memory>
@@ -12,21 +11,16 @@ using std::make_shared;
 using std::cout;
 using std::endl;
 using std::chrono::duration_cast;
-using std::chrono::milliseconds;
+using std::chrono::microseconds;
 using std::chrono::system_clock;
-using std::ostringstream;
 using std::string;
 
 static string generate_file_name(const char *directory) {
-    const long long ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-    ostringstream stream;
-    stream << directory << ms;
-    string answer = stream.str();
-    const char *name = answer.c_str();
-    return name;
+    uint64_t microseconds_since_epoch = duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
+    return string(directory) + std::to_string(microseconds_since_epoch);
 }
 
-bool function_that_returns_bool() {
+bool function_that_returns_false() {
     int status = 0;
     return !!status;
 }
@@ -76,21 +70,50 @@ void return_by_value_sandbox() {
 
 void unique_ptr_sandbox() {
     unique_ptr<entity> unique_entity = make_unique<entity>();
-    unique_entity->print();
+    unique_entity->print_name();
+}
+
+void create_many_files_with_unique_names() {
+    for (int i = 0; i < 1000; ++i) {
+        const string file_name = generate_file_name("/Users/yaskovdev/dev/files/");
+        cout << file_name << endl;
+        const char *null_terminated_file_name = file_name.c_str();
+        // Note: file name_ you pass to fopen should be null-terminated. c_str() returns a pointer to null-terminated array of characters.
+        FILE *file = fopen(null_terminated_file_name, "w");
+        if (file == nullptr) {
+            cout << "Cannot open file with name " << null_terminated_file_name << endl;
+            return;
+        }
+        fprintf(file, "Iteration %d", i);
+        fclose(file);
+    }
 }
 
 int main(int argc, char **argv) {
+//    int const *const ints = new int[5];
+//    ints[0] = 5;
     {
         shared_ptr<entity> ptr_to_entity = make_shared<entity>();
         {
             shared_ptr<entity> another_ptr_to_entity = ptr_to_entity;
-            another_ptr_to_entity->print();
+            another_ptr_to_entity->print_name();
             cout << "Going to exit inner block" << endl;
         }
         cout << "Exited inner block" << endl;
-        ptr_to_entity->print();
+        ptr_to_entity->print_name();
         cout << "Going to exit outer block" << endl;
     }
     cout << "Exited outer block" << endl;
+
+    int word_size = 5;
+    char *word = new char[word_size + 1];
+    char *current = word;
+    while (current - word < word_size) {
+        *current = 'a';
+        current += 1; // pointers increment according to the size of their type
+    }
+    *current = '\0';
+    cout << word << endl;
+
     return 0;
 }
