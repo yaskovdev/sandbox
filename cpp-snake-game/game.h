@@ -9,7 +9,9 @@ class game {
 public:
     std::unordered_map<int, std::pair<int, int>> key_to_delta;
     bool ongoing;
-    std::pair<int, int> position;
+    std::pair<int, int> field_size;
+    std::pair<int, int> player_size;
+    std::pair<int, int> player_position;
 
     game();
 
