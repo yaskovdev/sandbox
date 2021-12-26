@@ -6,6 +6,6 @@ set(CMAKE_CXX_FLAGS "-D__STDC_CONSTANT_MACROS")
 
 find_package(SDL2 REQUIRED)
 
-add_executable(cpp_snake_game main.cpp game.cpp game.h enemy.cpp enemy.h pair.cpp pair.h)
+add_executable(cpp_snake_game main.cpp game.cpp game.h enemy.cpp enemy.h pair.cpp pair.h triple.cpp triple.h)
 target_include_directories(cpp_snake_game PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(cpp_snake_game PRIVATE ${SDL2_LIBRARIES})

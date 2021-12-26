@@ -3,18 +3,19 @@
 #include "SDL.h"
 #include "game.h"
 #include "pair.h"
+#include "triple.h"
 
 using std::cout;
 using std::endl;
 using std::make_pair;
 
-void render_square(SDL_Renderer *const renderer, pair const position, pair const size) {
+void render_square(SDL_Renderer *const renderer, pair const position, pair const size, triple const color) {
     SDL_Rect rectangle;
     rectangle.x = position.x;
     rectangle.y = position.y;
     rectangle.w = size.x;
     rectangle.h = size.y;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, color.x, color.y, color.z, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
@@ -44,10 +45,10 @@ int main(int const argc, char const *const argv[]) {
         game.tick();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
-        render_square(renderer, game.player_position, game.player_size);
-        render_square(renderer, game.main_enemy.position, game.main_enemy.size);
-//        for (enemy enemy: game.enemies) {
-//        }
+        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
+        for (enemy enemy: game.enemies) {
+            render_square(renderer, enemy.position, enemy.size, triple(255, 0, 0));
+        }
         SDL_RenderPresent(renderer);
     }
 

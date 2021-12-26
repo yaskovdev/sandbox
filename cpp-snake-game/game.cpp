@@ -11,13 +11,11 @@ game::game() {
         {SDLK_RIGHT, pair(SPEED, 0)}
     });
     ongoing = true;
-    field_size = pair(640, 480);
+    field_size = pair(720, 480);
     player_size = pair(25, 100);
     player_position = pair(0, 0);
     pressed_keys = std::unordered_set<int>();
     time = 0;
-    enemy enemy(field_size, pair(10, 10));
-    main_enemy = enemy;
 }
 
 void game::handle_keydown(int key) {
@@ -34,12 +32,28 @@ void game::tick() {
         player_position.x = bounded(player_position.x + delta.x, 0, field_size.x - player_size.x);
         player_position.y = bounded(player_position.y + delta.y, 0, field_size.y - player_size.y);
     }
-    main_enemy.move();
-//    enemy enemy(field_size, pair(10, 10));
-//    enemies.push_back(enemy);
-//    if (time % 200 == 0) {
-//    }
+
+    for (enemy &enemy: enemies) {
+        enemy.move();
+    }
+    cleanup_enemies();
+
+    if (time % 200 == 0) {
+        enemy enemy(field_size, pair(10, 10));
+        enemies.push_back(enemy);
+    }
     time += 1;
+}
+
+void game::cleanup_enemies() {
+    std::list<enemy>::const_iterator iterator = enemies.begin();
+    while (iterator != enemies.end()) {
+        if (iterator->is_gone()) {
+            iterator = enemies.erase(iterator);
+        } else {
+            ++iterator;
+        }
+    }
 }
 
 void game::quit() {

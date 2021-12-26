@@ -9,6 +9,9 @@ enemy::enemy(pair field_size, pair size) {
 }
 
 void enemy::move() {
-    int y = position.y + 1;
-    position = pair(position.x, y);
+    position = pair(position.x, position.y + 1);
+}
+
+bool enemy::is_gone() const {
+    return position.y >= field_size.y;
 }

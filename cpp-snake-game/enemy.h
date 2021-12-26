@@ -14,6 +14,8 @@ public:
 
     enemy(pair field_size, pair size);
 
+    bool is_gone() const;
+
     void move();
 };
 

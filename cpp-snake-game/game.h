@@ -17,7 +17,7 @@ public:
     pair player_size;
     pair player_position;
     std::unordered_set<int> pressed_keys;
-    enemy main_enemy = enemy(field_size, pair(10, 10));
+    std::list<enemy> enemies;
 
     game();
 
@@ -33,6 +33,7 @@ public:
 
 private:
     int time; // TODO: temporary way
+    void cleanup_enemies();
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H
