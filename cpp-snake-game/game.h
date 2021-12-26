@@ -5,14 +5,15 @@
 #include <SDL_keycode.h>
 #include <unordered_map>
 #include <unordered_set>
+#include "pair.h"
 
 class game {
 public:
-    std::unordered_map<int, std::pair<int, int>> key_to_delta;
+    std::unordered_map<int, pair> key_to_delta;
     bool ongoing;
-    std::pair<int, int> field_size;
-    std::pair<int, int> player_size;
-    std::pair<int, int> player_position;
+    pair field_size;
+    pair player_size;
+    pair player_position;
     std::unordered_set<int> pressed_keys;
 
     game();
@@ -21,9 +22,14 @@ public:
 
     void handle_keyup(int key);
 
-    void update();
+    void tick();
 
     void quit();
+
+    static int bounded(int value, int min, int max);
+
+private:
+    int time; // TODO: temporary way
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H

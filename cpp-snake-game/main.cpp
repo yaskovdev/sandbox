@@ -2,19 +2,19 @@
 #include <unordered_map>
 #include "SDL.h"
 #include "game.h"
+#include "pair.h"
 
 using std::cout;
 using std::endl;
-using std::pair;
 using std::make_pair;
 
-void render_square(SDL_Renderer *const renderer, pair<int, int> const position, pair<int, int> const size) {
+void render_square(SDL_Renderer *const renderer, pair const position, pair const size) {
     SDL_Rect rectangle;
-    rectangle.x = position.first;
-    rectangle.y = position.second;
-    rectangle.w = size.first;
-    rectangle.h = size.second;
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+    rectangle.x = position.x;
+    rectangle.y = position.y;
+    rectangle.w = size.x;
+    rectangle.h = size.y;
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
@@ -26,8 +26,8 @@ int main(int const argc, char const *const argv[]) {
     game game;
 
     SDL_Init(SDL_INIT_VIDEO);
-    pair<int, int> field_size = game.field_size;
-    SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.first, field_size.second, 0);
+    pair field_size = game.field_size;
+    SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.x, field_size.y, 0);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
     while (game.ongoing) {
@@ -36,14 +36,12 @@ int main(int const argc, char const *const argv[]) {
             if (quit_requested(e)) {
                 game.quit();
             } else if (e.type == SDL_KEYDOWN) {
-                cout << "DOWN" << endl;
                 game.handle_keydown(e.key.keysym.sym);
-                game.update();
             } else if (e.type == SDL_KEYUP) {
-                cout << "UP" << endl;
                 game.handle_keyup(e.key.keysym.sym);
             }
         }
+        game.tick();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
         render_square(renderer, game.player_position, game.player_size);
