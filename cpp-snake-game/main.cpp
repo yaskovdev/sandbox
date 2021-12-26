@@ -45,6 +45,9 @@ int main(int const argc, char const *const argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
         render_square(renderer, game.player_position, game.player_size);
+        render_square(renderer, game.main_enemy.position, game.main_enemy.size);
+//        for (enemy enemy: game.enemies) {
+//        }
         SDL_RenderPresent(renderer);
     }
 

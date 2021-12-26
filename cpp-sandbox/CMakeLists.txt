@@ -16,6 +16,6 @@ find_library(AVUTIL_LIBRARY avutil)
 find_path(AVDEVICE_INCLUDE_DIR libavdevice/avdevice.h)
 find_library(AVDEVICE_LIBRARY avdevice)
 
-add_executable(cpp_sandbox main.cpp entity.cpp entity.h)
+add_executable(cpp_sandbox main.cpp entity.cpp entity.h pair.cpp pair.h)
 target_include_directories(cpp_sandbox PRIVATE ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${AVDEVICE_INCLUDE_DIR})
 target_link_libraries(cpp_sandbox PRIVATE ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${AVDEVICE_LIBRARY})

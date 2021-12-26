@@ -13,3 +13,7 @@ entity::~entity() {
 void entity::print_name() {
     std::cout << "Entity name is " << name_ << std::endl;
 }
+
+void entity::increment() {
+    count = pair(count.x, count.y + 1);
+}

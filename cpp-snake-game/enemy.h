@@ -13,6 +13,8 @@ public:
     pair position;
 
     enemy(pair field_size, pair size);
+
+    void move();
 };
 
 #endif //CPP_SNAKE_GAME_ENEMY_H

@@ -25,16 +25,16 @@ bool function_that_returns_false() {
     return !!status;
 }
 
-typedef struct pair {
-    int x;
-    int y;
-} pair;
-
-// Allocate on the stack if possible. It is not possible if you need a bigger scope, or you need to load really much data (megabytes of data).
-pair function_that_returns_pair_by_value() {
-    pair p = {0, 1};
-    return p;
-}
+//typedef struct pair {
+//    int x;
+//    int y;
+//} pair;
+//
+//// Allocate on the stack if possible. It is not possible if you need a bigger scope, or you need to load really much data (megabytes of data).
+//pair function_that_returns_pair_by_value() {
+//    pair p = {0, 1};
+//    return p;
+//}
 
 void string_termination_sandbox() {
     for (int i = 0; i < 10000; i++) {
@@ -59,14 +59,14 @@ void string_termination_sandbox() {
     }
 }
 
-void return_by_value_sandbox() {
-    for (int i = 0; i < 100000; i++) {
-        const pair p = function_that_returns_pair_by_value();
-        const pair q = {10, 20};
-        printf("p.x=%d, p.y=%d\n", p.x, p.y);
-        printf("q.x=%d, q.y=%d\n", q.x, q.y);
-    }
-}
+//void return_by_value_sandbox() {
+//    for (int i = 0; i < 100000; i++) {
+//        const pair p = function_that_returns_pair_by_value();
+//        const pair q = {10, 20};
+//        printf("p.x=%d, p.y=%d\n", p.x, p.y);
+//        printf("q.x=%d, q.y=%d\n", q.x, q.y);
+//    }
+//}
 
 void unique_ptr_sandbox() {
     unique_ptr<entity> unique_entity = make_unique<entity>();
@@ -114,6 +114,11 @@ int main(int argc, char **argv) {
     }
     *current = '\0';
     cout << word << endl;
+
+    entity e;
+    cout << "y before increment " << std::to_string(e.count.y) << endl;
+    e.increment();
+    cout << "y after increment " << std::to_string(e.count.y) << endl;
 
     return 0;
 }

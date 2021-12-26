@@ -5,7 +5,9 @@
 #include <SDL_keycode.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <list>
 #include "pair.h"
+#include "enemy.h"
 
 class game {
 public:
@@ -15,6 +17,7 @@ public:
     pair player_size;
     pair player_position;
     std::unordered_set<int> pressed_keys;
+    enemy main_enemy = enemy(field_size, pair(10, 10));
 
     game();
 
