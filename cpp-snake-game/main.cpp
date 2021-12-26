@@ -1,12 +1,22 @@
 #include <iostream>
+#include <unordered_map>
 #include "SDL.h"
 
-#define SPEED 10
+#define SPEED 20
 
 using std::cout;
 using std::endl;
+using std::pair;
+using std::make_pair;
 
-void render_square(std::pair<int, int> const position, SDL_Renderer *renderer) {
+std::unordered_map<SDL_KeyCode, pair<int, int>> key_to_delta({
+    {SDLK_UP,    make_pair(0, -SPEED)},
+    {SDLK_DOWN,  make_pair(0, SPEED)},
+    {SDLK_LEFT,  make_pair(-SPEED, 0)},
+    {SDLK_RIGHT, make_pair(SPEED, 0)}
+});
+
+void render_square(SDL_Renderer *const renderer, pair<int, int> const position) {
     SDL_Rect rectangle;
     rectangle.x = position.first;
     rectangle.y = position.second;
@@ -16,49 +26,30 @@ void render_square(std::pair<int, int> const position, SDL_Renderer *renderer) {
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
-void update(std::pair<int, int> *const position, std::pair<int, int> const update) {
-    position->first += update.first;
-    position->second += update.second;
+void update(pair<int, int> *const position, pair<int, int> const delta) {
+    position->first += delta.first;
+    position->second += delta.second;
 }
 
-int main(int argc, char *argv[]) {
+int main(int const argc, char const *const argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window *const window = SDL_CreateWindow("SDL2Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+    SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
-    SDL_Window *window = SDL_CreateWindow("SDL2Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
-
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-
-    SDL_Event e;
     bool quit = false;
-    std::pair<int, int> position = std::make_pair(0, 0);
-    int x = 0;
-    int y = 0;
+    pair<int, int> position = make_pair(0, 0);
     while (!quit) {
+        SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             } else if (e.type == SDL_KEYDOWN) {
-                std::pair<int, int> delta;
-                switch (e.key.keysym.sym) {
-                    case SDLK_UP:
-                        delta = std::make_pair(0, -SPEED);
-                        break;
-                    case SDLK_DOWN:
-                        delta = std::make_pair(0, SPEED);
-                        break;
-                    case SDLK_RIGHT:
-                        delta = std::make_pair(SPEED, 0);
-                        break;
-                    case SDLK_LEFT:
-                        delta = std::make_pair(-SPEED, 0);
-                        break;
-                }
-                update(&position, delta);
+                update(&position, key_to_delta[(SDL_KeyCode) e.key.keysym.sym]);
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
-        render_square(position, renderer);
+        render_square(renderer, position);
         SDL_RenderPresent(renderer);
     }
 
