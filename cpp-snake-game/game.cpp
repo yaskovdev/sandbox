@@ -1,21 +1,21 @@
 #include "game.h"
 #include "enemy.h"
 
-#define SPEED 2
+#define PLAYER_SPEED 1
 
 game::game() {
     key_to_delta = std::unordered_map<int, pair>({
-        {SDLK_UP,    pair(0, -SPEED)},
-        {SDLK_DOWN,  pair(0, SPEED)},
-        {SDLK_LEFT,  pair(-SPEED, 0)},
-        {SDLK_RIGHT, pair(SPEED, 0)}
+        {SDLK_UP,    pair(0, -PLAYER_SPEED)},
+        {SDLK_DOWN,  pair(0, PLAYER_SPEED)},
+        {SDLK_LEFT,  pair(-PLAYER_SPEED, 0)},
+        {SDLK_RIGHT, pair(PLAYER_SPEED, 0)}
     });
     ongoing = true;
     field_size = pair(720, 480);
     player_size = pair(25, 100);
     player_position = pair(0, 0);
+    player_health = 100;
     pressed_keys = std::unordered_set<int>();
-    time = 0;
 }
 
 void game::handle_keydown(int key) {
@@ -35,23 +35,38 @@ void game::tick() {
 
     for (enemy &enemy: enemies) {
         enemy.move();
+        enemy.collided = enemy.is_collided_with_object(player_position, player_size);
     }
-    cleanup_enemies();
+    cleanup_flown_away_enemies();
+    cleanup_collided_enemies();
 
-    if (time % 200 == 0) {
-        enemy enemy(field_size, pair(10, 10));
+    if (time % 100 == 0 && rand() % 2 == 0) {
+        enemy enemy(field_size, pair(20, 20));
         enemies.push_back(enemy);
     }
     time += 1;
 }
 
-void game::cleanup_enemies() {
-    std::list<enemy>::const_iterator iterator = enemies.begin();
-    while (iterator != enemies.end()) {
-        if (iterator->is_gone()) {
-            iterator = enemies.erase(iterator);
+void game::cleanup_flown_away_enemies() {
+    std::list<enemy>::const_iterator candidate = enemies.begin();
+    while (candidate != enemies.end()) {
+        if (candidate->is_flown_away()) {
+            candidate = enemies.erase(candidate);
         } else {
-            ++iterator;
+            ++candidate;
+        }
+    }
+}
+
+// TODO: very similar to cleanup_flown_away_enemies()
+void game::cleanup_collided_enemies() {
+    std::list<enemy>::const_iterator candidate = enemies.begin();
+    while (candidate != enemies.end()) {
+        if (candidate->collided) {
+            player_health -= 1;
+            candidate = enemies.erase(candidate);
+        } else {
+            ++candidate;
         }
     }
 }

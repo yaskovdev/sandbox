@@ -1,7 +1,3 @@
-//
-// Created by Sergey Yaskov on 26.12.2021.
-//
-
 #include "triple.h"
 
 triple::triple() : triple(0, 0, 0) {

@@ -12,10 +12,12 @@
 class game {
 public:
     std::unordered_map<int, pair> key_to_delta;
+    unsigned int time;
     bool ongoing;
     pair field_size;
     pair player_size;
     pair player_position;
+    int player_health;
     std::unordered_set<int> pressed_keys;
     std::list<enemy> enemies;
 
@@ -32,8 +34,10 @@ public:
     static int bounded(int value, int min, int max);
 
 private:
-    int time; // TODO: temporary way
-    void cleanup_enemies();
+
+    void cleanup_flown_away_enemies();
+
+    void cleanup_collided_enemies();
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H

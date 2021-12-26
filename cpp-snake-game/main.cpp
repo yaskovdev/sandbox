@@ -19,6 +19,12 @@ void render_square(SDL_Renderer *const renderer, pair const position, pair const
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
+void render_health(game const &game) {
+    if (game.time % 500 == 0) {
+        cout << std::to_string(game.player_health) << endl;
+    }
+}
+
 bool quit_requested(const SDL_Event e) {
     return e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE);
 }
@@ -45,10 +51,11 @@ int main(int const argc, char const *const argv[]) {
         game.tick();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
-        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
         for (enemy enemy: game.enemies) {
             render_square(renderer, enemy.position, enemy.size, triple(255, 0, 0));
         }
+        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
+        render_health(game);
         SDL_RenderPresent(renderer);
     }
 
