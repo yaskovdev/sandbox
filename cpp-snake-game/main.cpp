@@ -18,6 +18,10 @@ void render_square(SDL_Renderer *const renderer, pair<int, int> const position, 
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
+bool quit_requested(const SDL_Event e) {
+    return e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE);
+}
+
 int main(int const argc, char const *const argv[]) {
     game game;
 
@@ -29,10 +33,15 @@ int main(int const argc, char const *const argv[]) {
     while (game.ongoing) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
+            if (quit_requested(e)) {
                 game.quit();
             } else if (e.type == SDL_KEYDOWN) {
+                cout << "DOWN" << endl;
                 game.handle_keydown(e.key.keysym.sym);
+                game.update();
+            } else if (e.type == SDL_KEYUP) {
+                cout << "UP" << endl;
+                game.handle_keyup(e.key.keysym.sym);
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);

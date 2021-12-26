@@ -4,6 +4,7 @@
 #include <utility>
 #include <SDL_keycode.h>
 #include <unordered_map>
+#include <unordered_set>
 
 class game {
 public:
@@ -12,10 +13,15 @@ public:
     std::pair<int, int> field_size;
     std::pair<int, int> player_size;
     std::pair<int, int> player_position;
+    std::unordered_set<int> pressed_keys;
 
     game();
 
     void handle_keydown(int key);
+
+    void handle_keyup(int key);
+
+    void update();
 
     void quit();
 };

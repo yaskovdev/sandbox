@@ -13,6 +13,7 @@ game::game() {
     field_size = std::make_pair(640, 480);
     player_size = std::make_pair(50, 50);
     player_position = std::make_pair(0, 0);
+    pressed_keys = std::unordered_set<int>();
 }
 
 int bounded(int value, int min, int max) {
@@ -20,9 +21,19 @@ int bounded(int value, int min, int max) {
 }
 
 void game::handle_keydown(int key) {
-    std::pair<int, int> delta = key_to_delta[key];
-    player_position.first = bounded(player_position.first + delta.first, 0, field_size.first - player_size.first);
-    player_position.second = bounded(player_position.second + delta.second, 0, field_size.second - player_size.second);
+    pressed_keys.insert(key);
+}
+
+void game::handle_keyup(int key) {
+    pressed_keys.erase(key);
+}
+
+void game::update() {
+    for (int const pressed_key: pressed_keys) {
+        std::pair<int, int> delta = key_to_delta[pressed_key];
+        player_position.first = bounded(player_position.first + delta.first, 0, field_size.first - player_size.first);
+        player_position.second = bounded(player_position.second + delta.second, 0, field_size.second - player_size.second);
+    }
 }
 
 void game::quit() {
