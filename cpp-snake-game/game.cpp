@@ -72,13 +72,11 @@ void game::update_state_of_bullets() {
 void game::update_state_of_enemies() {
     std::list<moving_space_object>::const_iterator enemy = enemies.begin();
     while (enemy != enemies.end()) {
-        if (is_flown_away(*enemy)) {
+        if (is_flown_away(*enemy) || is_collided_with_bullet(*enemy)) {
             enemy = enemies.erase(enemy);
         } else if (enemy->is_collided_with_object(player_)) {
             enemy = enemies.erase(enemy);
             player_.apply_collision_damage();
-        } else if (is_collided_with_bullet(*enemy)) {
-            enemy = enemies.erase(enemy);
         } else {
             ++enemy;
         }
