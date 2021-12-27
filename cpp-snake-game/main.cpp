@@ -25,7 +25,7 @@ unsigned int most_recent_visibility_change = 0;
 
 void render_player(SDL_Renderer *const renderer, game const &game) {
     if (!game.paused && game.player_.collided_recently()) {
-        if (game.time() - most_recent_visibility_change > 50) {
+        if (game.time() - most_recent_visibility_change > 10) {
             visible = !visible;
             most_recent_visibility_change = game.time();
         }
@@ -60,7 +60,7 @@ int main(int const argc, char const *const argv[]) {
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.x, field_size.y, 0);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    const long long dt = 100000;
+    const long long dt = 10000;
 
     long long current_time = now_us();
     long long accumulator = 0;

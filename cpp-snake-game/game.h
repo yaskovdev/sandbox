@@ -13,8 +13,8 @@
 
 #define PLAYER_SPEED 5
 #define PLAYER_SIZE pair(25, 100)
-#define SHOOT_PERIOD 50
-#define BULLET_SPEED pair(0, -2)
+#define SHOOT_PERIOD 10
+#define BULLET_SPEED pair(0, -10)
 
 class game {
 public:

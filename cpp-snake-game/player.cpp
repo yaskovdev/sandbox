@@ -11,7 +11,7 @@ void player::apply_collision_damage() {
 }
 
 bool player::collided_recently() const {
-    return collided && clock_.time - most_recent_collision_time <= 500;
+    return collided && clock_.time - most_recent_collision_time <= 100;
 }
 
 bool player::is_dead() const {

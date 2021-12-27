@@ -41,9 +41,10 @@ void game::tick() {
     }
     update_state_of_enemies();
 
-    if (clock_.time % 100 == 0 && rand() % 2 == 0) {
+    if (clock_.time % 10 == 0 && rand() % 2 == 0) {
         const pair enemy_size = pair(20, 20);
-        moving_space_object enemy(pair(rand() % (field_size.x - enemy_size.x), -enemy_size.y), enemy_size, pair(0, 1));
+        int horizontal_speed = rand() % 3 == 0 ? 1 - rand() % 3 : 0;
+        moving_space_object enemy(pair(rand() % (field_size.x - enemy_size.x), -enemy_size.y), enemy_size, pair(horizontal_speed, 5));
         enemies.push_back(enemy);
     }
 
