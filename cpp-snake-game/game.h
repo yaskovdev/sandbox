@@ -12,8 +12,8 @@
 
 class game {
 public:
-    std::unordered_map<int, pair> key_to_delta;
-    unsigned int time;
+    std::unordered_map<int, pair> key_to_movement;
+    unsigned int time; // TODO: probably should be a clock object injected into game and player (and other classes if needed)
     bool ongoing;
     pair field_size;
     std::unordered_set<int> pressed_keys;
@@ -31,8 +31,6 @@ public:
     void quit();
 
     static int bounded(int value, int min, int max);
-
-    bool collided_recently() const;
 
 private:
 

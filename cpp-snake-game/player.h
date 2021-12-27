@@ -13,6 +13,10 @@ public:
     unsigned int most_recent_collision_time;
 
     player();
+
+    void apply_collision_damage(unsigned int collision_time);
+
+    bool collided_recently(unsigned int time) const;
 };
 
 
