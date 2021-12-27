@@ -74,11 +74,10 @@ void game::update_state_of_enemies() {
     while (enemy != enemies.end()) {
         if (is_flown_away(*enemy)) {
             enemy = enemies.erase(enemy);
-            // TODO: player should extend space_object
-        } else if (enemy->is_collided_with_object(moving_space_object(player_.position, player_.size, pair(0, 0)))) {
+        } else if (enemy->is_collided_with_object(player_)) {
             enemy = enemies.erase(enemy);
             player_.apply_collision_damage();
-        } else if (is_collided_with_bullet(enemy)) {
+        } else if (is_collided_with_bullet(*enemy)) {
             enemy = enemies.erase(enemy);
         } else {
             ++enemy;
@@ -106,6 +105,6 @@ pair game::player_position(pair field_size, pair player_size) {
     return {field_size.x / 2 - player_size.x / 2 - 1, field_size.y / 2};
 }
 
-bool game::is_collided_with_bullet(std::list<moving_space_object, std::allocator<moving_space_object>>::const_iterator enemy) {
-    return std::any_of(bullets.begin(), bullets.end(), [&enemy](moving_space_object b) { return enemy->is_collided_with_object(b); });
+bool game::is_collided_with_bullet(space_object enemy) {
+    return std::any_of(bullets.begin(), bullets.end(), [&](space_object b) { return enemy.is_collided_with_object(b); });
 }
