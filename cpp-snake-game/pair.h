@@ -9,6 +9,8 @@ public:
 
     int x;
     int y;
+
+    bool intersects(pair p) const;
 };
 
 #endif //CPP_SNAKE_GAME_PAIR_H
