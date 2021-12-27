@@ -4,6 +4,8 @@
 #include "pair.h"
 #include "color.h"
 
+#define HEALTH_BAR_COLOR color(255, 0, 255)
+
 using std::cout;
 using std::endl;
 
@@ -32,10 +34,13 @@ void render_player(SDL_Renderer *const renderer, game const &game) {
     if (visible) {
         render_rectangle(renderer, game.player_.position, game.player_.size, color(255, 255, 255));
     }
-};
+}
 
-void render_health(SDL_Renderer *const renderer, game const &game) {
-    render_rectangle(renderer, pair(10, 10), pair(game.player_.health, 10), color(255, 0, 255));
+void render_health_bar(SDL_Renderer *const renderer, game const &game) {
+    int health = game.player_.health;
+    for (int i = 0; i < health; i++) {
+        render_rectangle(renderer, pair(10 + 20 * i, 10), pair(10, 10), HEALTH_BAR_COLOR);
+    }
 }
 
 bool quit_requested(const SDL_Event e) {
@@ -48,7 +53,7 @@ int main(int const argc, char const *const argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     pair field_size = g.field_size;
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.x, field_size.y, 0);
-    SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     while (g.ongoing) {
         SDL_Event e;
@@ -71,7 +76,7 @@ int main(int const argc, char const *const argv[]) {
             render_rectangle(renderer, enemy.position, enemy.size, color(255, 0, 0));
         }
         render_player(renderer, g);
-        render_health(renderer, g);
+        render_health_bar(renderer, g);
         SDL_RenderPresent(renderer);
     }
 

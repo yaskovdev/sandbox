@@ -2,10 +2,10 @@
 #include "player.h"
 #include "clock.h"
 
-player::player(class clock &clock, pair size, pair position) : clock_(clock), space_object(position, size) {}
+player::player(class clock &clock, pair position, pair size) : clock_(clock), space_object(position, size) {}
 
 void player::apply_collision_damage() {
-    health -= 20;
+    health -= 1;
     collided = true;
     most_recent_collision_time = std::max(most_recent_collision_time, clock_.time);
 }

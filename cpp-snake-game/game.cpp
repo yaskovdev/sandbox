@@ -4,9 +4,9 @@
 
 #define PLAYER_SIZE pair(25, 100)
 #define SHOOT_PERIOD 50
-#define BULLET_SPEED pair (0, -2)
+#define BULLET_SPEED pair(0, -2)
 
-game::game(class clock &clock) : clock_(clock), player_(clock, PLAYER_SIZE, player_position(field_size, PLAYER_SIZE)) {}
+game::game(class clock &clock) : clock_(clock), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int key) {
     pressed_keys.insert(key);
@@ -47,7 +47,7 @@ void game::tick() {
 
     if (clock_.time % 100 == 0 && rand() % 2 == 0) {
         const pair enemy_size = pair(20, 20);
-        moving_space_object enemy(pair(rand() % (field_size.x - enemy_size.x), 0), enemy_size, pair(0, 1));
+        moving_space_object enemy(pair(rand() % (field_size.x - enemy_size.x), -enemy_size.y), enemy_size, pair(0, 1));
         enemies.push_back(enemy);
     }
 

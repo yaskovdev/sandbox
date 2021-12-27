@@ -8,11 +8,11 @@
 
 class player : public space_object {
 public:
-    int health = 100;
+    int health = 5;
     bool collided = false;
     unsigned int most_recent_collision_time = 0;
 
-    explicit player(class clock &clock, pair size, pair position);
+    explicit player(class clock &clock, pair position, pair size);
 
     void apply_collision_damage();
 
