@@ -1,7 +1,6 @@
 #ifndef CPP_SNAKE_GAME_SPACE_OBJECT_H
 #define CPP_SNAKE_GAME_SPACE_OBJECT_H
 
-#include <utility>
 #include "pair.h"
 
 class space_object {
@@ -10,15 +9,15 @@ public:
 
     pair position;
 
-    int speed;
+    pair speed;
 
-    space_object(pair field_size, pair position, pair size, int speed);
+    space_object(pair field_size, pair position, pair size, pair speed);
 
     bool is_flown_away() const;
 
     void move();
 
-    bool is_collided_with_object(pair object_position, pair object_size) const;
+    bool is_collided_with_object(space_object object) const;
 
 private:
     pair field_size;

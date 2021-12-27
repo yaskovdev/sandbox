@@ -3,7 +3,7 @@
 
 #define PLAYER_SIZE pair(25, 100)
 #define SHOOT_PERIOD 50
-#define BULLET_SPEED -2
+#define BULLET_SPEED pair (0, -2)
 
 game::game(class clock &clock) : clock_(clock), player_(clock, PLAYER_SIZE, player_position(field_size, PLAYER_SIZE)) {}
 
@@ -46,7 +46,7 @@ void game::tick() {
 
     if (clock_.time % 100 == 0 && rand() % 2 == 0) {
         const pair enemy_size = pair(20, 20);
-        space_object enemy(field_size, pair(rand() % (field_size.x - enemy_size.x), 0), enemy_size, 1);
+        space_object enemy(field_size, pair(rand() % (field_size.x - enemy_size.x), 0), enemy_size, pair(0, 1));
         enemies.push_back(enemy);
     }
 
@@ -73,7 +73,8 @@ void game::update_state_of_enemies() {
     while (enemy != enemies.end()) {
         if (enemy->is_flown_away()) {
             enemy = enemies.erase(enemy);
-        } else if (enemy->is_collided_with_object(player_.position_, player_.size)) {
+            // TODO: player should extend space_object
+        } else if (enemy->is_collided_with_object(space_object(field_size, player_.position_, player_.size, pair(0, 0)))) {
             enemy = enemies.erase(enemy);
             player_.apply_collision_damage();
         } else if (is_collided_with_bullet(enemy)) {
@@ -101,10 +102,5 @@ pair game::player_position(pair field_size, pair player_size) {
 }
 
 bool game::is_collided_with_bullet(std::list<space_object, std::allocator<space_object>>::const_iterator enemy) {
-    for (space_object bullet: bullets) {
-        if (enemy->is_collided_with_object(bullet.position, bullet.size)) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(bullets.begin(), bullets.end(), [&enemy](space_object b) { return enemy->is_collided_with_object(b); });
 }
