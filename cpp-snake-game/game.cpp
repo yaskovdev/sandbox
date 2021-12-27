@@ -23,14 +23,14 @@ void game::tick() {
     for (int const pressed_key: pressed_keys) {
         if (pressed_key == SDLK_SPACE) {
             if (clock_.time % SHOOT_PERIOD == 0) {
-                pair bullet_position = pair(player_.position_.x + player_.size.x / 2 - 1, player_.position_.y);
-                space_object bullet(field_size, bullet_position, pair(5, 5), BULLET_SPEED);
+                pair bullet_position = pair(player_.position.x + player_.size.x / 2 - 1, player_.position.y);
+                space_object bullet(bullet_position, pair(5, 5), BULLET_SPEED);
                 bullets.push_back(bullet);
             }
         } else {
             pair delta = key_to_movement[pressed_key];
-            player_.position_.x = bounded(player_.position_.x + delta.x, 0, field_size.x - player_.size.x);
-            player_.position_.y = bounded(player_.position_.y + delta.y, 0, field_size.y - player_.size.y);
+            player_.position.x = bounded(player_.position.x + delta.x, 0, field_size.x - player_.size.x);
+            player_.position.y = bounded(player_.position.y + delta.y, 0, field_size.y - player_.size.y);
         }
     }
 
@@ -46,7 +46,7 @@ void game::tick() {
 
     if (clock_.time % 100 == 0 && rand() % 2 == 0) {
         const pair enemy_size = pair(20, 20);
-        space_object enemy(field_size, pair(rand() % (field_size.x - enemy_size.x), 0), enemy_size, pair(0, 1));
+        space_object enemy(pair(rand() % (field_size.x - enemy_size.x), 0), enemy_size, pair(0, 1));
         enemies.push_back(enemy);
     }
 
@@ -60,7 +60,7 @@ void game::tick() {
 void game::update_state_of_bullets() {
     std::list<space_object>::const_iterator bullet = bullets.begin();
     while (bullet != bullets.end()) {
-        if (bullet->is_flown_away()) {
+        if (is_flown_away(*bullet)) {
             bullet = bullets.erase(bullet);
         } else {
             ++bullet;
@@ -71,10 +71,10 @@ void game::update_state_of_bullets() {
 void game::update_state_of_enemies() {
     std::list<space_object>::const_iterator enemy = enemies.begin();
     while (enemy != enemies.end()) {
-        if (enemy->is_flown_away()) {
+        if (is_flown_away(*enemy)) {
             enemy = enemies.erase(enemy);
             // TODO: player should extend space_object
-        } else if (enemy->is_collided_with_object(space_object(field_size, player_.position_, player_.size, pair(0, 0)))) {
+        } else if (enemy->is_collided_with_object(space_object(player_.position, player_.size, pair(0, 0)))) {
             enemy = enemies.erase(enemy);
             player_.apply_collision_damage();
         } else if (is_collided_with_bullet(enemy)) {
@@ -91,6 +91,10 @@ void game::quit() {
 
 unsigned int game::time() const {
     return clock_.time;
+}
+
+bool game::is_flown_away(space_object object) const {
+    return object.position.y >= field_size.y;
 }
 
 int game::bounded(int value, int min, int max) {

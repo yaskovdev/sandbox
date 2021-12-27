@@ -11,17 +11,13 @@ public:
 
     pair speed;
 
-    space_object(pair field_size, pair position, pair size, pair speed);
-
-    bool is_flown_away() const;
+    space_object(pair position, pair size, pair speed);
 
     void move();
 
     bool is_collided_with_object(space_object object) const;
 
 private:
-    pair field_size;
-
     static bool intersect(pair segment_a, pair segment_b);
 };
 

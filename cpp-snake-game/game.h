@@ -52,6 +52,8 @@ private:
     static pair player_position(pair field_size, pair player_size);
 
     bool is_collided_with_bullet(std::list<space_object, std::allocator<space_object>>::const_iterator enemy);
+
+    bool is_flown_away(space_object object) const;
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H

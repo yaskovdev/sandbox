@@ -4,11 +4,10 @@
 
 #include "pair.h"
 #include "clock.h"
+#include "space_object.h"
 
-class player {
+class player : public space_object {
 public:
-    pair size;
-    pair position_;
     int health = 100;
     bool collided = false;
     unsigned int most_recent_collision_time = 0;

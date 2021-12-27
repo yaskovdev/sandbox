@@ -30,7 +30,7 @@ void render_player(SDL_Renderer *const renderer, game const &game) {
         visible = true;
     }
     if (visible) {
-        render_rectangle(renderer, game.player_.position_, game.player_.size, color(255, 255, 255));
+        render_rectangle(renderer, game.player_.position, game.player_.size, color(255, 255, 255));
     }
 };
 
