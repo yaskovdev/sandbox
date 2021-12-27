@@ -10,17 +10,24 @@
 #include "enemy.h"
 #include "player.h"
 
+#define PLAYER_SPEED 1
+
 class game {
 public:
-    std::unordered_map<int, pair> key_to_movement;
-    unsigned int time; // TODO: probably should be a clock object injected into game and player (and other classes if needed)
-    bool ongoing;
-    pair field_size;
-    std::unordered_set<int> pressed_keys;
-    player player;
+    std::unordered_map<int, pair> key_to_movement = std::unordered_map<int, pair>({
+        {SDLK_UP,    pair(0, -PLAYER_SPEED)},
+        {SDLK_DOWN,  pair(0, PLAYER_SPEED)},
+        {SDLK_LEFT,  pair(-PLAYER_SPEED, 0)},
+        {SDLK_RIGHT, pair(PLAYER_SPEED, 0)}
+    });
+    bool ongoing = true;
+    bool paused = false;
+    pair field_size = pair(720, 480);
+    std::unordered_set<int> pressed_keys = std::unordered_set<int>();
+    player player_;
     std::list<enemy> enemies;
 
-    game();
+    explicit game(class clock &clock);
 
     void handle_keydown(int key);
 
@@ -30,11 +37,16 @@ public:
 
     void quit();
 
-    static int bounded(int value, int min, int max);
+    unsigned int time() const;
 
 private:
+    class clock &clock_;
 
     void update_state_of_enemies();
+
+    static int bounded(int value, int min, int max);
+
+    static pair player_position(pair field_size, pair player_size);
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H

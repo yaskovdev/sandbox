@@ -1,20 +1,19 @@
 #include <algorithm>
 #include "player.h"
+#include "clock.h"
 
-player::player() {
-    size = pair(25, 100);
-    position = pair(0, 0);
-    health = 100;
-    collided = false;
-    most_recent_collision_time = 0;
-}
+player::player(class clock &clock, pair size, pair position) : clock_(clock), size(size), position_(position) {}
 
-void player::apply_collision_damage(unsigned int collision_time) {
-    health -= 1;
+void player::apply_collision_damage() {
+    health -= 20;
     collided = true;
-    most_recent_collision_time = std::max(most_recent_collision_time, collision_time);
+    most_recent_collision_time = std::max(most_recent_collision_time, clock_.time);
 }
 
-bool player::collided_recently(unsigned int time) const {
-    return collided && time - most_recent_collision_time <= 500;
+bool player::collided_recently() const {
+    return collided && clock_.time - most_recent_collision_time <= 500;
+}
+
+bool player::is_dead() const {
+    return health <= 0;
 }

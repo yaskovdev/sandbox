@@ -3,20 +3,26 @@
 
 
 #include "pair.h"
+#include "clock.h"
 
 class player {
 public:
     pair size;
-    pair position;
-    int health;
-    bool collided;
-    unsigned int most_recent_collision_time;
+    pair position_;
+    int health = 100;
+    bool collided = false;
+    unsigned int most_recent_collision_time = 0;
 
-    player();
+    explicit player(class clock &clock, pair size, pair position);
 
-    void apply_collision_damage(unsigned int collision_time);
+    void apply_collision_damage();
 
-    bool collided_recently(unsigned int time) const;
+    bool is_dead() const;
+
+    bool collided_recently() const;
+
+private:
+    class clock &clock_;
 };
 
 

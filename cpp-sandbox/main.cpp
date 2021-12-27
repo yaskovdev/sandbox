@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include "entity.h"
+#include "clock.h"
 #include <cstdio>
 #include <memory>
 
@@ -89,6 +90,10 @@ void create_many_files_with_unique_names() {
     }
 }
 
+void function(class clock &c) {
+    c.tick();
+}
+
 int main(int argc, char **argv) {
 //    int const *const ints = new int[5];
 //    ints[0] = 5;
@@ -119,6 +124,11 @@ int main(int argc, char **argv) {
     cout << "y before increment " << std::to_string(e.count.y) << endl;
     e.increment();
     cout << "y after increment " << std::to_string(e.count.y) << endl;
+
+    class clock c;
+    cout << "Time is " << std::to_string(c.get_time()) << endl;
+    function(c);
+    cout << "Time is " << std::to_string(c.get_time()) << endl;
 
     return 0;
 }
