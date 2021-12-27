@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "SDL.h"
 #include "game.h"
 #include "pair.h"
@@ -47,6 +48,10 @@ bool quit_requested(const SDL_Event e) {
     return e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE);
 }
 
+long long now_us() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+};
+
 int main(int const argc, char const *const argv[]) {
     class clock c;
     game g(c);
@@ -55,18 +60,36 @@ int main(int const argc, char const *const argv[]) {
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.x, field_size.y, 0);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+    const long long dt = 100000;
+
+    long long current_time = now_us();
+    long long accumulator = 0;
+
     while (g.ongoing) {
-        SDL_Event e;
-        while (SDL_PollEvent(&e)) {
-            if (quit_requested(e)) {
-                g.quit();
-            } else if (e.type == SDL_KEYDOWN) {
-                g.handle_keydown(e.key.keysym.sym);
-            } else if (e.type == SDL_KEYUP) {
-                g.handle_keyup(e.key.keysym.sym);
+        long long new_time = now_us();
+        long long frame_time = new_time - current_time;
+        current_time = new_time;
+
+        accumulator += frame_time;
+//        cout << std::to_string(frame_time) << endl;
+//        cout << "frame" << endl;
+
+        while (accumulator >= dt) {
+            SDL_Event e;
+            while (SDL_PollEvent(&e)) {
+                if (quit_requested(e)) {
+                    g.quit();
+                } else if (e.type == SDL_KEYDOWN) {
+                    g.handle_keydown(e.key.keysym.sym);
+                } else if (e.type == SDL_KEYUP) {
+                    g.handle_keyup(e.key.keysym.sym);
+                }
             }
+//            cout << "tick" << endl;
+            g.tick();
+            accumulator -= dt;
         }
-        g.tick();
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
         for (space_object bullet: g.bullets) {

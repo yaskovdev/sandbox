@@ -2,10 +2,6 @@
 #include "space_object.h"
 #include "moving_space_object.h"
 
-#define PLAYER_SIZE pair(25, 100)
-#define SHOOT_PERIOD 50
-#define BULLET_SPEED pair(0, -2)
-
 game::game(class clock &clock) : clock_(clock), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int key) {

@@ -11,7 +11,10 @@
 #include "player.h"
 #include "moving_space_object.h"
 
-#define PLAYER_SPEED 1
+#define PLAYER_SPEED 5
+#define PLAYER_SIZE pair(25, 100)
+#define SHOOT_PERIOD 50
+#define BULLET_SPEED pair(0, -2)
 
 class game {
 public:
