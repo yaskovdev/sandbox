@@ -1,5 +1,4 @@
 #include <iostream>
-#include <unordered_map>
 #include "SDL.h"
 #include "game.h"
 #include "pair.h"
@@ -65,7 +64,10 @@ int main(int const argc, char const *const argv[]) {
         g.tick();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
-        for (enemy enemy: g.enemies) {
+        for (space_object bullet: g.bullets) {
+            render_rectangle(renderer, bullet.position, bullet.size, color(255, 255, 255));
+        }
+        for (space_object enemy: g.enemies) {
             render_rectangle(renderer, enemy.position, enemy.size, color(255, 0, 0));
         }
         render_player(renderer, g);

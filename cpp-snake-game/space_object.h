@@ -1,10 +1,10 @@
-#ifndef CPP_SNAKE_GAME_ENEMY_H
-#define CPP_SNAKE_GAME_ENEMY_H
+#ifndef CPP_SNAKE_GAME_SPACE_OBJECT_H
+#define CPP_SNAKE_GAME_SPACE_OBJECT_H
 
 #include <utility>
 #include "pair.h"
 
-class enemy {
+class space_object {
 public:
     pair size;
 
@@ -12,7 +12,7 @@ public:
 
     int speed;
 
-    enemy(pair field_size, pair size);
+    space_object(pair field_size, pair position, pair size, int speed);
 
     bool is_flown_away() const;
 
@@ -26,4 +26,4 @@ private:
     static bool intersect(pair segment_a, pair segment_b);
 };
 
-#endif //CPP_SNAKE_GAME_ENEMY_H
+#endif //CPP_SNAKE_GAME_SPACE_OBJECT_H

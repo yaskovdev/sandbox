@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <list>
 #include "pair.h"
-#include "enemy.h"
+#include "space_object.h"
 #include "player.h"
 
 #define PLAYER_SPEED 1
@@ -25,7 +25,8 @@ public:
     pair field_size = pair(720, 480);
     std::unordered_set<int> pressed_keys = std::unordered_set<int>();
     player player_;
-    std::list<enemy> enemies;
+    std::list<space_object> enemies;
+    std::list<space_object> bullets;
 
     explicit game(class clock &clock);
 
@@ -42,11 +43,15 @@ public:
 private:
     class clock &clock_;
 
+    void update_state_of_bullets();
+
     void update_state_of_enemies();
 
     static int bounded(int value, int min, int max);
 
     static pair player_position(pair field_size, pair player_size);
+
+    bool is_collided_with_bullet(std::list<space_object, std::allocator<space_object>>::const_iterator enemy);
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H
