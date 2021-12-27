@@ -1,11 +1,7 @@
 #include "space_object.h"
 
 // TODO: unit tests in C++
-space_object::space_object(pair position, pair size, pair speed) : position(position), size(size), speed(speed) {}
-
-void space_object::move() {
-    position = pair(position.x + speed.x, position.y + speed.y);
-}
+space_object::space_object(pair position, pair size) : position(position), size(size) {}
 
 bool space_object::is_collided_with_object(space_object object) const {
     int x = position.x;

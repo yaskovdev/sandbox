@@ -9,11 +9,7 @@ public:
 
     pair position;
 
-    pair speed;
-
-    space_object(pair position, pair size, pair speed);
-
-    void move();
+    space_object(pair position, pair size);
 
     bool is_collided_with_object(space_object object) const;
 
