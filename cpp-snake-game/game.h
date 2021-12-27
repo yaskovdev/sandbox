@@ -8,6 +8,7 @@
 #include <list>
 #include "pair.h"
 #include "enemy.h"
+#include "player.h"
 
 class game {
 public:
@@ -15,12 +16,8 @@ public:
     unsigned int time;
     bool ongoing;
     pair field_size;
-    pair player_size;
-    pair player_position;
-    int player_health;
-    bool collided;
-    unsigned int most_recent_collision_time;
     std::unordered_set<int> pressed_keys;
+    player player;
     std::list<enemy> enemies;
 
     game();

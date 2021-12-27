@@ -12,13 +12,8 @@ game::game() {
     });
     ongoing = true;
     field_size = pair(720, 480);
-    player_size = pair(25, 100);
-    player_position = pair(0, 0);
-    player_health = 100;
     pressed_keys = std::unordered_set<int>();
     time = 0;
-    collided = false;
-    most_recent_collision_time = 0;
 }
 
 void game::handle_keydown(int key) {
@@ -32,8 +27,8 @@ void game::handle_keyup(int key) {
 void game::tick() {
     for (int const pressed_key: pressed_keys) {
         pair delta = key_to_delta[pressed_key];
-        player_position.x = bounded(player_position.x + delta.x, 0, field_size.x - player_size.x);
-        player_position.y = bounded(player_position.y + delta.y, 0, field_size.y - player_size.y);
+        player.position.x = bounded(player.position.x + delta.x, 0, field_size.x - player.size.x);
+        player.position.y = bounded(player.position.y + delta.y, 0, field_size.y - player.size.y);
     }
 
     for (enemy &enemy: enemies) {
@@ -53,10 +48,11 @@ void game::update_state_of_enemies() {
     while (enemy != enemies.end()) {
         if (enemy->is_flown_away()) {
             enemy = enemies.erase(enemy);
-        } else if (enemy->is_collided_with_object(player_position, player_size)) {
-            player_health -= 1;
-            collided = true;
-            most_recent_collision_time = std::max(most_recent_collision_time, time);
+        } else if (enemy->is_collided_with_object(player.position, player.size)) {
+            // TODO: should be a method of player
+            player.health -= 1;
+            player.collided = true;
+            player.most_recent_collision_time = std::max(player.most_recent_collision_time, time);
             enemy = enemies.erase(enemy);
         } else {
             ++enemy;
@@ -72,6 +68,7 @@ int game::bounded(int value, int min, int max) {
     return std::min(std::max(value, min), max);
 }
 
+// TODO: should be a method of player
 bool game::collided_recently() const {
-    return collided && time - most_recent_collision_time <= 500; // TODO: introduce class player
+    return player.collided && time - player.most_recent_collision_time <= 500;
 }

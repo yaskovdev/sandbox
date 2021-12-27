@@ -32,14 +32,14 @@ void render_player(SDL_Renderer *const renderer, game const &game) {
         visible = true;
     }
     if (visible) {
-        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
+        render_square(renderer, game.player.position, game.player.size, triple(255, 255, 255));
     }
 };
 
 void render_health(game const &game) {
     if (game.time % 500 == 0) {
-        cout << std::to_string(game.player_health) << endl;
-        cout << std::to_string(game.most_recent_collision_time) << endl;
+        cout << std::to_string(game.player.health) << endl;
+        cout << std::to_string(game.player.most_recent_collision_time) << endl;
     }
 }
 

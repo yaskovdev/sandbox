@@ -12,15 +12,13 @@ public:
 
     int speed;
 
-    bool collided;
-
     enemy(pair field_size, pair size);
 
     bool is_flown_away() const;
 
     void move();
 
-    bool is_collided_with_object(pair object_size, pair object_position) const;
+    bool is_collided_with_object(pair object_position, pair object_size) const;
 
 private:
     pair field_size;

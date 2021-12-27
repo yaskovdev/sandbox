@@ -7,7 +7,6 @@ enemy::enemy(pair field_size, pair size) {
     this->size = size;
     this->position = pair(rand() % (field_size.x - size.x), 0);
     this->speed = 1;
-    this->collided = false;
 }
 
 void enemy::move() {
