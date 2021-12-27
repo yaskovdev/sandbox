@@ -18,6 +18,8 @@ public:
     pair player_size;
     pair player_position;
     int player_health;
+    bool collided;
+    unsigned int most_recent_collision_time;
     std::unordered_set<int> pressed_keys;
     std::list<enemy> enemies;
 
@@ -33,11 +35,11 @@ public:
 
     static int bounded(int value, int min, int max);
 
+    bool collided_recently() const;
+
 private:
 
-    void cleanup_flown_away_enemies();
-
-    void cleanup_collided_enemies();
+    void update_state_of_enemies();
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H

@@ -19,9 +19,27 @@ void render_square(SDL_Renderer *const renderer, pair const position, pair const
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
+bool visible = true;
+unsigned int most_recent_visibility_change = 0;
+
+void render_player(SDL_Renderer *const renderer, game const &game) {
+    if (game.collided_recently()) {
+        if (game.time - most_recent_visibility_change > 50) {
+            visible = !visible;
+            most_recent_visibility_change = game.time;
+        }
+    } else {
+        visible = true;
+    }
+    if (visible) {
+        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
+    }
+};
+
 void render_health(game const &game) {
     if (game.time % 500 == 0) {
         cout << std::to_string(game.player_health) << endl;
+        cout << std::to_string(game.most_recent_collision_time) << endl;
     }
 }
 
@@ -54,7 +72,7 @@ int main(int const argc, char const *const argv[]) {
         for (enemy enemy: game.enemies) {
             render_square(renderer, enemy.position, enemy.size, triple(255, 0, 0));
         }
-        render_square(renderer, game.player_position, game.player_size, triple(255, 255, 255));
+        render_player(renderer, game);
         render_health(game);
         SDL_RenderPresent(renderer);
     }

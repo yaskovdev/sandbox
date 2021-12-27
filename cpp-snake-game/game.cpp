@@ -16,6 +16,9 @@ game::game() {
     player_position = pair(0, 0);
     player_health = 100;
     pressed_keys = std::unordered_set<int>();
+    time = 0;
+    collided = false;
+    most_recent_collision_time = 0;
 }
 
 void game::handle_keydown(int key) {
@@ -35,10 +38,8 @@ void game::tick() {
 
     for (enemy &enemy: enemies) {
         enemy.move();
-        enemy.collided = enemy.is_collided_with_object(player_position, player_size);
     }
-    cleanup_flown_away_enemies();
-    cleanup_collided_enemies();
+    update_state_of_enemies();
 
     if (time % 100 == 0 && rand() % 2 == 0) {
         enemy enemy(field_size, pair(20, 20));
@@ -47,26 +48,18 @@ void game::tick() {
     time += 1;
 }
 
-void game::cleanup_flown_away_enemies() {
-    std::list<enemy>::const_iterator candidate = enemies.begin();
-    while (candidate != enemies.end()) {
-        if (candidate->is_flown_away()) {
-            candidate = enemies.erase(candidate);
-        } else {
-            ++candidate;
-        }
-    }
-}
-
-// TODO: very similar to cleanup_flown_away_enemies()
-void game::cleanup_collided_enemies() {
-    std::list<enemy>::const_iterator candidate = enemies.begin();
-    while (candidate != enemies.end()) {
-        if (candidate->collided) {
+void game::update_state_of_enemies() {
+    std::list<enemy>::const_iterator enemy = enemies.begin();
+    while (enemy != enemies.end()) {
+        if (enemy->is_flown_away()) {
+            enemy = enemies.erase(enemy);
+        } else if (enemy->is_collided_with_object(player_position, player_size)) {
             player_health -= 1;
-            candidate = enemies.erase(candidate);
+            collided = true;
+            most_recent_collision_time = std::max(most_recent_collision_time, time);
+            enemy = enemies.erase(enemy);
         } else {
-            ++candidate;
+            ++enemy;
         }
     }
 }
@@ -77,4 +70,8 @@ void game::quit() {
 
 int game::bounded(int value, int min, int max) {
     return std::min(std::max(value, min), max);
+}
+
+bool game::collided_recently() const {
+    return collided && time - most_recent_collision_time <= 500; // TODO: introduce class player
 }
