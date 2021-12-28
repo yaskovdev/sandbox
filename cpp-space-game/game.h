@@ -1,5 +1,5 @@
-#ifndef CPP_SNAKE_GAME_GAME_H
-#define CPP_SNAKE_GAME_GAME_H
+#ifndef CPP_SPACE_GAME_GAME_H
+#define CPP_SPACE_GAME_GAME_H
 
 #include <utility>
 #include <SDL_keycode.h>
@@ -32,7 +32,7 @@ public:
     int score = 0;
 
     explicit game(class clock &clock, std::mt19937 &generator, pair const &field_size);
-[]
+
     void handle_keydown(int key);
 
     void handle_keyup(int key);
@@ -72,4 +72,4 @@ private:
     static pair player_position(pair const &field_size, pair const &player_size);
 };
 
-#endif //CPP_SNAKE_GAME_GAME_H
+#endif //CPP_SPACE_GAME_GAME_H

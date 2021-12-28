@@ -1,5 +1,5 @@
-#ifndef CPP_SNAKE_GAME_PAIR_H
-#define CPP_SNAKE_GAME_PAIR_H
+#ifndef CPP_SPACE_GAME_PAIR_H
+#define CPP_SPACE_GAME_PAIR_H
 
 class pair {
 public:
@@ -13,4 +13,4 @@ public:
     bool intersects(pair p) const;
 };
 
-#endif //CPP_SNAKE_GAME_PAIR_H
+#endif //CPP_SPACE_GAME_PAIR_H

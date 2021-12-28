@@ -1,5 +1,5 @@
-#ifndef CPP_SNAKE_GAME_PLAYER_H
-#define CPP_SNAKE_GAME_PLAYER_H
+#ifndef CPP_SPACE_GAME_PLAYER_H
+#define CPP_SPACE_GAME_PLAYER_H
 
 
 #include "pair.h"
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif //CPP_SNAKE_GAME_PLAYER_H
+#endif //CPP_SPACE_GAME_PLAYER_H

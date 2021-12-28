@@ -1,5 +1,5 @@
-#ifndef CPP_SNAKE_GAME_SPACE_OBJECT_H
-#define CPP_SNAKE_GAME_SPACE_OBJECT_H
+#ifndef CPP_SPACE_GAME_SPACE_OBJECT_H
+#define CPP_SPACE_GAME_SPACE_OBJECT_H
 
 #include "pair.h"
 
@@ -14,4 +14,4 @@ public:
     bool is_collided_with_object(space_object &object) const;
 };
 
-#endif //CPP_SNAKE_GAME_SPACE_OBJECT_H
+#endif //CPP_SPACE_GAME_SPACE_OBJECT_H

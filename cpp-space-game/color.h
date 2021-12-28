@@ -1,5 +1,5 @@
-#ifndef CPP_SNAKE_GAME_COLOR_H
-#define CPP_SNAKE_GAME_COLOR_H
+#ifndef CPP_SPACE_GAME_COLOR_H
+#define CPP_SPACE_GAME_COLOR_H
 
 
 class color {
@@ -14,4 +14,4 @@ public:
 };
 
 
-#endif //CPP_SNAKE_GAME_COLOR_H
+#endif //CPP_SPACE_GAME_COLOR_H
