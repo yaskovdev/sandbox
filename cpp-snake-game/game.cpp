@@ -110,7 +110,7 @@ int game::bounded(int const value, int const min, int const max) {
     return std::min(std::max(value, min), max);
 }
 
-pair game::player_position(pair const field_size, pair const player_size) {
+pair game::player_position(pair const &field_size, pair const &player_size) {
     return {field_size.x / 2 - player_size.x / 2 - 1, field_size.y / 2};
 }
 

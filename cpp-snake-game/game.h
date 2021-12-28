@@ -32,7 +32,7 @@ public:
     int score = 0;
 
     explicit game(class clock &clock, std::mt19937 &generator, pair const &field_size);
-
+[]
     void handle_keydown(int key);
 
     void handle_keyup(int key);
@@ -63,13 +63,13 @@ private:
 
     void update_state_of_enemies();
 
-    static int bounded(int value, int min, int max);
-
-    static pair player_position(pair field_size, pair player_size);
-
     bool is_collided_with_bullet(space_object const &enemy);
 
     bool is_flown_away(space_object const &object) const;
+
+    static int bounded(int value, int min, int max);
+
+    static pair player_position(pair const &field_size, pair const &player_size);
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H
