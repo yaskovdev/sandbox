@@ -2,7 +2,8 @@
 #include "space_object.h"
 #include "moving_space_object.h"
 
-game::game(class clock &clock) : clock_(clock), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
+game::game(class clock &clock, pair field_size) :
+    clock_(clock), field_size(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int key) {
     pressed_keys.insert(key);
@@ -81,7 +82,7 @@ void game::update_state_of_enemies() {
 }
 
 void game::quit() {
-    ongoing = false;
+    stopped = true;
 }
 
 unsigned int game::time() const {

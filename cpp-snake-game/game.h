@@ -18,21 +18,17 @@
 
 class game {
 public:
-    std::unordered_map<int, pair> key_to_movement = std::unordered_map<int, pair>({
-        {SDLK_UP,    pair(0, -PLAYER_SPEED)},
-        {SDLK_DOWN,  pair(0, PLAYER_SPEED)},
-        {SDLK_LEFT,  pair(-PLAYER_SPEED, 0)},
-        {SDLK_RIGHT, pair(PLAYER_SPEED, 0)}
-    });
-    bool ongoing = true;
+    bool stopped = false;
+
     bool paused = false;
-    pair field_size = pair(720, 480);
-    std::unordered_set<int> pressed_keys = std::unordered_set<int>();
+
     player player_;
+
     std::list<moving_space_object> enemies;
+
     std::list<moving_space_object> bullets;
 
-    explicit game(class clock &clock);
+    explicit game(class clock &clock, pair field_size);
 
     void handle_keydown(int key);
 
@@ -45,7 +41,18 @@ public:
     unsigned int time() const;
 
 private:
+    std::unordered_map<int, pair> key_to_movement = std::unordered_map<int, pair>({
+        {SDLK_UP,    pair(0, -PLAYER_SPEED)},
+        {SDLK_DOWN,  pair(0, PLAYER_SPEED)},
+        {SDLK_LEFT,  pair(-PLAYER_SPEED, 0)},
+        {SDLK_RIGHT, pair(PLAYER_SPEED, 0)}
+    });
+
     class clock &clock_;
+
+    pair field_size;
+
+    std::unordered_set<int> pressed_keys = std::unordered_set<int>();
 
     void update_state_of_bullets();
 

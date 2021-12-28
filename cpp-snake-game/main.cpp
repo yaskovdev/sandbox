@@ -53,26 +53,23 @@ long long now_us() {
 };
 
 int main(int const argc, char const *const argv[]) {
+    pair field_size = pair(720, 480);
     class clock c;
-    game g(c);
+    game g(c, field_size);
     SDL_Init(SDL_INIT_VIDEO);
-    pair field_size = g.field_size;
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, field_size.x, field_size.y, 0);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     const long long dt = 10000;
-
     long long current_time = now_us();
     long long accumulator = 0;
 
-    while (g.ongoing) {
+    while (!g.stopped) {
         long long new_time = now_us();
         long long frame_time = new_time - current_time;
         current_time = new_time;
 
         accumulator += frame_time;
-//        cout << std::to_string(frame_time) << endl;
-//        cout << "frame" << endl;
 
         while (accumulator >= dt) {
             SDL_Event e;
@@ -85,7 +82,6 @@ int main(int const argc, char const *const argv[]) {
                     g.handle_keyup(e.key.keysym.sym);
                 }
             }
-//            cout << "tick" << endl;
             g.tick();
             accumulator -= dt;
         }
