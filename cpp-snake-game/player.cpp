@@ -2,7 +2,7 @@
 #include "player.h"
 #include "clock.h"
 
-player::player(class clock &clock, pair position, pair size) : clock_(clock), space_object(position, size) {}
+player::player(class clock const &clock, pair position, pair size) : clock_(clock), space_object(position, size) {}
 
 void player::apply_collision_damage() {
     health -= 1;

@@ -2,7 +2,7 @@
 #include "space_object.h"
 #include "moving_space_object.h"
 
-game::game(class clock &clock, std::mt19937 &generator, pair field_size) :
+game::game(class clock &clock, std::mt19937 &generator, pair const &field_size) :
     clock_(clock), generator(generator), field_size(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int const key) {
@@ -30,6 +30,11 @@ void game::tick() {
             player_.position.x = bounded(player_.position.x + delta.x, 0, field_size.x - player_.size.x);
             player_.position.y = bounded(player_.position.y + delta.y, 0, field_size.y - player_.size.y);
         }
+    }
+
+    if (score >= 10) {
+        score = 0;
+        player_.health += 1;
     }
 
     for (moving_space_object &bullet: bullets) {
@@ -75,7 +80,10 @@ void game::update_state_of_bullets() {
 void game::update_state_of_enemies() {
     std::list<moving_space_object>::const_iterator enemy = enemies.begin();
     while (enemy != enemies.end()) {
-        if (is_flown_away(*enemy) || is_collided_with_bullet(*enemy)) {
+        if (is_flown_away(*enemy)) {
+            enemy = enemies.erase(enemy);
+        } else if (is_collided_with_bullet(*enemy)) {
+            score++;
             enemy = enemies.erase(enemy);
         } else if (enemy->is_collided_with_object(player_)) {
             enemy = enemies.erase(enemy);
@@ -94,7 +102,7 @@ unsigned int game::time() const {
     return clock_.time;
 }
 
-bool game::is_flown_away(space_object const object) const {
+bool game::is_flown_away(space_object const &object) const {
     return object.position.y >= field_size.y;
 }
 
@@ -106,6 +114,6 @@ pair game::player_position(pair const field_size, pair const player_size) {
     return {field_size.x / 2 - player_size.x / 2 - 1, field_size.y / 2};
 }
 
-bool game::is_collided_with_bullet(space_object const enemy) {
+bool game::is_collided_with_bullet(space_object const &enemy) {
     return std::any_of(bullets.begin(), bullets.end(), [&](space_object b) { return enemy.is_collided_with_object(b); });
 }

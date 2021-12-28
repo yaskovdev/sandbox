@@ -7,6 +7,7 @@
 #include "color.h"
 
 #define HEALTH_BAR_COLOR color(255, 0, 255)
+#define SCORE_BAR_COLOR color(0, 255, 255)
 
 using std::cout;
 using std::endl;
@@ -42,6 +43,12 @@ void render_health_bar(SDL_Renderer *const renderer, game const &game) {
     int health = game.player_.health;
     for (int i = 0; i < health; i++) {
         render_rectangle(renderer, pair(10 + 20 * i, 10), pair(10, 10), HEALTH_BAR_COLOR);
+    }
+}
+
+void render_score_bar(SDL_Renderer *const renderer, game const &game) {
+    for (int i = 0; i < game.score; i++) {
+        render_rectangle(renderer, pair(10 + 20 * i, 30), pair(10, 10), SCORE_BAR_COLOR);
     }
 }
 
@@ -100,6 +107,7 @@ int main(int const argc, char const *const argv[]) {
         }
         render_player(renderer, g);
         render_health_bar(renderer, g);
+        render_score_bar(renderer, g);
         SDL_RenderPresent(renderer);
     }
 

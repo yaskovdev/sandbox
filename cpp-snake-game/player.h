@@ -12,7 +12,7 @@ public:
     bool collided = false;
     unsigned int most_recent_collision_time = 0;
 
-    explicit player(class clock &clock, pair position, pair size);
+    explicit player(class clock const &clock, pair position, pair size);
 
     void apply_collision_damage();
 
@@ -21,7 +21,7 @@ public:
     bool collided_recently() const;
 
 private:
-    class clock &clock_;
+    class clock const &clock_;
 };
 
 

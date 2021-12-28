@@ -14,7 +14,7 @@
 
 #define PLAYER_SPEED 5
 #define PLAYER_SIZE pair(25, 100)
-#define SHOOT_PERIOD 10
+#define SHOOT_PERIOD 20
 #define BULLET_SPEED pair(0, -10)
 
 class game {
@@ -29,7 +29,9 @@ public:
 
     std::list<moving_space_object> bullets;
 
-    explicit game(class clock &clock, std::mt19937 &generator, pair field_size);
+    int score = 0;
+
+    explicit game(class clock &clock, std::mt19937 &generator, pair const &field_size);
 
     void handle_keydown(int key);
 
@@ -65,9 +67,9 @@ private:
 
     static pair player_position(pair field_size, pair player_size);
 
-    bool is_collided_with_bullet(space_object enemy);
+    bool is_collided_with_bullet(space_object const &enemy);
 
-    bool is_flown_away(space_object object) const;
+    bool is_flown_away(space_object const &object) const;
 };
 
 #endif //CPP_SNAKE_GAME_GAME_H
