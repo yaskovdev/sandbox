@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <list>
+#include <random>
 #include "pair.h"
 #include "space_object.h"
 #include "player.h"
@@ -28,7 +29,7 @@ public:
 
     std::list<moving_space_object> bullets;
 
-    explicit game(class clock &clock, pair field_size);
+    explicit game(class clock &clock, std::mt19937 &generator, pair field_size);
 
     void handle_keydown(int key);
 
@@ -49,6 +50,8 @@ private:
     });
 
     class clock &clock_;
+
+    std::mt19937 &generator;
 
     pair field_size;
 
