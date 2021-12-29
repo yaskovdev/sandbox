@@ -4,8 +4,6 @@
 
 class color {
 public:
-    color();
-
     color(int r, int g, int b);
 
     int r;
