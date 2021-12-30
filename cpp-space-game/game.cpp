@@ -1,16 +1,17 @@
+#include <iostream>
 #include "game.h"
 #include "space_object.h"
 #include "moving_space_object.h"
 
 game::game(class clock &clock, std::mt19937 &generator, pair const &field_size) :
-    clock_(clock), generator(generator), field_size(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
+    clock_(clock), generator_(generator), field_size_(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int const key) {
-    pressed_keys.insert(key);
+    pressed_keys_.insert(key);
 }
 
 void game::handle_keyup(int const key) {
-    pressed_keys.erase(key);
+    pressed_keys_.erase(key);
 }
 
 void game::tick() {
@@ -18,17 +19,18 @@ void game::tick() {
         return;
     }
 
-    for (int const pressed_key: pressed_keys) {
+    for (int const pressed_key: pressed_keys_) {
         if (pressed_key == SDLK_SPACE) {
-            if (clock_.time % SHOOT_PERIOD == 0) {
+            if (clock_.time - most_recent_shot_time_ > SHOOT_PERIOD) {
                 pair bullet_position = pair(player_.position.x + player_.size.x / 2 - 1, player_.position.y);
                 moving_space_object bullet(bullet_position, pair(5, 5), BULLET_SPEED);
                 bullets.push_back(bullet);
+                most_recent_shot_time_ = clock_.time;
             }
         } else {
             pair delta = key_to_movement[pressed_key];
-            player_.position.x = bounded(player_.position.x + delta.x, 0, field_size.x - player_.size.x);
-            player_.position.y = bounded(player_.position.y + delta.y, 0, field_size.y - player_.size.y);
+            player_.position.x = bounded(player_.position.x + delta.x, 0, field_size_.x - player_.size.x);
+            player_.position.y = bounded(player_.position.y + delta.y, 0, field_size_.y - player_.size.y);
         }
     }
 
@@ -50,11 +52,11 @@ void game::tick() {
     std::uniform_int_distribution<int> enemy_spawn_distribution(0, 1);
     std::uniform_int_distribution<int> enemy_moves_horizontally_distribution(0, 2);
     std::uniform_int_distribution<int> enemy_horizontal_speed_distribution(-1, 1);
-    if (clock_.time % 10 == 0 && enemy_spawn_distribution(generator) == 0) {
+    if (clock_.time % 10 == 0 && enemy_spawn_distribution(generator_) == 0) {
         const pair enemy_size = pair(20, 20);
-        int horizontal_speed = enemy_moves_horizontally_distribution(generator) == 0 ? enemy_horizontal_speed_distribution(generator) : 0;
-        std::uniform_int_distribution<int> enemy_position_distribution(0, field_size.x - enemy_size.x - 1);
-        pair enemy_position = pair(enemy_position_distribution(generator), -enemy_size.y);
+        int horizontal_speed = enemy_moves_horizontally_distribution(generator_) == 0 ? enemy_horizontal_speed_distribution(generator_) : 0;
+        std::uniform_int_distribution<int> enemy_position_distribution(0, field_size_.x - enemy_size.x - 1);
+        pair enemy_position = pair(enemy_position_distribution(generator_), -enemy_size.y);
         moving_space_object enemy(enemy_position, enemy_size, pair(horizontal_speed, 5));
         enemies.push_back(enemy);
     }
@@ -103,7 +105,7 @@ unsigned int game::time() const {
 }
 
 bool game::is_flown_away(space_object const &object) const {
-    return object.position.y >= field_size.y;
+    return object.position.y >= field_size_.y;
 }
 
 int game::bounded(int const value, int const min, int const max) {

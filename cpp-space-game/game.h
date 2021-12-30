@@ -53,11 +53,13 @@ private:
 
     class clock &clock_;
 
-    std::mt19937 &generator;
+    std::mt19937 &generator_;
 
-    pair field_size;
+    pair field_size_;
 
-    std::unordered_set<int> pressed_keys = std::unordered_set<int>();
+    std::unordered_set<int> pressed_keys_ = std::unordered_set<int>();
+
+    unsigned int most_recent_shot_time_ = 0;
 
     void update_state_of_bullets();
 

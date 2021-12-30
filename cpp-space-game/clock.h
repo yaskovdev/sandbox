@@ -4,9 +4,7 @@
 
 class clock {
 public:
-    clock();
-
-    unsigned int time;
+    unsigned int time = 0;
 
     void tick();
 };
