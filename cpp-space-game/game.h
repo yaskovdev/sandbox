@@ -31,7 +31,7 @@ public:
 
     int score = 0;
 
-    explicit game(class clock &clock, std::mt19937 &generator, pair const &field_size);
+    explicit game(game_clock &clock, std::mt19937 &generator, pair const &field_size);
 
     void handle_keydown(int key);
 
@@ -51,7 +51,7 @@ private:
         {SDLK_RIGHT, pair(PLAYER_SPEED, 0)}
     });
 
-    class clock &clock_;
+    game_clock &clock_;
 
     std::mt19937 &generator_;
 
@@ -65,7 +65,7 @@ private:
 
     void update_state_of_enemies();
 
-    bool is_collided_with_bullet(space_object const &enemy);
+    bool is_collided_with_bullet(space_object const &bullet);
 
     bool is_flown_away(space_object const &object) const;
 

@@ -5,13 +5,13 @@
 
 class space_object {
 public:
-    pair size;
-
     pair position;
+
+    pair size;
 
     space_object(pair position, pair size);
 
-    bool is_collided_with_object(space_object &object) const;
+    bool is_collided_with(space_object &object) const;
 };
 
 #endif //CPP_SPACE_GAME_SPACE_OBJECT_H

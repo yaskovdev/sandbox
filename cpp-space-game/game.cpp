@@ -3,7 +3,7 @@
 #include "space_object.h"
 #include "moving_space_object.h"
 
-game::game(class clock &clock, std::mt19937 &generator, pair const &field_size) :
+game::game(game_clock &clock, std::mt19937 &generator, pair const &field_size) :
     clock_(clock), generator_(generator), field_size_(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
 void game::handle_keydown(int const key) {
@@ -21,7 +21,7 @@ void game::tick() {
 
     for (int const pressed_key: pressed_keys_) {
         if (pressed_key == SDLK_SPACE) {
-            if (clock_.time - most_recent_shot_time_ > SHOOT_PERIOD) {
+            if (clock_.time - most_recent_shot_time_ >= SHOOT_PERIOD) {
                 pair bullet_position = pair(player_.position.x + player_.size.x / 2 - 1, player_.position.y);
                 moving_space_object bullet(bullet_position, pair(5, 5), BULLET_SPEED);
                 bullets.push_back(bullet);
@@ -85,9 +85,9 @@ void game::update_state_of_enemies() {
         if (is_flown_away(*enemy)) {
             enemy = enemies.erase(enemy);
         } else if (is_collided_with_bullet(*enemy)) {
-            score++;
             enemy = enemies.erase(enemy);
-        } else if (enemy->is_collided_with_object(player_)) {
+            score++;
+        } else if (enemy->is_collided_with(player_)) {
             enemy = enemies.erase(enemy);
             player_.apply_collision_damage();
         } else {
@@ -117,5 +117,5 @@ pair game::player_position(pair const &field_size, pair const &player_size) {
 }
 
 bool game::is_collided_with_bullet(space_object const &enemy) {
-    return std::any_of(bullets.begin(), bullets.end(), [&](space_object b) { return enemy.is_collided_with_object(b); });
+    return std::any_of(bullets.begin(), bullets.end(), [&](space_object bullet) { return enemy.is_collided_with(bullet); });
 }

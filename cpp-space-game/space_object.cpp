@@ -1,9 +1,9 @@
 #include "space_object.h"
 
-// TODO: unit tests in C++
 space_object::space_object(pair position, pair size) : position(position), size(size) {}
 
-bool space_object::is_collided_with_object(space_object &object) const {
+// TODO: unit tests in C++
+bool space_object::is_collided_with(space_object &object) const {
     int x = position.x;
     int y = position.y;
     int object_x = object.position.x;

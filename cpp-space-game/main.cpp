@@ -63,21 +63,21 @@ long long now_us() {
 int main(int const argc, char const *const argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_DisplayMode display_mode;
-    int status = SDL_GetCurrentDisplayMode(0, &display_mode);
+    int const status = SDL_GetCurrentDisplayMode(0, &display_mode);
     if (status < 0) {
         cout << SDL_GetError() << endl;
         return status;
     }
     SDL_ShowCursor(SDL_DISABLE);
-    int w = display_mode.w;
-    int h = display_mode.h;
+    int const w = display_mode.w;
+    int const h = display_mode.h;
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_FULLSCREEN);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     std::random_device os_seed;
-    const uint_least32_t seed = os_seed();
+    uint_least32_t const seed = os_seed();
     std::mt19937 generator(seed);
-    class clock c;
-    game g(c, generator, pair(w, h));
+    game_clock clock;
+    game g(clock, generator, pair(w, h));
 
     const long long dt = 10000;
     long long current_time = now_us();

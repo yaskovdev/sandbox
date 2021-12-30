@@ -6,11 +6,12 @@
 
 class moving_space_object : public space_object {
 public:
-    pair speed;
-
     moving_space_object(pair position, pair size, pair speed);
 
     void move();
+
+private:
+    pair speed_;
 };
 
 

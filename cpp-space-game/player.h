@@ -3,16 +3,14 @@
 
 
 #include "pair.h"
-#include "clock.h"
+#include "game_clock.h"
 #include "space_object.h"
 
 class player : public space_object {
 public:
     int health = 5;
-    bool collided = false;
-    unsigned int most_recent_collision_time = 0;
 
-    explicit player(class clock const &clock, pair position, pair size);
+    explicit player(game_clock const &clock, pair position, pair size);
 
     void apply_collision_damage();
 
@@ -21,7 +19,9 @@ public:
     bool collided_recently() const;
 
 private:
-    class clock const &clock_;
+    game_clock const &clock_;
+    bool collided_ = false;
+    unsigned int most_recent_collision_time_ = 0;
 };
 
 
