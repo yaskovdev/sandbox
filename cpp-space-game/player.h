@@ -14,9 +14,9 @@ public:
 
     void apply_collision_damage();
 
-    bool is_dead() const;
+    [[nodiscard]] bool is_dead() const;
 
-    bool collided_recently() const;
+    [[nodiscard]] bool collided_recently() const;
 
 private:
     game_clock const &clock_;

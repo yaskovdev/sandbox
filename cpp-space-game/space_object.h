@@ -11,7 +11,7 @@ public:
 
     space_object(pair position, pair size);
 
-    bool is_collided_with(space_object &object) const;
+    [[nodiscard]] bool is_collided_with(space_object &other) const;
 };
 
 #endif //CPP_SPACE_GAME_SPACE_OBJECT_H

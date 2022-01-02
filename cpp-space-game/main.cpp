@@ -9,10 +9,7 @@
 #define HEALTH_BAR_COLOR color(255, 0, 255)
 #define SCORE_BAR_COLOR color(0, 255, 255)
 
-using std::cout;
-using std::endl;
-
-void render_rectangle(SDL_Renderer *const renderer, pair const position, pair const size, color const color) {
+void render_rectangle(SDL_Renderer *const renderer, const pair position, const pair size, color const color) {
     SDL_Rect rectangle;
     rectangle.x = position.x;
     rectangle.y = position.y;
@@ -25,7 +22,7 @@ void render_rectangle(SDL_Renderer *const renderer, pair const position, pair co
 bool visible = true;
 unsigned int most_recent_visibility_change = 0;
 
-void render_player(SDL_Renderer *const renderer, game const &game) {
+void render_player(SDL_Renderer *const renderer, const game &game) {
     if (!game.paused && game.player_.collided_recently()) {
         if (game.time() - most_recent_visibility_change > 10) {
             visible = !visible;
@@ -39,42 +36,42 @@ void render_player(SDL_Renderer *const renderer, game const &game) {
     }
 }
 
-void render_health_bar(SDL_Renderer *const renderer, game const &game) {
+void render_health_bar(SDL_Renderer *const renderer, const game &game) {
     int health = game.player_.health;
     for (int i = 0; i < health; i++) {
         render_rectangle(renderer, pair(10 + 20 * i, 10), pair(10, 10), HEALTH_BAR_COLOR);
     }
 }
 
-void render_score_bar(SDL_Renderer *const renderer, game const &game) {
+void render_score_bar(SDL_Renderer *const renderer, const game &game) {
     for (int i = 0; i < game.score; i++) {
         render_rectangle(renderer, pair(10 + 20 * i, 30), pair(10, 10), SCORE_BAR_COLOR);
     }
 }
 
-bool quit_requested(const SDL_Event e) {
+bool is_quit_event(const SDL_Event e) {
     return e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE);
 }
 
 long long now_us() {
     return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-};
+}
 
-int main(int const argc, char const *const argv[]) {
+int main(const int argc, const char *const argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_DisplayMode display_mode;
-    int const status = SDL_GetCurrentDisplayMode(0, &display_mode);
+    const int status = SDL_GetCurrentDisplayMode(0, &display_mode);
     if (status < 0) {
-        cout << SDL_GetError() << endl;
+        std::cout << SDL_GetError() << '\n';
         return status;
     }
     SDL_ShowCursor(SDL_DISABLE);
-    int const w = display_mode.w;
-    int const h = display_mode.h;
+    const int w = display_mode.w;
+    const int h = display_mode.h;
     SDL_Window *const window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_FULLSCREEN);
     SDL_Renderer *const renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     std::random_device os_seed;
-    uint_least32_t const seed = os_seed();
+    const uint_least32_t seed = os_seed();
     std::mt19937 generator(seed);
     game_clock clock;
     game g(clock, generator, pair(w, h));
@@ -93,7 +90,7 @@ int main(int const argc, char const *const argv[]) {
         while (accumulator >= dt) {
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
-                if (quit_requested(e)) {
+                if (is_quit_event(e)) {
                     g.quit();
                 } else if (e.type == SDL_KEYDOWN) {
                     g.handle_keydown(e.key.keysym.sym);

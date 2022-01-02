@@ -10,7 +10,7 @@ public:
     int x;
     int y;
 
-    bool intersects(pair p) const;
+    [[nodiscard]] bool intersects(pair p) const;
 };
 
 #endif //CPP_SPACE_GAME_PAIR_H

@@ -3,14 +3,14 @@
 #include "space_object.h"
 #include "moving_space_object.h"
 
-game::game(game_clock &clock, std::mt19937 &generator, pair const &field_size) :
-    clock_(clock), generator_(generator), field_size_(field_size), player_(clock, player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
+game::game(game_clock &clock, std::mt19937 &generator, const pair &field_size) :
+    clock_(clock), generator_(generator), field_size_(field_size), player_(clock, initial_player_position(field_size, PLAYER_SIZE), PLAYER_SIZE) {}
 
-void game::handle_keydown(int const key) {
+void game::handle_keydown(const int key) {
     pressed_keys_.insert(key);
 }
 
-void game::handle_keyup(int const key) {
+void game::handle_keyup(const int key) {
     pressed_keys_.erase(key);
 }
 
@@ -19,18 +19,15 @@ void game::tick() {
         return;
     }
 
-    for (int const pressed_key: pressed_keys_) {
-        if (pressed_key == SDLK_SPACE) {
-            if (clock_.time - most_recent_shot_time_ >= SHOOT_PERIOD) {
-                pair bullet_position = pair(player_.position.x + player_.size.x / 2 - 1, player_.position.y);
-                moving_space_object bullet(bullet_position, pair(5, 5), BULLET_SPEED);
-                bullets.push_back(bullet);
-                most_recent_shot_time_ = clock_.time;
-            }
-        } else {
-            pair delta = key_to_movement[pressed_key];
-            player_.position.x = bounded(player_.position.x + delta.x, 0, field_size_.x - player_.size.x);
-            player_.position.y = bounded(player_.position.y + delta.y, 0, field_size_.y - player_.size.y);
+    for (const int pressed_key: pressed_keys_) {
+        if (pressed_key == SDLK_SPACE && clock_.time - most_recent_shot_time_ >= SHOOT_PERIOD) {
+            const std::list<moving_space_object> &shot_bullets = weapon_.shoot(pair(player_.position.x + player_.size.x / 2 - 1, player_.position.y));
+            bullets.insert(bullets.end(), shot_bullets.begin(), shot_bullets.end());
+            most_recent_shot_time_ = clock_.time;
+        } else if (key_to_movement.count(pressed_key)) {
+            const auto[dx, dy] = key_to_movement.at(pressed_key);
+            player_.position.x = bounded(player_.position.x + dx, 0, field_size_.x - player_.size.x);
+            player_.position.y = bounded(player_.position.y + dy, 0, field_size_.y - player_.size.y);
         }
     }
 
@@ -69,7 +66,7 @@ void game::tick() {
 }
 
 void game::update_state_of_bullets() {
-    std::list<moving_space_object>::const_iterator bullet = bullets.begin();
+    auto bullet = bullets.begin();
     while (bullet != bullets.end()) {
         if (is_flown_away(*bullet)) {
             bullet = bullets.erase(bullet);
@@ -80,7 +77,7 @@ void game::update_state_of_bullets() {
 }
 
 void game::update_state_of_enemies() {
-    std::list<moving_space_object>::const_iterator enemy = enemies.begin();
+    auto enemy = enemies.begin();
     while (enemy != enemies.end()) {
         if (is_flown_away(*enemy)) {
             enemy = enemies.erase(enemy);
@@ -104,18 +101,18 @@ unsigned int game::time() const {
     return clock_.time;
 }
 
-bool game::is_flown_away(space_object const &object) const {
+bool game::is_flown_away(const space_object &object) const {
     return object.position.y >= field_size_.y;
 }
 
-int game::bounded(int const value, int const min, int const max) {
+int game::bounded(const int value, const int min, const int max) {
     return std::min(std::max(value, min), max);
 }
 
-pair game::player_position(pair const &field_size, pair const &player_size) {
+pair game::initial_player_position(const pair &field_size, const pair &player_size) {
     return {field_size.x / 2 - player_size.x / 2 - 1, field_size.y / 2};
 }
 
-bool game::is_collided_with_bullet(space_object const &enemy) {
+bool game::is_collided_with_bullet(const space_object &enemy) {
     return std::any_of(bullets.begin(), bullets.end(), [&](space_object bullet) { return enemy.is_collided_with(bullet); });
 }
