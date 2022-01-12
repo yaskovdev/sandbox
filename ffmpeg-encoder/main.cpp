@@ -68,8 +68,8 @@ int main(int argc, char **argv) {
     c->width = 352;
     c->height = 288;
     /* frames per second */
-    c->time_base = (AVRational) {1, 25};
-    c->framerate = (AVRational) {25, 1};
+    c->time_base = av_make_q(1, 25);
+    c->framerate = av_make_q(25, 1);
 
     c->gop_size = 10; /* emit one intra frame every ten frames */
     c->max_b_frames = 1;
