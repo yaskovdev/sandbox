@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsSandbox", "CsSandbox\CsSandbox.csproj", "{3C011E45-823C-458B-9248-15A95096EA68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C011E45-823C-458B-9248-15A95096EA68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C011E45-823C-458B-9248-15A95096EA68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C011E45-823C-458B-9248-15A95096EA68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C011E45-823C-458B-9248-15A95096EA68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
