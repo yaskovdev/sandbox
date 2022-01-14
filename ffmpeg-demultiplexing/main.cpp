@@ -284,6 +284,7 @@ int main(int argc, char **argv) {
     if (audio_stream) {
         printf("Demuxing audio from file '%s' into '%s'\n", src_filename, audio_dst_filename);
         printf("Audio stream time_base is %d/%d\n", audio_stream->time_base.num, audio_stream->time_base.den);
+        audio_dec_ctx->pkt_timebase = audio_stream->time_base; // This line can be deleted: it does not affect the pts of the decoded frame.
     }
 
     /* read frames from the file */
