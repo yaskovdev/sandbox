@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncAwait", "AsyncAwait\As
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForEachVsLinqSumPerformance", "ForEachVsLinqSumPerformance\ForEachVsLinqSumPerformance.csproj", "{CCFC552B-F56F-47B5-9D4F-FF1FCD724747}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceVsImplementationAssembly", "ReferenceVsImplementationAssembly\ReferenceVsImplementationAssembly.csproj", "{B81B598B-C011-4998-95F5-C77C2BC03874}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{CCFC552B-F56F-47B5-9D4F-FF1FCD724747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCFC552B-F56F-47B5-9D4F-FF1FCD724747}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCFC552B-F56F-47B5-9D4F-FF1FCD724747}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B81B598B-C011-4998-95F5-C77C2BC03874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B81B598B-C011-4998-95F5-C77C2BC03874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B81B598B-C011-4998-95F5-C77C2BC03874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B81B598B-C011-4998-95F5-C77C2BC03874}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
