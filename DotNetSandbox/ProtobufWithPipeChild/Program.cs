@@ -7,15 +7,11 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine($"Child process started with PID {Environment.ProcessId}");
-        using var parentToChildPipe =
-            new AnonymousPipeClientStream(PipeDirection.In, args[0]);
+        using var parentToChildPipe = new AnonymousPipeClientStream(PipeDirection.In, args[0]);
         using var pipeReader = new StreamReader(parentToChildPipe);
-        Console.WriteLine("Waiting for a command from the parent process...");
         try
         {
-            var command = Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128);
-            Console.WriteLine($"Received command {command}");
+            Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128);
         }
         catch (Exception e)
         {
