@@ -19,7 +19,7 @@ public static class Program
         }
         catch (Exception e)
         {
-            File.WriteAllText("/Users/yaskovdev/dev/ProtobufWithPipeChild.StackTrace.txt", e.ToString());
+            File.WriteAllText("c:/dev/ProtobufWithPipeChild.StackTrace.txt", e.ToString());
         }
     }
 }

@@ -15,9 +15,13 @@ public static class Program
         using var parentToChildPipe =
             new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
         using var childProcess = new Process();
+        // Note: added CreateNoWindow, UseShellExecute, RedirectStandardError and the error started to reproduce locally
         childProcess.StartInfo.FileName = "ProtobufWithPipeChild";
-        childProcess.StartInfo.Arguments = parentToChildPipe.GetClientHandleAsString();
+        childProcess.StartInfo.CreateNoWindow = true;
+        childProcess.StartInfo.UseShellExecute = false;
         childProcess.StartInfo.RedirectStandardOutput = true;
+        childProcess.StartInfo.RedirectStandardError = true;
+        childProcess.StartInfo.Arguments = parentToChildPipe.GetClientHandleAsString();
         childProcess.Start();
         parentToChildPipe.DisposeLocalCopyOfClientHandle();
         Console.WriteLine($"Going to send command in {DelayMs} ms");
