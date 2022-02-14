@@ -13,7 +13,7 @@ public static class Program
         using var pipeReader = new StreamReader(parentToChildPipe);
         try
         {
-            Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128); // if replace int with string, then stops reproducing
+            Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128); // if replace Command with string, then stops reproducing
         }
         catch (Exception e)
         {
