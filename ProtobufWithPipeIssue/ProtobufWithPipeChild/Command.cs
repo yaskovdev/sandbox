@@ -1,6 +1,10 @@
-﻿namespace ProtobufWithPipeChild;
+﻿using ProtoBuf;
 
-public enum Command
+namespace ProtobufWithPipeChild;
+
+[ProtoContract]
+public class Command
 {
-    Evaluate
+    [ProtoMember(0)]
+    public CommandType Type { get; set; }
 }

@@ -13,7 +13,9 @@ public static class Program
         using var pipeReader = new StreamReader(parentToChildPipe);
         try
         {
-            Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128); // if replace Command with string, then stops reproducing
+            Serializer.DeserializeWithLengthPrefix<CommandType>(parentToChildPipe, PrefixStyle.Base128);
+            // var value = Serializer.DeserializeWithLengthPrefix<Command>(parentToChildPipe, PrefixStyle.Base128);
+            // File.WriteAllText(Path.Combine(OutputPath, "ProtobufWithPipeChild.Value.txt"), value == null ? "null" : value.Type.ToString());
         }
         catch (Exception e)
         {
