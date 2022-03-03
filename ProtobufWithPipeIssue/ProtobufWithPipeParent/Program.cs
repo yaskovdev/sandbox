@@ -12,7 +12,7 @@ public static class Program
         using var parentToChildPipe =
             new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
         using var childProcess = new Process();
-        childProcess.StartInfo.FileName = "ProtobufWithPipeChild"; // .exe is not needed, apparently
+        childProcess.StartInfo.FileName = "ProtobufWithPipeChild";
         childProcess.StartInfo.CreateNoWindow = true; // Note: the error will start happening if you set this to true
         childProcess.StartInfo.Arguments = parentToChildPipe.GetClientHandleAsString();
         childProcess.Start();

@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="protobuf-net" Version="3.0.101" />
+        <ProjectReference Include="..\ProtobufWithPipeChild\ProtobufWithPipeChild.csproj"/>
     </ItemGroup>
 
 </Project>
