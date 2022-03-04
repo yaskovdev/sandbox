@@ -3,7 +3,7 @@ const {launch, getStream} = require('puppeteer-stream')
 
 const app = express()
 const port = 3000
-const runAfter = (func, timeout) => new Promise((resolve, reject) => setTimeout(() => func(resolve), timeout))
+const runAfter = (func, timeout) => new Promise((resolve) => setTimeout(() => func(resolve), timeout))
 
 app.use(express.json());
 
