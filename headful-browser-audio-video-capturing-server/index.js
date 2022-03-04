@@ -20,7 +20,7 @@ const product = 'chrome'
 
 app.post('/', async (request, response) => {
     try {
-        const {urlOfWebPageToCapture, webPageWidth, webPageHeight} = request.body;
+        const {urlOfWebPageToCapture, webPageWidth, webPageHeight, durationInSeconds} = request.body;
         console.log(`Received a request to capture ${urlOfWebPageToCapture} Web page`);
         const browser = await launch({
             args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
@@ -44,7 +44,7 @@ app.post('/', async (request, response) => {
             } catch (error) {
             }
             done()
-        }, 1000 * 12);
+        }, 1000 * durationInSeconds);
     } catch (e) {
         console.log(e)
     }

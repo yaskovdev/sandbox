@@ -25,7 +25,7 @@ In your terminal run:
 ```shell
 curl -v http://localhost:49160/ \
    -H 'Content-Type: application/json' \
-   -d '{ "urlOfWebPageToCapture": "http://localhost:8000/", "webPageWidth": 800, "webPageHeight": 600 }' \
+   -d '{ "urlOfWebPageToCapture": "http://localhost:8000/", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 10 }' \
    --output ./recording.webm
 ```
 
