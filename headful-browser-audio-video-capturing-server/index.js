@@ -1,8 +1,8 @@
 const express = require('express')
 const {launch, getStream} = require('puppeteer-stream')
 
-const host = '0.0.0.0'
-const port = 8080
+const HOST = '0.0.0.0'
+const PORT = 8080
 
 const runAfter = (func, timeout) => new Promise((resolve) => setTimeout(() => func(resolve), timeout))
 
@@ -10,8 +10,8 @@ const app = express()
 
 app.use(express.json())
 
-app.listen(port, host, async () => {
-    console.log(`Capturing Server is listening on port ${port}`)
+app.listen(PORT, HOST, async () => {
+    console.log(`Capturing Server is listening on port ${PORT}`)
 })
 
 const allowRunningChromeAsRoot = '--no-sandbox';

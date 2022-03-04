@@ -20,5 +20,5 @@ COPY . .
 
 EXPOSE 8080
 
-RUN chmod +x ./run-with-sample.sh
-CMD ["./run-with-sample.sh"]
+RUN chmod +x ./run.sh
+CMD ["./run.sh"]
