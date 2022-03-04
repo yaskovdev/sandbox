@@ -11,11 +11,13 @@ app.listen(port, 'localhost', async () => {
     console.log(`Capturing Server is listening on port ${port}`)
 })
 
+const allowAudioAutoplayInChrome = '--autoplay-policy=no-user-gesture-required';
+
 app.post('/', async (request, response) => {
     const {urlOfWebPageToCapture, webPageWidth, webPageHeight} = request.body;
     console.log(urlOfWebPageToCapture)
     const browser = await launch({
-        args: ['--autoplay-policy=no-user-gesture-required'],
+        args: [allowAudioAutoplayInChrome],
         headless: false,
         product: 'chrome'
     })

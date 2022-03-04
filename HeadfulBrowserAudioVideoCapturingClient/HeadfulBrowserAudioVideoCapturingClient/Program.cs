@@ -19,9 +19,9 @@ public static class Program
             var task = new CaptureTask("http://localhost:8000", 800, 600);
             request.Content = new StringContent(JsonConvert.SerializeObject(task), Encoding.UTF8, "application/json");
             var response = await httpClient.SendAsync(request);
-            await using var clientStream = await response.Content.ReadAsStreamAsync();
-            await using var fs = new FileStream($"{link}.webm", FileMode.Create);
-            await clientStream.CopyToAsync(fs);
+            await using var capturedContent = await response.Content.ReadAsStreamAsync();
+            await using var file = new FileStream($"{link}.webm", FileMode.Create);
+            await capturedContent.CopyToAsync(file);
         });
 
         await Task.WhenAll(tasks);
