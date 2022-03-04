@@ -10,6 +10,7 @@ public static class Program
     {
         var settings = new CefSettings();
         settings.CefCommandLineArgs.Add("autoplay-policy", "no-user-gesture-required");
+        settings.EnableAudio();
         Cef.Initialize(settings);
         using var browser = new ChromiumWebBrowser("http://localhost:8000/");
         browser.AudioHandler = new CustomAudioHandler();
