@@ -1,40 +1,25 @@
 using CefSharp;
+using CefSharp.Handler;
 using CefSharp.Structs;
 
 namespace HeadlessBrowserAudioVideoCapturing;
 
-public class CustomAudioHandler : IAudioHandler
+public class CustomAudioHandler : AudioHandler
 {
-    public void Dispose()
+    private const bool ProceedWithAudioStreamCapture = true;
+
+    protected override bool GetAudioParameters(IWebBrowser chromiumWebBrowser, IBrowser browser, ref AudioParameters parameters)
     {
-        Console.WriteLine(nameof(Dispose));
+        return ProceedWithAudioStreamCapture;
     }
 
-    public bool GetAudioParameters(IWebBrowser chromiumWebBrowser, IBrowser browser, ref AudioParameters parameters)
+    protected override void OnAudioStreamStarted(IWebBrowser chromiumWebBrowser, IBrowser browser, AudioParameters parameters, int channels)
     {
-        Console.WriteLine(nameof(GetAudioParameters));
-        return true;
+        Console.WriteLine($"Audio stream started with channel layout {parameters.ChannelLayout}");
     }
 
-    public void OnAudioStreamStarted(IWebBrowser chromiumWebBrowser, IBrowser browser, AudioParameters parameters,
-        int channels)
+    protected override void OnAudioStreamPacket(IWebBrowser chromiumWebBrowser, IBrowser browser, IntPtr data, int noOfFrames, long pts)
     {
-        Console.WriteLine(nameof(OnAudioStreamStarted));
-    }
-
-    public void OnAudioStreamPacket(IWebBrowser chromiumWebBrowser, IBrowser browser, IntPtr data, int noOfFrames,
-        long pts)
-    {
-        Console.WriteLine(nameof(OnAudioStreamPacket));
-    }
-
-    public void OnAudioStreamStopped(IWebBrowser chromiumWebBrowser, IBrowser browser)
-    {
-        Console.WriteLine(nameof(OnAudioStreamStopped));
-    }
-
-    public void OnAudioStreamError(IWebBrowser chromiumWebBrowser, IBrowser browser, string errorMessage)
-    {
-        Console.WriteLine(nameof(OnAudioStreamError));
+        // Console.WriteLine($"Got audio packet with number of frames {noOfFrames}");
     }
 }
