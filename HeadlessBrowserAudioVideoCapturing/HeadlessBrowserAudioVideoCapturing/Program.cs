@@ -19,17 +19,18 @@ public static class Program
         {
             throw new Exception($"Page load failed with ErrorCode:{initialLoadResponse.ErrorCode}, HttpStatusCode:{initialLoadResponse.HttpStatusCode}");
         }
-        await Task.Delay(1000);
         var devToolsClient = browser.GetDevToolsClient();
-        var pageClient = devToolsClient.Page;
-        var response = await pageClient.StartScreencastAsync(StartScreencastFormat.Jpeg, 100, 800, 600, 1);
-        Console.WriteLine($"Response is {response.Success}");
-        pageClient.ScreencastFrame += async (sender, args) =>
+        var page = devToolsClient.Page;
+        var response = await page.StartScreencastAsync(StartScreencastFormat.Png, 100, 800, 600, 1);
+        Console.WriteLine($"Response is {response.ResponseAsJsonString}");
+        page.ScreencastFrame += async (sender, args) =>
         {
-            await pageClient.ScreencastFrameAckAsync(args.SessionId);
+            await page.ScreencastFrameAckAsync(args.SessionId);
             Console.WriteLine($"Got frame with session ID {args.SessionId}");
+            await File.WriteAllBytesAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "frames", $"capture_{DateTime.UtcNow.Ticks}.png"), args.Data);
         };
-        var captureScreenshotResponse = await pageClient.CaptureScreenshotAsync();
+        Console.ReadLine();
+        var captureScreenshotResponse = await page.CaptureScreenshotAsync();
         var screenshotPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
             "CefSharp_screenshot.png");
         Console.WriteLine("Screenshot ready. Saving to {0}", screenshotPath);
