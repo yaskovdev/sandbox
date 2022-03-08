@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtobufWithPipeChild", "Pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Struct", "Struct\Struct.csproj", "{F7001163-89B5-425B-949A-8FC7AA0C141A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base64", "Base64\Base64.csproj", "{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{F7001163-89B5-425B-949A-8FC7AA0C141A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7001163-89B5-425B-949A-8FC7AA0C141A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7001163-89B5-425B-949A-8FC7AA0C141A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

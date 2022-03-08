@@ -15,7 +15,7 @@ public static class Program
             settings.CefCommandLineArgs.Add("autoplay-policy", "no-user-gesture-required");
             settings.EnableAudio();
             Cef.Initialize(settings);
-            using var browser = new ChromiumWebBrowser("https://yaskovdev.github.io/video-and-audio-capturing-test/");
+            using var browser = new ChromiumWebBrowser("https://yaskovdev.github.io/video-and-audio-capturing-test/hello-delayed-5-seconds.html");
             browser.AudioHandler = new CustomAudioHandler();
             var initialLoadResponse = await browser.WaitForInitialLoadAsync();
             AssertSuccess(initialLoadResponse.Success,
@@ -25,7 +25,7 @@ public static class Program
             page.ScreencastFrame += async (_, args) =>
             {
                 await page.ScreencastFrameAckAsync(args.SessionId);
-                Console.WriteLine($"Got frame with session ID {args.SessionId} and timestamp {args.Metadata.Timestamp}");
+                // Console.WriteLine($"Got frame with session ID {args.SessionId} and timestamp {args.Metadata.Timestamp}");
                 var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "frames", $"capture_{DateTime.UtcNow.Ticks}.png");
                 await File.WriteAllBytesAsync(path, args.Data);
             };
