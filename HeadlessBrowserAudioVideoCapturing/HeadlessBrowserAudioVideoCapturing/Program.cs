@@ -15,7 +15,7 @@ public static class Program
             settings.CefCommandLineArgs.Add("autoplay-policy", "no-user-gesture-required");
             settings.EnableAudio();
             Cef.Initialize(settings);
-            using var browser = new ChromiumWebBrowser("https://yaskovdev.github.io/video-and-audio-capturing-test/hello-delayed-5-seconds.html");
+            using var browser = new ChromiumWebBrowser("https://yaskovdev.github.io/video-and-audio-capturing-test/");
             browser.AudioHandler = new CustomAudioHandler();
             var initialLoadResponse = await browser.WaitForInitialLoadAsync();
             AssertSuccess(initialLoadResponse.Success,
