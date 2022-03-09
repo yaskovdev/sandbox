@@ -1,4 +1,3 @@
-using System.Reflection;
 using CefSharp;
 using CefSharp.Handler;
 using CefSharp.Structs;
@@ -11,15 +10,12 @@ public class CustomAudioHandler : AudioHandler
 
     private int _numberOfChannels;
 
-    private readonly FileStream _rawAudioFile;
+    private readonly FileStream _rawCapturedAudio;
 
-    public CustomAudioHandler()
+    public CustomAudioHandler(string workingDirectory)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        var assemblyPath = assembly.Location;
-        var executableLocation = Path.GetDirectoryName(assemblyPath) ?? throw new Exception($"Cannot find location of assembly {assemblyPath}");
-        var dest = Path.Combine(executableLocation, $"sound_{DateTime.UtcNow.Ticks}.pcm");
-        _rawAudioFile = new FileStream(dest, FileMode.Create, FileAccess.Write);
+        var dest = Path.Combine(workingDirectory, $"audio.pcm");
+        _rawCapturedAudio = new FileStream(dest, FileMode.Create, FileAccess.Write);
     }
 
     protected override bool GetAudioParameters(IWebBrowser chromiumWebBrowser, IBrowser browser, ref AudioParameters parameters) =>
@@ -49,8 +45,7 @@ public class CustomAudioHandler : AudioHandler
                     }
                 }
             }
-            Console.WriteLine($"Successfully copied {samples.Length} bytes to managed array");
-            _rawAudioFile.Write(samples, 0, samples.Length);
+            _rawCapturedAudio.Write(samples, 0, samples.Length);
         }
     }
 }
