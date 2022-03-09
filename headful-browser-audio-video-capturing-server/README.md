@@ -17,12 +17,18 @@ docker build . -t yaskovdev/capturing-server
 docker run -p 49160:8080 -d yaskovdev/capturing-server
 ```
 
+## Docker Image Push To Registry
+
+```shell
+docker image push yaskovdev/capturing-server
+```
+
 ## Capturing The Sample Web Page
 
 In your terminal run:
 
 ```shell
-curl -v http://localhost:49160/ \
+curl -v http://localhost:49160/captures \
    -H 'Content-Type: application/json' \
    -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 10 }' \
    --output ./recording.webm

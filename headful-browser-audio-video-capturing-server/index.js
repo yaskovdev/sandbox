@@ -18,7 +18,11 @@ const allowRunningChromeAsRoot = '--no-sandbox'
 const allowAudioAutoplayInChrome = '--autoplay-policy=no-user-gesture-required'
 const product = 'chrome'
 
-app.post('/', async (request, response) => {
+app.get('/status', async (request, response) => {
+    response.send('RUNNING')
+})
+
+app.post('/captures', async (request, response) => {
     const {urlOfWebPageToCapture, webPageWidth, webPageHeight, durationInSeconds} = request.body
     console.log(`Received a request to capture ${urlOfWebPageToCapture} Web page`)
     const browser = await launch({
