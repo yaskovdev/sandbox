@@ -8,5 +8,7 @@ spec:
   containers:
     - image: yaskovdev/capturing-server
       name: capturing-server
+      ports:
+        - containerPort: 8080
   dnsPolicy: ClusterFirst
   restartPolicy: Always

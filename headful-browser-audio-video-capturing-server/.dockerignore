@@ -1,5 +1,5 @@
-node_modules
 deployment
+node_modules
 .gitignore
 recording.webm
 README.md

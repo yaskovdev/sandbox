@@ -14,7 +14,7 @@ In the project directory run:
 
 ```shell
 docker build . -t yaskovdev/capturing-server
-docker run -p 49160:8080 -d yaskovdev/capturing-server
+docker run -p 8080:8080 -d yaskovdev/capturing-server
 ```
 
 ## Docker Image Push To Registry
@@ -23,14 +23,22 @@ docker run -p 49160:8080 -d yaskovdev/capturing-server
 docker image push yaskovdev/capturing-server
 ```
 
+## Create Pod And Service In Kubernetes
+
+```shell
+kubectl create -f deployment/pod.yaml
+kubectl create -f deployment/service.yaml
+curl http://localhost:32674/status
+```
+
 ## Capturing The Sample Web Page
 
 In your terminal run:
 
 ```shell
-curl -v http://localhost:49160/captures \
+curl -v http://localhost:8080/captures \
    -H 'Content-Type: application/json' \
-   -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 10 }' \
+   -d '{ "urlOfWebPageToCapture": "https://www.youtube.com/embed/WPTxkU38BKg?autoplay=1", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 60 }' \
    --output ./recording.webm
 ```
 
