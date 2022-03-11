@@ -38,7 +38,7 @@ In your terminal run:
 ```shell
 curl -v http://localhost:8080/captures \
    -H 'Content-Type: application/json' \
-   -d '{ "urlOfWebPageToCapture": "https://www.youtube.com/embed/WPTxkU38BKg?autoplay=1", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 60 }' \
+   -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "durationInSeconds": 10 }' \
    --output ./recording.webm
 ```
 

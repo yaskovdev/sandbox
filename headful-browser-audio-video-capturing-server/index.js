@@ -36,7 +36,23 @@ app.post('/captures', async (request, response) => {
     await page.goto(urlOfWebPageToCapture)
     await page.setViewport({width: webPageWidth, height: webPageHeight})
 
-    const stream = await getStream(page, {audio: true, video: true})
+    const stream = await getStream(page, {
+        audio: true,
+        video: true,
+        videoConstraints: {
+            mandatory: {
+                // If minWidth/Height have the same aspect ratio (e.g., 16:9) as
+                // maxWidth/Height, the implementation will letterbox/pillarbox as
+                // needed. Otherwise, set minWidth/Height to 0 to allow output video
+                // to be of any arbitrary size.
+                minWidth: 16,
+                minHeight: 9,
+                maxWidth: 854,
+                maxHeight: 480,
+                maxFrameRate: 60  // Note: Frame rate is variable (0 <= x <= 60).
+            }
+        }
+    })
     stream.pipe(response)
 
     await runAfter(async done => {
