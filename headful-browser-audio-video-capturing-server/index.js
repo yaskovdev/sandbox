@@ -24,7 +24,7 @@ app.get('/status', async (request, response) => {
 
 app.post('/captures', async (request, response) => {
     const {urlOfWebPageToCapture, webPageWidth, webPageHeight, mimeType, frameRate, durationInSeconds} = request.body
-    console.log(`Received a request to capture ${urlOfWebPageToCapture} Web page`)
+    console.log(`Received the capture request`, request.body)
     const browser = await launch({
         args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
         headless: false,
