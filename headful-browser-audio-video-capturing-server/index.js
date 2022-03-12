@@ -23,7 +23,7 @@ app.get('/status', async (request, response) => {
 })
 
 app.post('/captures', async (request, response) => {
-    const {urlOfWebPageToCapture, webPageWidth, webPageHeight, frameRate, durationInSeconds} = request.body
+    const {urlOfWebPageToCapture, webPageWidth, webPageHeight, mimeType, frameRate, durationInSeconds} = request.body
     console.log(`Received a request to capture ${urlOfWebPageToCapture} Web page`)
     const browser = await launch({
         args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
@@ -39,6 +39,7 @@ app.post('/captures', async (request, response) => {
     const stream = await getStream(page, {
         audio: true,
         video: true,
+        mimeType,
         videoConstraints: {
             mandatory: {
                 minWidth: webPageWidth,
