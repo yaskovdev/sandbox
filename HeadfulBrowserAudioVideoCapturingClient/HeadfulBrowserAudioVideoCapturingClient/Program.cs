@@ -6,14 +6,14 @@ namespace HeadfulBrowserAudioVideoCapturingClient;
 public static class Program
 {
     private static readonly Uri CapturingServerBaseAddress =
-        new("http://localhost:8080/captures");
-        // new("http://capturing-server-ingress.c977159d4da548cfab16.westeurope.aksapp.io/captures");
+        // new("http://localhost:8080/captures");
+        new("http://capturing-server-ingress.c977159d4da548cfab16.westeurope.aksapp.io/captures");
 
     public static async Task Main()
     {
-        var links = new[] { 0 };
+        var links = new[] { 0, 1, 2 };
         var httpClient = new HttpClient();
-        const int capturingDurationInSeconds = 4;
+        const int capturingDurationInSeconds = 60;
         httpClient.BaseAddress = CapturingServerBaseAddress;
         httpClient.Timeout = TimeSpan.FromSeconds(capturingDurationInSeconds + 30);
 
