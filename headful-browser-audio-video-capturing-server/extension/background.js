@@ -32,11 +32,6 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 		(stream) => {
 			if (!stream) return;
 
-			console.log('Tracks:')
-			stream.getTracks().forEach(track => {
-				console.log(track)
-			});
-
 			recorder = new MediaRecorder(stream, {
 				ignoreMutedMedia: true,
 				audioBitsPerSecond,
@@ -48,7 +43,6 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 			// TODO: recorder onerror
 
 			recorder.ondataavailable = async function (event) {
-				console.log('Got data of size', event.data.size);
 				if (event.data.size > 0) {
 					const buffer = await event.data.arrayBuffer();
 					const data = arrayBufferToString(buffer);
