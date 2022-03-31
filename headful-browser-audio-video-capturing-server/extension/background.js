@@ -18,7 +18,7 @@ chrome.browserAction.onClicked.addListener(function (activeTab) {
             maxFrameRate: 60,  // Note: Frame rate is variable (0 <= x <= 60).
         }
     }
-    const options = {index: 0, audio: true, video: true, videoConstraints};
+    const options = {index: 0, audio: true, video: true, mimeType: 'video/mp4', videoConstraints};
     START_RECORDING(options)
 })
 
@@ -31,6 +31,11 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 		},
 		(stream) => {
 			if (!stream) return;
+
+			console.log('Tracks:')
+			stream.getTracks().forEach(track => {
+				console.log(track)
+			});
 
 			recorder = new MediaRecorder(stream, {
 				ignoreMutedMedia: true,

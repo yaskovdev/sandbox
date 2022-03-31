@@ -13,10 +13,23 @@ internal class CaptureTask
     [JsonProperty("webPageHeight")]
     internal int WebPageHeight { get; }
 
-    internal CaptureTask(string urlOfWebPageToCapture, int webPageWidth, int webPageHeight)
+    [JsonProperty("mimeType")]
+    internal string MimeType { get; }
+
+    [JsonProperty("frameRate")]
+    internal int FrameRate { get; }
+
+    [JsonProperty("durationInSeconds")]
+    internal int DurationInSeconds { get; }
+
+    internal CaptureTask(string urlOfWebPageToCapture, int webPageWidth, int webPageHeight, string mimeType,
+        int frameRate, int durationInSeconds)
     {
         UrlOfWebPageToCapture = urlOfWebPageToCapture;
         WebPageWidth = webPageWidth;
         WebPageHeight = webPageHeight;
+        MimeType = mimeType;
+        FrameRate = frameRate;
+        DurationInSeconds = durationInSeconds;
     }
 }
