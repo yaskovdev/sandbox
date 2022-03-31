@@ -33,6 +33,10 @@ docker image push capturingservercontainerregistry.azurecr.io/capturingservercon
 
 ## Create Pod And Service In Kubernetes
 
+az aks update -n CapturingServerAks -g HeadfulCapturingServer --attach-acr CapturingServerContainerRegistry
+
+https://docs.microsoft.com/en-us/azure/aks/http-application-routing
+
 ```shell
 kubectl create -f deployment/pod.yaml
 kubectl create -f deployment/service.yaml
@@ -44,9 +48,9 @@ curl http://localhost:32674/status
 In your terminal run:
 
 ```shell
-curl -v http://aks-helloworld.d9150a5f27c14886b71a.westeurope.aksapp.io/captures \
+curl -v http://capturing-server-ingress.c977159d4da548cfab16.westeurope.aksapp.io/captures \
    -H 'Content-Type: application/json' \
-   -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "frameRate": 8, "durationInSeconds": 300 }' \
+   -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "frameRate": 8, "durationInSeconds": 4 }' \
    --output ./recording.webm
 ```
 

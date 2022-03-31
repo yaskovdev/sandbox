@@ -6,14 +6,14 @@ namespace HeadfulBrowserAudioVideoCapturingClient;
 public static class Program
 {
     private static readonly Uri CapturingServerBaseAddress =
-        // new("http://localhost:8080/captures");
-        new("http://aks-helloworld.d9150a5f27c14886b71a.westeurope.aksapp.io/captures");
+        new("http://localhost:8080/captures");
+        // new("http://capturing-server-ingress.c977159d4da548cfab16.westeurope.aksapp.io/captures");
 
     public static async Task Main()
     {
-        var links = new[] { 0, 1, 2 };
+        var links = new[] { 0 };
         var httpClient = new HttpClient();
-        const int capturingDurationInSeconds = 120;
+        const int capturingDurationInSeconds = 4;
         httpClient.BaseAddress = CapturingServerBaseAddress;
         httpClient.Timeout = TimeSpan.FromSeconds(capturingDurationInSeconds + 30);
 
@@ -22,7 +22,7 @@ public static class Program
             Console.WriteLine($"Sending task {link}");
             var request = new HttpRequestMessage(HttpMethod.Post, CapturingServerBaseAddress);
             // const string mimeType = @"video/x-matroska";
-            const string mimeType = @"video/webm;codecs=pcm";
+            const string mimeType = @"video/webm";
             // var outputFileExtension = mimeType.Split("/")[1];
             var outputFileExtension = "webm";
             var task = new CaptureTask("https://yaskovdev.github.io/video-and-audio-capturing-test/", 1920, 1080,
