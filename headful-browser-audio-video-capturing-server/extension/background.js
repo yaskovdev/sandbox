@@ -44,15 +44,15 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 
 			recorder.ondataavailable = async function (event) {
 				if (event.data.size > 0) {
-					const buffer = await event.data.arrayBuffer();
-					const data = arrayBufferToString(buffer);
-
-					if (window.sendData) {
-						window.sendData({
-							id: index,
-							data,
-						});
-					}
+					// const buffer = await event.data.arrayBuffer();
+					// const data = arrayBufferToString(buffer);
+					//
+					// if (window.sendData) {
+					// 	window.sendData({
+					// 		id: index,
+					// 		data,
+					// 	});
+					// }
 				}
 			};
 			recorder.onerror = () => recorder.stop();
