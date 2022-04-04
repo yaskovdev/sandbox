@@ -37,7 +37,7 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 				audioBitsPerSecond,
 				videoBitsPerSecond,
 				bitsPerSecond,
-				mimeType: 'video/webm;codecs:"avc1.42402a"',
+				mimeType
 			});
 			recorders[index] = recorder;
 			// TODO: recorder onerror
