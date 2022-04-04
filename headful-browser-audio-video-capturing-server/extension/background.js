@@ -32,7 +32,13 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 		(stream) => {
 			if (!stream) return;
 
-			recorder = new MediaRecorder(stream);
+			recorder = new MediaRecorder(stream, {
+				ignoreMutedMedia: true,
+				audioBitsPerSecond,
+				videoBitsPerSecond,
+				bitsPerSecond,
+				mimeType: 'video/webm;codecs:"avc1.42402a"',
+			});
 			recorders[index] = recorder;
 			// TODO: recorder onerror
 

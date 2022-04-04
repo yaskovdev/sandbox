@@ -6,7 +6,7 @@ metadata:
   name: capturing-server
 spec:
   containers:
-    - image: capturingservercontainerregistry.azurecr.io/capturingservercontainerregistry/capturing-server:15ad5de
+    - image: capturingservercontainerregistry.azurecr.io/capturingservercontainerregistry/capturing-server:963aeea
       name: capturing-server
       ports:
         - containerPort: 8080
