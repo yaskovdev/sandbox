@@ -32,29 +32,23 @@ function START_RECORDING({ index, video, audio, frameSize, audioBitsPerSecond, v
 		(stream) => {
 			if (!stream) return;
 
-			recorder = new MediaRecorder(stream, {
-				ignoreMutedMedia: true,
-				audioBitsPerSecond,
-				videoBitsPerSecond,
-				bitsPerSecond,
-				mimeType,
-			});
+			recorder = new MediaRecorder(stream);
 			recorders[index] = recorder;
 			// TODO: recorder onerror
 
-			recorder.ondataavailable = async function (event) {
-				if (event.data.size > 0) {
-					// const buffer = await event.data.arrayBuffer();
-					// const data = arrayBufferToString(buffer);
-					//
-					// if (window.sendData) {
-					// 	window.sendData({
-					// 		id: index,
-					// 		data,
-					// 	});
-					// }
-				}
-			};
+            recorder.ondataavailable = async function (event) {
+                if (event.data.size > 0) {
+                    const buffer = await event.data.arrayBuffer();
+                    const data = arrayBufferToString(buffer);
+
+                    if (window.sendData) {
+                        window.sendData({
+                            id: index,
+                            data,
+                        });
+                    }
+                }
+            };
 			recorder.onerror = () => recorder.stop();
 
 			recorder.onstop = function () {
