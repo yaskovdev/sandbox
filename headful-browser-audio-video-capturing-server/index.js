@@ -134,6 +134,8 @@ app.post('/captures', async (request, response) => {
     const {urlOfWebPageToCapture, webPageWidth, webPageHeight, mimeType, frameRate, durationInSeconds} = request.body
     console.log(`Received the capture request`, request.body)
     const browser = await launch({
+        // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        executablePath: '/usr/bin/google-chrome',
         args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
         headless: false,
         product

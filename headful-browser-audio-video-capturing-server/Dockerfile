@@ -10,6 +10,13 @@ RUN apt-get update && apt-get install -y \
     xvfb \
  && rm -rf /var/lib/apt/lists/*
 
+# TODO: find a way to install Google Chrome without --fix-broken hack
+RUN wget https://dl.google.com/linux/direct/google-chrome-unstable_current_amd64.deb \
+ ; dpkg -i google-chrome-unstable_current_amd64.deb \
+ ; apt-get -y update \
+ ; apt-get -y upgrade \
+ ; apt -y --fix-broken install
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
