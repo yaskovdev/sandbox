@@ -11,9 +11,9 @@ public static class Program
 
     public static async Task Main()
     {
-        var links = new[] { 0 };
+        var links = new[] { 0, 1, 2 };
         var httpClient = new HttpClient();
-        const int capturingDurationInSeconds = 10;
+        const int capturingDurationInSeconds = 180;
         httpClient.BaseAddress = CapturingServerBaseAddress;
         httpClient.Timeout = TimeSpan.FromSeconds(capturingDurationInSeconds + 30);
 
