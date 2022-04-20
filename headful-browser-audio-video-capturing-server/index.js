@@ -11,42 +11,57 @@ const app = express()
 app.use(express.json())
 
 app.listen(PORT, HOST, async () => {
-    console.log(`Capturing Server is listening on port ${PORT}`)
+    console.log(`Capturing Server is listening on ${HOST}:${PORT}`)
 })
 
-const allowRunningChromeAsRoot = '--no-sandbox';
+const allowRunningChromeAsRoot = '--no-sandbox'
 const allowAudioAutoplayInChrome = '--autoplay-policy=no-user-gesture-required'
 const product = 'chrome'
 
-app.post('/', async (request, response) => {
-    try {
-        const {urlOfWebPageToCapture, webPageWidth, webPageHeight, durationInSeconds} = request.body;
-        console.log(`Received a request to capture ${urlOfWebPageToCapture} Web page`);
-        const browser = await launch({
-            args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
-            headless: false,
-            product
-        });
-        console.log(`Successfully launched the ${product} browser`);
-        const page = await browser.newPage();
-        await page.goto(urlOfWebPageToCapture);
-        await page.setViewport({width: webPageWidth, height: webPageHeight});
+app.get('/status', async (request, response) => {
+    response.send('RUNNING')
+})
 
-        const stream = await getStream(page, {audio: true, video: true});
-        stream.pipe(response);
+app.post('/captures', async (request, response) => {
+    const {urlOfWebPageToCapture, webPageWidth, webPageHeight, mimeType, frameRate, durationInSeconds} = request.body
+    console.log(`Received the capture request`, request.body)
+    const browser = await launch({
+        args: [allowRunningChromeAsRoot, allowAudioAutoplayInChrome],
+        headless: false,
+        product
+    })
+    console.log(`Successfully launched the ${product} browser`)
+    const pages = await browser.pages()
+    const page = pages[0]
+    await page.goto(urlOfWebPageToCapture)
+    await page.setViewport({width: webPageWidth, height: webPageHeight})
 
-        await runAfter(async done => {
-            try {
-                await stream.destroy()
-                await page.close()
-                await browser.close()
-                console.log("finished")
-            } catch (error) {
+    const stream = await getStream(page, {
+        audio: true,
+        video: true,
+        mimeType,
+        videoConstraints: {
+            mandatory: {
+                minWidth: webPageWidth,
+                minHeight: webPageHeight,
+                maxWidth: webPageWidth,
+                maxHeight: webPageHeight,
+                minFrameRate: frameRate,
+                maxFrameRate: frameRate
             }
-            done()
-        }, 1000 * durationInSeconds);
-    } catch (e) {
-        console.log(e)
-    }
+        }
+    })
+    stream.pipe(response)
+
+    await runAfter(async done => {
+        try {
+            await stream.destroy()
+            await page.close()
+            await browser.close()
+            console.log("Finished capturing")
+        } catch (error) {
+        }
+        done()
+    }, 1000 * durationInSeconds)
     response.end()
 })

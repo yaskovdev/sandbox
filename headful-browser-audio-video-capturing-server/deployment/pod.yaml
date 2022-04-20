@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: capturing-server
+  name: capturing-server
+spec:
+  containers:
+    - image: capturingservercontainerregistry.azurecr.io/capturingservercontainerregistry/capturing-server
+      name: capturing-server
+      ports:
+        - containerPort: 8080
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
