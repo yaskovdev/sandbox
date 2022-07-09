@@ -48,7 +48,7 @@ curl http://localhost:32674/status
 In your terminal run:
 
 ```shell
-curl -v http://capturing-server-ingress.c977159d4da548cfab16.westeurope.aksapp.io/captures \
+curl -v http://localhost:8080/captures \
    -H 'Content-Type: application/json' \
    -d '{ "urlOfWebPageToCapture": "https://yaskovdev.github.io/video-and-audio-capturing-test/", "webPageWidth": 800, "webPageHeight": 600, "frameRate": 8, "durationInSeconds": 4 }' \
    --output ./recording.webm
