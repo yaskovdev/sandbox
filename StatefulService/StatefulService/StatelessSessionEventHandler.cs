@@ -2,6 +2,7 @@ namespace StatefulService;
 
 /// <summary>
 /// Contains only business logic (average duration calculation) and no state. Bad OOP.
+/// Also, need to pass session ID to HandleEvent and to all the subsequent calls (if any).
 /// </summary>
 public class StatelessSessionEventHandler : ISessionEventHandler
 {
