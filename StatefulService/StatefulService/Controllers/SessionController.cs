@@ -8,29 +8,19 @@ public class SessionController : ControllerBase
 {
     private readonly ISessionService sessionService;
     private readonly ISessionEventHandler sessionEventHandler;
-    private readonly ILogger<SessionController> logger;
 
-    public SessionController(ISessionService sessionService, ISessionEventHandler sessionEventHandler, ILogger<SessionController> logger)
+    public SessionController(ISessionService sessionService, ISessionEventHandler sessionEventHandler)
     {
         this.sessionService = sessionService;
         this.sessionEventHandler = sessionEventHandler;
-        this.logger = logger;
     }
 
     [HttpGet("/{sessionId}/average-duration-of-events")]
-    public double GetAverageDurationOfEvents(string sessionId)
-    {
-        var session = sessionService.GetSession(sessionId);
-        return session.AverageDurationOfEvents;
-    }
+    public double GetAverageDurationOfEvents(string sessionId) => sessionService.GetSession(sessionId).AverageDurationOfEvents;
 
     [HttpPost("/{sessionId}")]
     public void Create(string sessionId) => sessionService.CreateSession(sessionId);
 
     [HttpPost("/{sessionId}/events")]
-    public void HandleEvent(string sessionId, [FromBody] SessionEvent sessionEvent)
-    {
-        sessionEventHandler.HandleEvent(sessionId, sessionEvent);
-        logger.LogInformation("Registered event");
-    }
+    public void HandleEvent(string sessionId, [FromBody] SessionEvent sessionEvent) => sessionEventHandler.HandleEvent(sessionId, sessionEvent);
 }

@@ -8,10 +8,5 @@ public class SessionService : ISessionService
 
     public Session GetSession(string id) => repository.GetSession(id);
 
-    public Session CreateSession(string id)
-    {
-        var session = new Session { Id = id };
-        repository.CreateSession(session);
-        return session;
-    }
+    public void CreateSession(string id) => repository.CreateSession(new Session { Id = id });
 }
