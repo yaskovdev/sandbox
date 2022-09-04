@@ -2,22 +2,16 @@ namespace StatefulService;
 
 public class SessionService : ISessionService
 {
-    private readonly IDictionary<string, Session> sessions = new Dictionary<string, Session>();
+    private readonly ISessionRepository repository;
 
-    public Session GetSession(string id) => sessions[id];
+    public SessionService(ISessionRepository repository) => this.repository = repository;
+
+    public Session GetSession(string id) => repository.GetSession(id);
 
     public Session CreateSession(string id)
     {
-        var session = new Session();
-        sessions[id] = session;
-        return session;
-    }
-
-    public Session RegisterEvent(string sessionId, SessionEvent sessionEvent)
-    {
-        var session = GetSession(sessionId);
-        session.NumberOfEvents += 1;
-        session.TotalDurationOfEvents += sessionEvent.Duration;
+        var session = new Session { Id = id };
+        repository.CreateSession(session);
         return session;
     }
 }

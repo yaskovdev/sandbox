@@ -7,30 +7,30 @@ namespace StatefulService.Controllers;
 public class SessionController : ControllerBase
 {
     private readonly ISessionService sessionService;
+    private readonly ISessionEventHandler sessionEventHandler;
     private readonly ILogger<SessionController> logger;
 
-    public SessionController(ISessionService sessionService, ILogger<SessionController> logger)
+    public SessionController(ISessionService sessionService, ISessionEventHandler sessionEventHandler, ILogger<SessionController> logger)
     {
         this.sessionService = sessionService;
+        this.sessionEventHandler = sessionEventHandler;
         this.logger = logger;
     }
 
-    [HttpGet("/{sessionId}")]
-    public Session Get(string sessionId) => sessionService.GetSession(sessionId);
-
-    [HttpPost("/{sessionId}")]
-    public Session Create(string sessionId)
+    [HttpGet("/{sessionId}/average-duration-of-events")]
+    public double GetAverageDurationOfEvents(string sessionId)
     {
-        var session = sessionService.CreateSession(sessionId);
-        logger.LogInformation("Created session");
-        return session;
+        var session = sessionService.GetSession(sessionId);
+        return session.AverageDurationOfEvents;
     }
 
+    [HttpPost("/{sessionId}")]
+    public void Create(string sessionId) => sessionService.CreateSession(sessionId);
+
     [HttpPost("/{sessionId}/events")]
-    public Session RegisterEvent(string sessionId, [FromBody] SessionEvent sessionEvent)
+    public void HandleEvent(string sessionId, [FromBody] SessionEvent sessionEvent)
     {
-        var session = sessionService.RegisterEvent(sessionId, sessionEvent);
+        sessionEventHandler.HandleEvent(sessionId, sessionEvent);
         logger.LogInformation("Registered event");
-        return session;
     }
 }

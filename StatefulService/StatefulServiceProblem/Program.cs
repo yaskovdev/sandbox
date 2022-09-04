@@ -1,12 +1,11 @@
-using StatefulService;
+using StatefulServiceProblem;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddSingleton<ISessionRepository, SessionRepository>();
-builder.Services.AddSingleton<ISessionEventHandler, StatelessSessionEventHandler>();
-builder.Services.AddSingleton<ISessionService, SessionService>();
+builder.Services.AddSingleton<ISessionEventHandlers, SessionEventHandlers>();
+builder.Services.AddSingleton<ISessionEventHandler, StatefulSessionEventHandler>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
