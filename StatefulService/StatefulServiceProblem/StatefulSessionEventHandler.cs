@@ -7,6 +7,7 @@ namespace StatefulServiceProblem;
 /// events properly.
 /// TODO: consider writing an article about this problem.
 /// Note: APIs of both the services are the same. But they are implemented differently.
+/// Why it's bad OOP: https://martinfowler.com/bliki/AnemicDomainModel.html.
 /// </summary>
 public class StatefulSessionEventHandler : ISessionEventHandler
 {
