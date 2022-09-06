@@ -16,6 +16,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Struct", "Struct\Struct.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base64", "Base64\Base64.csproj", "{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClient", "HttpClient\HttpClient.csproj", "{32CA8CC2-6301-49E7-94AE-7714BD777CAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NullableTypes", "NullableTypes\NullableTypes.csproj", "{CFA4E6F8-4A65-4570-A0E3-515E9339AD36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DllImportSandbox", "DllImportSandbox\DllImportSandbox.csproj", "{70349615-9D05-482A-96C2-B30230DCC71E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +60,17 @@ Global
 		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD244947-0EF0-4D98-B8CE-1E0C1BEB02C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32CA8CC2-6301-49E7-94AE-7714BD777CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32CA8CC2-6301-49E7-94AE-7714BD777CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32CA8CC2-6301-49E7-94AE-7714BD777CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32CA8CC2-6301-49E7-94AE-7714BD777CAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFA4E6F8-4A65-4570-A0E3-515E9339AD36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFA4E6F8-4A65-4570-A0E3-515E9339AD36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFA4E6F8-4A65-4570-A0E3-515E9339AD36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFA4E6F8-4A65-4570-A0E3-515E9339AD36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70349615-9D05-482A-96C2-B30230DCC71E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70349615-9D05-482A-96C2-B30230DCC71E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70349615-9D05-482A-96C2-B30230DCC71E}.Release|Any CPU.ActiveCfg = Release|x64
+		{70349615-9D05-482A-96C2-B30230DCC71E}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

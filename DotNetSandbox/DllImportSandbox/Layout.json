@@ -1,0 +1,29 @@
+{
+    "protocolVersion": "2.0",
+    "id": "TestingComposerJson",
+    "backgroundColor": "#000000",
+    "extent": {
+        "left": 0,
+        "top": 0,
+        "width": 1920,
+        "height": 1080
+    },
+    "mirrorSources": false,
+    "assets": [],
+    "sources": [
+        {
+            "index": 3000,
+            "type": "FIXED",
+            "left": 0,
+            "top": 0,
+            "width": 1920,
+            "height": 1080,
+            "zOrder": 2,
+            "fillMode": "FIT_TO_FRAME",
+            "role": "ATTENDEE",
+            "grid": {
+                "decoration": "NONE"
+            }
+        }
+    ]
+}
