@@ -1,6 +1,7 @@
 ﻿namespace DllImportSandbox;
 
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 public static class Program
 {
@@ -17,6 +18,20 @@ public static class Program
             var descriptionPtr = CompositorDll.CreateCompositorDescription(json);
             CompositorDll.CompositorSetDescription(compositorPtr, descriptionPtr);
             CompositorDll.DestroyCompositorDescription(descriptionPtr);
+        }
+
+        const int outputWidth = 1920;
+        const int outputHeight = 1080;
+        const int outputBufferLength = outputWidth * (outputHeight + outputHeight % 2) * 3 / 2;
+        var outputPtr = Marshal.AllocHGlobal(outputBufferLength);
+        try
+        {
+            var status = CompositorDll.CompositorComposeFrames(compositorPtr, DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond, Array.Empty<CompositorDll.Source>(), 0, outputPtr, outputPtr + outputWidth * outputHeight, outputWidth, outputHeight, outputWidth, outputWidth);
+            Console.WriteLine($"Composed empty sources with status {status.type}, {status.code}");
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(outputPtr);
         }
 
         Console.WriteLine($"Compositor is {compositorPtr}");

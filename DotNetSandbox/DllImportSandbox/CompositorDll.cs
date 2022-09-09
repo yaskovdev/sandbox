@@ -1,6 +1,7 @@
 ﻿namespace DllImportSandbox;
 
 using System.Runtime.InteropServices;
+using System.Security;
 
 public static class CompositorDll
 {
@@ -16,6 +17,36 @@ public static class CompositorDll
         Error = 0,
         Warning = 1,
         Info = 2
+    }
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Unicode)]
+    public struct Source
+    {
+        public int id;
+        public long timestamp;
+        // NV12
+        public IntPtr imageLuma;
+        public IntPtr imageChroma;
+        public int imageWidth;
+        public int imageHeight;
+        public int imageLumaStride;
+        public int imageChromaStride;
+        // Alpha
+        public IntPtr alphaData;
+        public int alphaWidth;
+        public int alphaHeight;
+        public int alphaStride;
+
+        public string displayName;
+        public int domSpk;
+        public int muted;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct CompositionResult
+    {
+        public int type;
+        public int code;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -35,4 +66,8 @@ public static class CompositorDll
 
     [DllImport("Microsoft.SlimCV.dll")]
     public static extern void DestroyCompositor(IntPtr handle);
+    
+    [SuppressUnmanagedCodeSecurity]
+    [DllImport("Microsoft.SlimCV.dll", SetLastError = false)]
+    public static extern CompositionResult CompositorComposeFrames(IntPtr handle, long tsMillis, [In] Source[] sources, int numSources, IntPtr dstLuma, IntPtr dstChroma, int dstWidth, int dstHeight, int dstStrideLuma, int dstStrideChroma);
 }
