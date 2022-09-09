@@ -5,7 +5,7 @@
 3. Run `.\BuildAndRun.ps1`.
 4. Wait a few minutes for the benchmark to finish.
 
-Expected: both "Allocated native memory" and "Native memory leak" have "10 B" value.
-Actual: both "Allocated native memory" and "Native memory leak" have "-" value.
+Expected: both "Allocated native memory" and "Native memory leak" are "10 B".
+Actual: both "Allocated native memory" and "Native memory leak" are "-".
 
 Remove `KeepBenchmarkFiles` annotation from `MemoryLeak` class and run again. This time everything works as expected.
