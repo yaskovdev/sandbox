@@ -15,5 +15,5 @@ int multiply(const multiplier* multiplier, const int number)
 void destroy_multiplier(const multiplier* multiplier)
 {
     delete multiplier;
-    std::cout << "Native: multiplier deleted..." << "\n";
+    std::cout << "Native: multiplier deleted" << "\n";
 }

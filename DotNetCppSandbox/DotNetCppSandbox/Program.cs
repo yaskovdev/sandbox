@@ -32,7 +32,7 @@ internal static class Program
     {
         var api = new MultiplierSafeHandleApi();
         using var multiplier = api.CreateMultiplier(coefficient);
-        Console.WriteLine($"Multiplier SafeHandle created");
+        Console.WriteLine("Multiplier SafeHandle created");
         Console.WriteLine($"{number} multiplied by {coefficient} is {api.Multiply(multiplier, number)}");
     }
 }
