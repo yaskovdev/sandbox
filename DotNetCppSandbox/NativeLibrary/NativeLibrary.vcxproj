@@ -156,7 +156,6 @@
   <ItemGroup>
     <ClCompile Include="api.cpp" />
     <ClCompile Include="multiplier.cpp" />
-    <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="api.h" />
