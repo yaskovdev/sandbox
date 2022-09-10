@@ -18,15 +18,15 @@ internal static class Program
     {
         Console.WriteLine("With IntPtr:");
         const byte length = 10;
-        var ptr = Marshal.AllocHGlobal(2 * length);
+        var resultingFramePtr = Marshal.AllocHGlobal(2 * length);
         try
         {
-            var status = ArrayFillerIntPtrApi.FillTwoArraysExtern(ptr, ptr + length, length);
-            ProcessArray(ptr, 2 * length);
+            var status = FrameProducerIntPtrApi.FillChromaAndLuma(resultingFramePtr, resultingFramePtr + length, length);
+            DisplayFrame(resultingFramePtr, 2 * length);
         }
         finally
         {
-            Marshal.FreeHGlobal(ptr);
+            Marshal.FreeHGlobal(resultingFramePtr);
         }
     }
 
@@ -34,18 +34,18 @@ internal static class Program
     {
         Console.WriteLine("With byte[]:");
         const byte length = 10;
-        var xs = new byte[length];
-        var ys = new byte[length];
-        var status = ArrayFillerIntArrayApi.FillTwoArraysExtern(xs, ys, length);
-        var array = new byte[2 * length];
+        var chroma = new byte[length];
+        var luma = new byte[length];
+        var status = FrameProducerIntArrayApi.FillChromaAndLuma(chroma, luma, length);
+        var resultingFrame = new byte[2 * length];
 
         // Requires copying:
-        Array.Copy(xs, 0, array, 0, length);
-        Array.Copy(ys, 0, array, length, length);
-        var handle = GCHandle.Alloc(array, GCHandleType.Pinned);
+        Array.Copy(chroma, 0, resultingFrame, 0, length);
+        Array.Copy(luma, 0, resultingFrame, length, length);
+        var handle = GCHandle.Alloc(resultingFrame, GCHandleType.Pinned);
         try
         {
-            ProcessArray(handle.AddrOfPinnedObject(), 2 * length);
+            DisplayFrame(handle.AddrOfPinnedObject(), 2 * length);
         }
         finally
         {
@@ -56,42 +56,41 @@ internal static class Program
     private static void UseSafeHandle()
     {
         Console.WriteLine("With SafeHandle:");
-        var api = new ArrayFillerSafeHandleApi();
+        var api = new FrameProducerSafeHandleApi();
         const byte length = 10;
-        var xs = new byte[length];
-        var ys = new byte[length];
-        using (var xsHandle = new ArraySafeHandle(xs))
+        var chroma = new byte[length];
+        var luma = new byte[length];
+        using (var chromaHandle = new ArraySafeHandle(chroma))
         {
-            using (var ysHandle = new ArraySafeHandle(ys))
+            using (var lumaHandle = new ArraySafeHandle(luma))
             {
-                api.FillTwoArrays(xsHandle, ysHandle, length);
+                api.FillChromaAndLuma(chromaHandle, lumaHandle, length);
             }
         }
-        var array = new byte[2 * length];
+        var resultingFrame = new byte[2 * length];
+
         // Requires copying:
-        Array.Copy(xs, 0, array, 0, length);
-        Array.Copy(ys, 0, array, length, length);
-        var handle = GCHandle.Alloc(array, GCHandleType.Pinned);
+        Array.Copy(chroma, 0, resultingFrame, 0, length);
+        Array.Copy(luma, 0, resultingFrame, length, length);
+        var resultingFrameHandle = GCHandle.Alloc(resultingFrame, GCHandleType.Pinned);
         try
         {
-            ProcessArray(handle.AddrOfPinnedObject(), 2 * length);
+            DisplayFrame(resultingFrameHandle.AddrOfPinnedObject(), 2 * length);
         }
         finally
         {
-            handle.Free();
+            resultingFrameHandle.Free();
         }
     }
 
-    private static void ProcessArray(IntPtr ptr, int length)
+    private static void DisplayFrame(IntPtr framePtr, int length)
     {
-        Console.Write("Going to process array: ");
+        Console.Write("Going to display frame: ");
+        // Just printing the frame bytes for simplicity:
         for (var i = 0; i < length; ++i)
         {
-            if (i > 0)
-            {
-                Console.Write(", ");
-            }
-            Console.Write(Marshal.ReadByte(ptr + i));
+            if (i > 0) Console.Write(", ");
+            Console.Write(Marshal.ReadByte(framePtr + i));
         }
         Console.WriteLine();
     }

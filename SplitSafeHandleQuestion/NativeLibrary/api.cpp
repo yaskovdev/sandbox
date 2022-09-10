@@ -1,17 +1,12 @@
 #include "api.h"
 #include <iostream>
 
-int fill_two_arrays(uint8_t* xs, uint8_t* ys, const uint8_t number_of_elements_in_each_array)
+int fill_chroma_and_luma(uint8_t* chroma, uint8_t* luma, const uint8_t number_of_elements_in_each_plane)
 {
-    std::cout << "Native: starting to fill the arrays..." << "\n";
-    for (uint8_t i = 0; i < number_of_elements_in_each_array; ++i)
+    std::cout << "Native: starting to fill chroma and luma planes of the frame..." << "\n";
+    for (uint8_t i = 0; i < number_of_elements_in_each_plane; ++i)
     {
-        xs[i] = i;
-        ys[i] = i;
-    }
-    for (uint8_t i = 0; i < number_of_elements_in_each_array; ++i)
-    {
-        std::cout << "Native: " << static_cast<unsigned>(xs[i]) << ", " << static_cast<unsigned>(ys[i]) << "\n";
+        chroma[i] = luma[i] = i;
     }
     return 0;
 }
