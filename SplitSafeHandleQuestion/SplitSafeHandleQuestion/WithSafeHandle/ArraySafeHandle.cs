@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ArraySafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
-    private GCHandle _handle; // GCHandle is a struct, should not be readonly
+    private GCHandle _handle; // GCHandle is a struct, must not be readonly
 
     public ArraySafeHandle(byte[] array) : base(true)
     {
