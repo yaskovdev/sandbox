@@ -57,14 +57,6 @@ internal static class Program
         }
     }
 
-    private static void DisposeDisposables<T>(IList<T> disposables) where T : IDisposableWithCounter
-    {
-        for (var i = 0; i < NumberOfDisposables; i++)
-        {
-            disposables[i].Dispose();
-        }
-    }
-
     private static IList<T> CreateDisposables<T>() where T : IDisposableWithCounter
     {
         var disposables = new List<T>();
@@ -74,5 +66,13 @@ internal static class Program
             disposables.Add((T)instance);
         }
         return disposables;
+    }
+
+    private static void DisposeDisposables<T>(IList<T> disposables) where T : IDisposableWithCounter
+    {
+        for (var i = 0; i < NumberOfDisposables; i++)
+        {
+            disposables[i].Dispose();
+        }
     }
 }
