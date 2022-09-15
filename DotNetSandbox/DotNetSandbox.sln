@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DllImportSandbox", "DllImpo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeHandleDemo", "SafeHandleDemo\SafeHandleDemo.csproj", "{383C0EBB-C8F0-4127-B377-5308C65D80A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threading", "Threading\Threading.csproj", "{A78FBF85-7CCB-4C6A-867B-5770950D17FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,5 +80,9 @@ Global
 		{383C0EBB-C8F0-4127-B377-5308C65D80A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{383C0EBB-C8F0-4127-B377-5308C65D80A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{383C0EBB-C8F0-4127-B377-5308C65D80A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
