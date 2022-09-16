@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeHandleDemo", "SafeHandl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threading", "Threading\Threading.csproj", "{A78FBF85-7CCB-4C6A-867B-5770950D17FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelConverter", "PixelConverter\PixelConverter.csproj", "{1ACC661B-B8EE-4911-8041-60DA5DB7584C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,9 @@ Global
 		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A78FBF85-7CCB-4C6A-867B-5770950D17FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ACC661B-B8EE-4911-8041-60DA5DB7584C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ACC661B-B8EE-4911-8041-60DA5DB7584C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ACC661B-B8EE-4911-8041-60DA5DB7584C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ACC661B-B8EE-4911-8041-60DA5DB7584C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

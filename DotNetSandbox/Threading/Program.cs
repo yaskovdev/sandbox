@@ -9,6 +9,7 @@ internal static class Program
         try
         {
             Test<SuperBadDisposable>();
+            Console.WriteLine($"{nameof(SuperBadDisposable)} passed the test");
         }
         catch (Exception e)
         {
@@ -17,6 +18,7 @@ internal static class Program
         try
         {
             Test<JustBadDisposable>();
+            Console.WriteLine($"{nameof(JustBadDisposable)} passed the test");
         }
         catch (Exception e)
         {
@@ -25,6 +27,7 @@ internal static class Program
         try
         {
             Test<ThreadSafeDisposableWithSynchronization>();
+            Console.WriteLine($"{nameof(ThreadSafeDisposableWithSynchronization)} passed the test");
         }
         catch (Exception e)
         {
@@ -33,6 +36,7 @@ internal static class Program
         try
         {
             Test<ThreadSafeDisposableWithInterlocked>();
+            Console.WriteLine($"{nameof(ThreadSafeDisposableWithInterlocked)} passed the test");
         }
         catch (Exception e)
         {
