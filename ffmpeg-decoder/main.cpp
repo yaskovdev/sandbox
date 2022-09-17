@@ -9,20 +9,13 @@ extern "C" {
 }
 
 static int read_input(uint8_t **input_buffer) {
-    std::ifstream input(R"(c:\dev\tasks\2981883\212.encoded)", std::ios::binary);
-    std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    input.close();
-    *input_buffer = &bytes[0];
+    std::ifstream input_stream(R"(c:\dev\tasks\2981883\212.encoded)", std::ios::binary);
+    std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
+    input_stream.close();
+    auto buffer = (uint8_t *) malloc(sizeof(uint8_t) * bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+    std::copy(bytes.begin(), bytes.end(), buffer);
+    *input_buffer = buffer;
     return static_cast<int>(bytes.size());
-}
-
-static void write_output_as_image(unsigned char *buffer, int wrap, int width, int height) {
-    FILE *f = fopen(R"(c:\dev\tasks\2981883\212.png)", "w");
-    fprintf(f, "P5\n%d %d\n%d\n", width, height, 255);
-    for (int i = 0; i < height; i++) {
-        fwrite(buffer + i * wrap, 1, width, f);
-    }
-    fclose(f);
 }
 
 static void write_output_as_raw_frame(uint8_t *buffer, int buffer_size) {
@@ -63,7 +56,6 @@ int main() {
         std::cout << line_size[0] << ", " << FFALIGN(line_size[0], align) << "\n";
         std::cout << line_size[1] << ", " << FFALIGN(line_size[1], align) << "\n";
         std::cout << line_size[2] << ", " << FFALIGN(line_size[2], align) << "\n";
-//        write_output_as_image(decoded_frame->data[0], line_size[0], context->width, context->height);
         auto pixel_format = static_cast<AVPixelFormat>(decoded_frame->format);
         int buffer_size = av_image_get_buffer_size(pixel_format, width, height, align);
         std::cout << "Buffer size is " << buffer_size << "\n";
