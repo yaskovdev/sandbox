@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -7,22 +8,19 @@ extern "C" {
 #include "libavutil/imgutils.h"
 }
 
-static unsigned long read_input(uint8_t **input_buffer) {
-    FILE *f = fopen(R"(c:\dev\tasks\2981883\212.encoded)", "rb");
-    fseek(f, 0, SEEK_END);
-    long size = ftell(f);
-    rewind(f);
-    auto buffer = (uint8_t *) malloc(sizeof(uint8_t) * size + AV_INPUT_BUFFER_PADDING_SIZE);
-    size_t actual_size = fread(buffer, 1, size, f);
-    *input_buffer = buffer;
-    return actual_size;
+static int read_input(uint8_t **input_buffer) {
+    std::ifstream input(R"(c:\dev\tasks\2981883\212.encoded)", std::ios::binary);
+    std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+    input.close();
+    *input_buffer = &bytes[0];
+    return static_cast<int>(bytes.size());
 }
 
-static void write_output_as_image(unsigned char *buf, int wrap, int xsize, int ysize) {
+static void write_output_as_image(unsigned char *buffer, int wrap, int width, int height) {
     FILE *f = fopen(R"(c:\dev\tasks\2981883\212.png)", "w");
-    fprintf(f, "P5\n%d %d\n%d\n", xsize, ysize, 255);
-    for (int i = 0; i < ysize; i++) {
-        fwrite(buf + i * wrap, 1, xsize, f);
+    fprintf(f, "P5\n%d %d\n%d\n", width, height, 255);
+    for (int i = 0; i < height; i++) {
+        fwrite(buffer + i * wrap, 1, width, f);
     }
     fclose(f);
 }
@@ -35,7 +33,7 @@ static void write_output_as_raw_frame(uint8_t *buffer, int buffer_size) {
 }
 
 static AVCodecContext *create_codec_context() {
-    AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     AVCodecContext *context = avcodec_alloc_context3(codec);
     avcodec_open2(context, codec, nullptr);
     return context;
@@ -57,17 +55,20 @@ int main() {
     int receive_frame_result = avcodec_receive_frame(context, decoded_frame);
 
     if (receive_frame_result == 0) {
-        std::cout << decoded_frame->width << "\n";
-        std::cout << decoded_frame->height << "\n";
-        std::cout << decoded_frame->linesize[0] << ", " << FFALIGN(decoded_frame->linesize[0], align) << "\n";
-        std::cout << decoded_frame->linesize[1] << ", " << FFALIGN(decoded_frame->linesize[1], align) << "\n";
-        std::cout << decoded_frame->linesize[2] << ", " << FFALIGN(decoded_frame->linesize[2], align) << "\n";
-//        write_output_as_image(decoded_frame->data[0], decoded_frame->linesize[0], context->width, context->height);
+        int width = decoded_frame->width;
+        int height = decoded_frame->height;
+        int *line_size = decoded_frame->linesize;
+        std::cout << width << "\n";
+        std::cout << height << "\n";
+        std::cout << line_size[0] << ", " << FFALIGN(line_size[0], align) << "\n";
+        std::cout << line_size[1] << ", " << FFALIGN(line_size[1], align) << "\n";
+        std::cout << line_size[2] << ", " << FFALIGN(line_size[2], align) << "\n";
+//        write_output_as_image(decoded_frame->data[0], line_size[0], context->width, context->height);
         auto pixel_format = static_cast<AVPixelFormat>(decoded_frame->format);
-        int buffer_size = av_image_get_buffer_size(pixel_format, decoded_frame->width, decoded_frame->height, align);
+        int buffer_size = av_image_get_buffer_size(pixel_format, width, height, align);
         std::cout << "Buffer size is " << buffer_size << "\n";
         auto *buffer = new uint8_t[buffer_size];
-        int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, decoded_frame->linesize, pixel_format, decoded_frame->width,decoded_frame->height, align);
+        int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, line_size, pixel_format, width, height, align);
         std::cout << "Copied " << number_of_bytes_written << " bytes" << "\n";
         write_output_as_raw_frame(buffer, buffer_size);
     }
