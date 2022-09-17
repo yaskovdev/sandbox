@@ -12,9 +12,8 @@ static int read_input(uint8_t **input_buffer) {
     std::ifstream input_stream(R"(c:\dev\tasks\2981883\212.encoded)", std::ios::binary);
     std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
     input_stream.close();
-    auto buffer = (uint8_t *) malloc(sizeof(uint8_t) * bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE);
-    std::copy(bytes.begin(), bytes.end(), buffer);
-    *input_buffer = buffer;
+    *input_buffer = (uint8_t *) malloc(sizeof(uint8_t) * bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+    std::copy(bytes.begin(), bytes.end(), *input_buffer);
     return static_cast<int>(bytes.size());
 }
 
