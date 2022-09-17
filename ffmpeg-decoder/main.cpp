@@ -42,15 +42,14 @@ static AVCodecContext *create_codec_context() {
 }
 
 int main() {
-    std::cout << "Decoding started..." << std::endl;
+    std::cout << "Decoding started..." << "\n";
 
     int align = 1;
-    AVPacket encoded_packet;
-    av_init_packet(&encoded_packet);
-    encoded_packet.size = read_input(&encoded_packet.data);
+    AVPacket *encoded_packet = av_packet_alloc();
+    encoded_packet->size = read_input(&encoded_packet->data);
 
     AVCodecContext *context = create_codec_context();
-    int send_packet_result = avcodec_send_packet(context, &encoded_packet);
+    int send_packet_result = avcodec_send_packet(context, encoded_packet);
     if (send_packet_result < 0) {
         exit(send_packet_result);
     }
@@ -66,9 +65,9 @@ int main() {
 //        write_output_as_image(decoded_frame->data[0], decoded_frame->linesize[0], context->width, context->height);
         auto pixel_format = static_cast<AVPixelFormat>(decoded_frame->format);
         int buffer_size = av_image_get_buffer_size(pixel_format, decoded_frame->width, decoded_frame->height, align);
-        std::cout << buffer_size << std::endl;
+        std::cout << "Buffer size is " << buffer_size << "\n";
         auto *buffer = new uint8_t[buffer_size];
-        int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, decoded_frame->linesize, pixel_format, decoded_frame->width, decoded_frame->height, align);
+        int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, decoded_frame->linesize, pixel_format, decoded_frame->width,decoded_frame->height, align);
         std::cout << "Copied " << number_of_bytes_written << " bytes" << "\n";
         write_output_as_raw_frame(buffer, buffer_size);
     }
