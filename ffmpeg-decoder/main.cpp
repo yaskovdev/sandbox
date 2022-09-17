@@ -8,8 +8,8 @@ extern "C" {
 #include "libavutil/imgutils.h"
 }
 
-static int read_input(uint8_t **input_buffer) {
-    std::ifstream input_stream(R"(c:\dev\tasks\2981883\212.encoded)", std::ios::binary);
+static int read_input(char *file_name, uint8_t **input_buffer) {
+    std::ifstream input_stream(file_name, std::ios::binary);
     std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
     input_stream.close();
     *input_buffer = (uint8_t *) malloc(sizeof(uint8_t) * bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE);
@@ -17,9 +17,9 @@ static int read_input(uint8_t **input_buffer) {
     return static_cast<int>(bytes.size());
 }
 
-static void write_output_as_raw_frame(uint8_t *buffer, int buffer_size) {
+static void write_output_as_raw_frame(char *file_name, uint8_t *buffer, int buffer_size) {
     std::ofstream output_stream;
-    output_stream.open(R"(c:\dev\tasks\2981883\212.raw)", std::ios::binary | std::ios::out);
+    output_stream.open(file_name, std::ios::binary | std::ios::out);
     output_stream.write((char *) buffer, buffer_size);
     output_stream.close();
 }
@@ -31,14 +31,18 @@ static AVCodecContext *create_codec_context() {
     return context;
 }
 
-int main() {
+int main(int argc, char **argv) {
+    if (argc < 3) {
+        std::cout << "Specify full path to input packet and output frame" << "\n";
+        exit(-1);
+    }
     std::cout << "Decoding started..." << "\n";
 
     int align = 1;
-    AVPacket *encoded_packet = av_packet_alloc();
-    encoded_packet->size = read_input(&encoded_packet->data);
 
     AVCodecContext *context = create_codec_context();
+    AVPacket *encoded_packet = av_packet_alloc();
+    encoded_packet->size = read_input(argv[1], &encoded_packet->data);
     int send_packet_result = avcodec_send_packet(context, encoded_packet);
     if (send_packet_result < 0) {
         exit(send_packet_result);
@@ -60,8 +64,14 @@ int main() {
         std::cout << "Buffer size is " << buffer_size << "\n";
         auto *buffer = new uint8_t[buffer_size];
         int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, line_size, pixel_format, width, height, align);
-        std::cout << "Copied " << number_of_bytes_written << " bytes" << "\n";
-        write_output_as_raw_frame(buffer, buffer_size);
+        std::cout << "Copied to buffer " << number_of_bytes_written << " bytes" << "\n";
+        write_output_as_raw_frame(argv[2], buffer, buffer_size);
     }
+
+    av_frame_free(&decoded_frame);
+    free(encoded_packet->data);
+    av_packet_free(&encoded_packet);
+    avcodec_free_context(&context);
+
     return receive_frame_result;
 }
