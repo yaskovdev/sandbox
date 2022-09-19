@@ -12,14 +12,14 @@ static int read_input(char *file_name, uint8_t **input_buffer) {
     std::ifstream input_stream(file_name, std::ios::binary);
     std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
     input_stream.close();
-    *input_buffer = (uint8_t *) malloc(sizeof(uint8_t) * bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE);
+    *input_buffer = new uint8_t[bytes.size() + AV_INPUT_BUFFER_PADDING_SIZE];
     std::copy(bytes.begin(), bytes.end(), *input_buffer);
     return static_cast<int>(bytes.size());
 }
 
 static void write_output_as_raw_frame(char *file_name, uint8_t *buffer, int buffer_size) {
     std::ofstream output_stream;
-    output_stream.open(file_name, std::ios::binary | std::ios::out);
+    output_stream.open(file_name, std::ios::binary);
     output_stream.write((char *) buffer, buffer_size);
     output_stream.close();
 }
@@ -66,10 +66,11 @@ int main(int argc, char **argv) {
         int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, line_size, pixel_format, width, height, align);
         std::cout << "Copied to buffer " << number_of_bytes_written << " bytes" << "\n";
         write_output_as_raw_frame(argv[2], buffer, buffer_size);
+        delete[] buffer;
     }
 
     av_frame_free(&decoded_frame);
-    free(encoded_packet->data);
+    delete[] encoded_packet->data;
     av_packet_free(&encoded_packet);
     avcodec_free_context(&context);
 
