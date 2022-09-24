@@ -1,0 +1,30 @@
+﻿<Project Sdk="MSBuild.SDK.SystemWeb/4.0.82">
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <FrameworkVersion>v4.0.30319</FrameworkVersion>
+        <AspNetToolPath>$(windir)\Microsoft.NET\Framework64\$(FrameworkVersion)</AspNetToolPath>
+        <MvcBuildViews>false</MvcBuildViews>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GeneratedBindingRedirectsAction>Overwrite</GeneratedBindingRedirectsAction>
+    </PropertyGroup>
+    <PropertyGroup>
+        <Copyright>Copyright © 2022</Copyright>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="Properties\launchSettings.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Skype.Bots.Media.Library" Version="1.24.0.36" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+
+    <Target Name="MvcBuildViews64" AfterTargets="AfterBuild">
+        <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" ToolPath="$(AspNetToolPath)" />
+    </Target>
+</Project>
