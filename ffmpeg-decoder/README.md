@@ -5,5 +5,5 @@ To build and run using CLion on Windows, make sure that:
 3. `Build, Execution, Deployment -> CMake -> Debug -> Environment` has `CMAKE_PREFIX_PATH` variable set
    to `C:\dev\ffmpeg\include;C:\dev\ffmpeg\lib`.
 4. `Build, Execution, Deployment -> Toolchains -> Visual Studio -> Architecture` is `amd64`.
-5. Pass as "Program arguments" full path to file with input packet and to file to write the output frame to,
+5. Pass as "Program arguments" file name with input packet and file name to write the output frame to,
    e.g., `c:\dev\212.encoded c:\dev\212.raw`.
