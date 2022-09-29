@@ -31,6 +31,32 @@ static AVCodecContext *create_codec_context() {
     return context;
 }
 
+void LogSupportedFormats(const AVPixelFormat *supported_formats) {
+    if (supported_formats == nullptr) {
+        std::cout << "H.264 decoder supported pixel formats are unknown" << "\n";
+    } else {
+        for (const AVPixelFormat *format = supported_formats; *format != AV_PIX_FMT_NONE; format++) {
+            std::cout << "H.264 decoder supported pixel format is " << *format << "\n";
+        }
+    }
+}
+
+AVPixelFormat GetFormatAndLogSupportedFormats(AVCodecContext *context, const AVPixelFormat *supported_formats) {
+    LogSupportedFormats(supported_formats);
+    const AVPixelFormat default_format = avcodec_default_get_format(context, supported_formats);
+    std::cout << "H.264 decoder format selected by default is " << default_format << "\n";
+    if (default_format == AV_PIX_FMT_YUVJ420P) {
+        for (const AVPixelFormat *format = supported_formats; *format != AV_PIX_FMT_NONE; format++) {
+            if (*format == AV_PIX_FMT_YUV420P) {
+                std::cout << "Overriding format selected by default (" << default_format << ") with " << AV_PIX_FMT_YUV420P << "\n";
+                return AV_PIX_FMT_YUV420P;
+            }
+        }
+        std::cout << "Cannot override format selected by default (" << default_format << ")" << "\n";
+    }
+    return default_format;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) {
         std::cout << "Specify full path to input packet and output frame" << "\n";
@@ -41,6 +67,8 @@ int main(int argc, char **argv) {
     int align = 1;
 
     AVCodecContext *context = create_codec_context();
+    context->get_format = GetFormatAndLogSupportedFormats;
+
     AVPacket *encoded_packet = av_packet_alloc();
     encoded_packet->size = read_input(argv[1], &encoded_packet->data);
     int send_packet_result = avcodec_send_packet(context, encoded_packet);
