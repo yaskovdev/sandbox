@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
         std::cout << line_size[1] << ", " << FFALIGN(line_size[1], align) << "\n";
         std::cout << line_size[2] << ", " << FFALIGN(line_size[2], align) << "\n";
         auto pixel_format = static_cast<AVPixelFormat>(decoded_frame->format);
+        std::cout << pixel_format << "\n";
         int buffer_size = av_image_get_buffer_size(pixel_format, width, height, align);
         std::cout << "Buffer size is " << buffer_size << "\n";
         auto *buffer = new uint8_t[buffer_size];
