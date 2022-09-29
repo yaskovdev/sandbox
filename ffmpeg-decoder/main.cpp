@@ -45,15 +45,6 @@ AVPixelFormat GetFormatAndLogSupportedFormats(AVCodecContext *context, const AVP
     LogSupportedFormats(supported_formats);
     const AVPixelFormat default_format = avcodec_default_get_format(context, supported_formats);
     std::cout << "H.264 decoder format selected by default is " << default_format << "\n";
-    if (default_format == AV_PIX_FMT_YUVJ420P) {
-        for (const AVPixelFormat *format = supported_formats; *format != AV_PIX_FMT_NONE; format++) {
-            if (*format == AV_PIX_FMT_YUV420P) {
-                std::cout << "Overriding format selected by default (" << default_format << ") with " << AV_PIX_FMT_YUV420P << "\n";
-                return AV_PIX_FMT_YUV420P;
-            }
-        }
-        std::cout << "Cannot override format selected by default (" << default_format << ")" << "\n";
-    }
     return default_format;
 }
 
