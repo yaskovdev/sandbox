@@ -1,6 +1,6 @@
-name:                haskell-stack-rest-server
+name:                haskell-reverse-game
 version:             0.1.0.0
-github:              "githubuser/haskell-stack-rest-server"
+github:              "githubuser/haskell-reverse-game"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "example@example.com"
@@ -17,24 +17,12 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/haskell-stack-rest-server#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/haskell-reverse-game#readme>
 
 dependencies:
 - base >= 4.7 && < 5
 - random
 - random-shuffle >= 0.0.4
-- scotty                        >= 0.9.1
-- bytestring                    >= 0.9        && < 0.11
-- text                          >= 0.11       && < 2.0
-- aeson                         >= 0.6
-- HTTP                          >= 4000.2.19
-- transformers                  >= 0.4.3.0
-- wai                           >= 3.0.2.3
-- wai-middleware-static         >= 0.7.0.1
-- wai-extra                     >= 3.0.7
-- resource-pool                 >= 0.2.3.2
-- configurator                  >= 0.3.0.0
-- MissingH                      >= 1.3.0.1
 
 ghc-options:
 - -Wall
@@ -51,7 +39,7 @@ library:
   source-dirs: src
 
 executables:
-  haskell-stack-rest-server-exe:
+  haskell-reverse-game-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -59,10 +47,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - haskell-stack-rest-server
+    - haskell-reverse-game
 
 tests:
-  haskell-stack-rest-server-test:
+  haskell-reverse-game-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -70,4 +58,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - haskell-stack-rest-server
+    - haskell-reverse-game
