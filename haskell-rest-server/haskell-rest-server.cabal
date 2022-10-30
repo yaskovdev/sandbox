@@ -21,13 +21,11 @@ executable haskell-rest-server
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:          base                          >= 4.6        && < 4.7
+  build-depends:          base                          >= 4.13        && < 4.14
                         , scotty                        >= 0.9.1
                         , bytestring                    >= 0.9        && < 0.11
                         , text                          >= 0.11       && < 2.0
-                        , mysql                         >= 0.1.1.8
-                        , mysql-simple                  >= 0.2.2.5
-                        , aeson                         >= 0.6        && < 0.9
+                        , aeson                         >= 0.6
                         , HTTP                          >= 4000.2.19
                         , transformers                  >= 0.4.3.0
                         , wai                           >= 3.0.2.3
