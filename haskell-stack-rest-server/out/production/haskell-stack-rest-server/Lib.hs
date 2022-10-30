@@ -2,9 +2,6 @@ module Lib
     ( startGame
     ) where
 
-import System.Random
-import System.Random.Shuffle (shuffle')
-  
 array :: [Int]
 array = [4, 3, 6, 2, 5, 1, 8, 7, 9]
 
@@ -24,13 +21,6 @@ loop xs = do
   input <- getUserInput
   let reversed = reverseFirst input xs
   if isSorted reversed then putStrLn "You won!" else loop reversed
-  
-shuffledArray :: IO [Int]
-shuffledArray = do
-  gen <- newStdGen
-  return (shuffle' [1, 2, 3, 4, 5, 6, 7, 8, 9] 9 gen)
-  
+
 startGame :: IO ()
-startGame = do
-  xs <- shuffledArray
-  loop xs
+startGame = loop array
