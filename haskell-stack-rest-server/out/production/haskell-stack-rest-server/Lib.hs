@@ -2,12 +2,13 @@ module Lib
     ( startGame
     ) where
 
-array :: [Int]
-array = [4, 3, 6, 2, 5, 1, 8, 7, 9]
+import System.Random
+import System.Random.Shuffle (shuffle')
 
 isSorted :: [Int] -> Bool
-isSorted [1, 2, 3, 4, 5, 6, 7, 8, 9] = True
-isSorted _ = False
+isSorted [] = True
+isSorted [_] = True
+isSorted (x:y:xs) = x <= y && isSorted (y:xs)
 
 reverseFirst :: Int -> [Int] -> [Int]
 reverseFirst n xs = reverse (take n xs) ++ drop n xs
@@ -21,6 +22,13 @@ loop xs = do
   input <- getUserInput
   let reversed = reverseFirst input xs
   if isSorted reversed then putStrLn "You won!" else loop reversed
+  
+shuffledArray :: [Int] -> IO [Int]
+shuffledArray xs = do
+  gen <- newStdGen
+  return (shuffle' xs (length xs) gen)
 
 startGame :: IO ()
-startGame = loop array
+startGame = do
+  xs <- shuffledArray [1..9]
+  loop xs
