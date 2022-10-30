@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelConverter", "PixelConv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutOfMemoryException", "OutOfMemoryException\OutOfMemoryException.csproj", "{31F05683-FBEA-46C3-9C28-1B1D5E0D358F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionBlock", "ActionBlock\ActionBlock.csproj", "{137DC263-AC8D-41DB-A9BA-A1925CD546D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,5 +98,9 @@ Global
 		{31F05683-FBEA-46C3-9C28-1B1D5E0D358F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31F05683-FBEA-46C3-9C28-1B1D5E0D358F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31F05683-FBEA-46C3-9C28-1B1D5E0D358F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

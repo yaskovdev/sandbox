@@ -6,6 +6,12 @@ internal static class Program
 
     public static void Main()
     {
+        // TestDisposables();
+        new VolatileDemo().Run();
+    }
+
+    private static void TestDisposables()
+    {
         try
         {
             Test<SuperBadDisposable>();
