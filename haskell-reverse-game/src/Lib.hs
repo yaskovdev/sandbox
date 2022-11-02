@@ -25,8 +25,8 @@ gameLoop :: [Int] -> IO ()
 gameLoop array = do
   print array
   numberOfElements <- getUserInput
-  let reversed = reverseFirst numberOfElements array
-  if isSorted reversed then putStrLn "You won!" else gameLoop reversed
+  let reversedArray = reverseFirst numberOfElements array
+  if isSorted reversedArray then putStrLn "You won!" else gameLoop reversedArray
 
 shuffledArray :: [Int] -> IO [Int]
 shuffledArray xs = shuffle' xs (length xs) <$> newStdGen
