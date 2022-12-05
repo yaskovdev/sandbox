@@ -25,7 +25,7 @@ void game::tick() {
             bullets.insert(bullets.end(), shot_bullets.begin(), shot_bullets.end());
             most_recent_shot_time_ = clock_.time;
         } else if (key_to_movement.count(pressed_key)) {
-            const auto[dx, dy] = key_to_movement.at(pressed_key);
+            const auto [dx, dy] = key_to_movement.at(pressed_key);
             player_.position.x = bounded(player_.position.x + dx, 0, field_size_.x - player_.size.x);
             player_.position.y = bounded(player_.position.y + dy, 0, field_size_.y - player_.size.y);
         }
@@ -77,18 +77,18 @@ void game::update_state_of_bullets() {
 }
 
 void game::update_state_of_enemies() {
-    auto enemy = enemies.begin();
-    while (enemy != enemies.end()) {
-        if (is_flown_away(*enemy)) {
-            enemy = enemies.erase(enemy);
-        } else if (is_collided_with_bullet(*enemy)) {
-            enemy = enemies.erase(enemy);
+    auto current_enemy = enemies.begin();
+    while (current_enemy != enemies.end()) {
+        if (is_flown_away(*current_enemy)) {
+            current_enemy = enemies.erase(current_enemy);
+        } else if (is_collided_with_bullet(*current_enemy)) {
+            current_enemy = enemies.erase(current_enemy);
             score++;
-        } else if (enemy->is_collided_with(player_)) {
-            enemy = enemies.erase(enemy);
+        } else if (current_enemy->is_collided_with(player_)) {
+            current_enemy = enemies.erase(current_enemy);
             player_.apply_collision_damage();
         } else {
-            ++enemy;
+            ++current_enemy;
         }
     }
 }
