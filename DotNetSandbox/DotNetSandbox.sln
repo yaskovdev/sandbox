@@ -30,7 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelConverter", "PixelConv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutOfMemoryException", "OutOfMemoryException\OutOfMemoryException.csproj", "{31F05683-FBEA-46C3-9C28-1B1D5E0D358F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionBlock", "ActionBlock\ActionBlock.csproj", "{137DC263-AC8D-41DB-A9BA-A1925CD546D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionBlockSandbox", "ActionBlockSandbox\ActionBlockSandbox.csproj", "{137DC263-AC8D-41DB-A9BA-A1925CD546D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
