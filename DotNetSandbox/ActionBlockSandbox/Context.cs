@@ -1,3 +1,3 @@
-﻿namespace ActionBlock;
+﻿namespace ActionBlockSandbox;
 
 public record Context(int Index);
