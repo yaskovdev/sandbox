@@ -10,7 +10,7 @@ public class TinyGp {
     double[] fitness;
     char[][] pop;
     static Random rd = new Random();
-    static final int ADD = 110, SUB = 111, MUL = 112, DIV = 113, FSET_START = ADD, FSET_END = DIV;
+    static final int ADD = 110, SUB = 111, MUL = 112, DIV = 113, COS = 114, FSET_START = ADD, FSET_END = COS;
     static double[] x = new double[FSET_START];
     static double minrandom, maxrandom;
     static char[] program;
@@ -38,6 +38,8 @@ public class TinyGp {
                 if (Math.abs(den) <= 0.001) return (num);
                 else return (num / den);
             }
+            case COS:
+                return Math.cos(run());
         }
         return (0.0); // should never get here
     }
@@ -50,6 +52,7 @@ public class TinyGp {
             case SUB:
             case MUL:
             case DIV:
+            case COS:
                 return (traverse(buffer, traverse(buffer, ++buffercount)));
         }
         return (0); // should never get here
@@ -94,8 +97,7 @@ public class TinyGp {
 
         len = traverse(Prog, 0);
         for (i = 0; i < fitnesscases; i++) {
-            for (int j = 0; j < varnumber; j++)
-                x[j] = targets[i][j];
+            if (varnumber >= 0) System.arraycopy(targets[i], 0, x, 0, varnumber);
             program = Prog;
             PC = 0;
             result = run();
@@ -123,6 +125,7 @@ public class TinyGp {
                 case SUB:
                 case MUL:
                 case DIV:
+                case COS:
                     buffer[pos] = prim;
                     one_child = grow(buffer, pos + 1, max, depth - 1);
                     if (one_child < 0) return (-1);
@@ -132,40 +135,50 @@ public class TinyGp {
         return (0); // should never get here
     }
 
-    int print_indiv(char[] buffer, int buffercounter) {
-        int a1 = 0, a2;
-        if (buffer[buffercounter] < FSET_START) {
-            if (buffer[buffercounter] < varnumber) System.out.print("X" + (buffer[buffercounter] + 1) + " ");
-            else System.out.print(x[buffer[buffercounter]]);
-            return (++buffercounter);
+    int print_indiv(char[] buffer, int position) {
+        int a1, a2;
+        if (buffer[position] < FSET_START) {
+            if (buffer[position] < varnumber) System.out.print("X" + (buffer[position] + 1) + " ");
+            else System.out.print(x[buffer[position]]);
+            return ++position;
         }
-        switch (buffer[buffercounter]) {
-            case ADD:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++buffercounter);
-                System.out.print(" + ");
-                break;
-            case SUB:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++buffercounter);
-                System.out.print(" - ");
-                break;
-            case MUL:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++buffercounter);
-                System.out.print(" * ");
-                break;
-            case DIV:
-                System.out.print("(");
-                a1 = print_indiv(buffer, ++buffercounter);
-                System.out.print(" / ");
-                break;
+        if (buffer[position] == ADD) {
+            System.out.print("(");
+            a1 = print_indiv(buffer, ++position);
+            System.out.print(" + ");
+            a2 = print_indiv(buffer, a1);
+            System.out.print(")");
+            return (a2);
+        } else if (buffer[position] == SUB) {
+            System.out.print("(");
+            a1 = print_indiv(buffer, ++position);
+            System.out.print(" - ");
+            a2 = print_indiv(buffer, a1);
+            System.out.print(")");
+            return (a2);
+        } else if (buffer[position] == MUL) {
+            System.out.print("(");
+            a1 = print_indiv(buffer, ++position);
+            System.out.print(" * ");
+            a2 = print_indiv(buffer, a1);
+            System.out.print(")");
+            return (a2);
+        } else if (buffer[position] == DIV) {
+            System.out.print("(");
+            a1 = print_indiv(buffer, ++position);
+            System.out.print(" / ");
+            a2 = print_indiv(buffer, a1);
+            System.out.print(")");
+            return (a2);
+        } else if (buffer[position] == COS) {
+            System.out.print("cos(");
+            a1 = print_indiv(buffer, ++position);
+            System.out.print(")");
+            return a1;
+        } else {
+            throw new IllegalStateException("Unknown element " + (int) buffer[position]);
         }
-        a2 = print_indiv(buffer, a1);
-        System.out.print(")");
-        return (a2);
     }
-
 
     static char[] buffer = new char[MAX_LEN];
 
@@ -193,7 +206,6 @@ public class TinyGp {
         }
         return (pop);
     }
-
 
     void stats(double[] fitness, char[][] pop, int gen) {
         int i, best = rd.nextInt(POPSIZE);
@@ -284,6 +296,7 @@ public class TinyGp {
                     case SUB:
                     case MUL:
                     case DIV:
+                    case COS:
                         parentcopy[mutsite] = (char) (rd.nextInt(FSET_END - FSET_START + 1) + FSET_START);
                 }
             }
@@ -342,7 +355,7 @@ public class TinyGp {
         long s = -1;
 
         if (args.length == 2) {
-            s = Integer.valueOf(args[0]).intValue();
+            s = Integer.parseInt(args[0]);
             fname = args[1];
         }
         if (args.length == 1) {
