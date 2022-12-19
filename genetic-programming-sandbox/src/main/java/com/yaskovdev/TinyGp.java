@@ -70,7 +70,7 @@ public class TinyGp {
             fitnesscases = Integer.parseInt(tokens.nextToken().trim());
             targets = new double[fitnesscases][varnumber + 1];
             if (varnumber + randomnumber >= FSET_START)
-                System.out.println(" too many v a r i a b l e s and c ons t ant s ");
+                System.out.println(" too many variables and constants");
 
             for (i = 0; i < fitnesscases; i++) {
                 line = in.readLine();
@@ -81,10 +81,10 @@ public class TinyGp {
             }
             in.close();
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: Pl eas e provide a data f i l e ");
+            System.out.println("ERROR: Please provide a data file");
             System.exit(0);
         } catch (Exception e) {
-            System.out.println("ERROR: I n c o r r e c t data format ");
+            System.out.println("ERROR: Incorrect data format");
             System.exit(0);
         }
     }
@@ -137,28 +137,28 @@ public class TinyGp {
         }
         switch (buffer[buffercounter]) {
             case ADD:
-                System.out.print(" ( ");
+                System.out.print("(");
                 a1 = printindiv(buffer, ++buffercounter);
                 System.out.print(" + ");
                 break;
             case SUB:
-                System.out.print(" ( ");
+                System.out.print("(");
                 a1 = printindiv(buffer, ++buffercounter);
                 System.out.print(" - ");
                 break;
             case MUL:
-                System.out.print(" ( ");
+                System.out.print("(");
                 a1 = printindiv(buffer, ++buffercounter);
                 System.out.print(" * ");
                 break;
             case DIV:
-                System.out.print(" ( ");
+                System.out.print("(");
                 a1 = printindiv(buffer, ++buffercounter);
                 System.out.print(" / ");
                 break;
         }
         a2 = printindiv(buffer, a1);
-        System.out.print(" ) ");
+        System.out.print(")");
         return (a2);
     }
 
@@ -207,7 +207,7 @@ public class TinyGp {
         }
         avglen = (double) node_count / POPSIZE;
         favgpop /= POPSIZE;
-        System.out.print("Generat ion=" + gen + " Avg Fi tne s s=" + (-favgpop) + " Best Fi tne s s=" + (-fbestpop) + " Avg Si z e=" + avglen + "\nBest I n d i v i d u a l : ");
+        System.out.print("Generation=" + gen + " Avg Fitness=" + (-favgpop) + " Best Fitness=" + (-fbestpop) + " AvgSize=" + avglen + "\nBest Individual: ");
         printindiv(pop[best], 0);
         System.out.print("\n");
         System.out.flush();
