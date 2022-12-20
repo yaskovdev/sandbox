@@ -1,56 +1,61 @@
 /**
-scalushgp.scala
-
-This file implements a version of the Push programming language (http://hampshire.edu/lspector/push.html)
-and the PushGP genetic programming system in Scala (http://scala-lang.org/).
-
-LICENSE:
-
-Copyright (c) 2011 Luke Vilnis
-
-This work is based on (versions as of 11/1/2011):
-
-Schush/SchushGP (http://hampshire.edu/lspector/schush.ss), copyright (c) 2009, 2010 Lee Spector
-Clojush/ClojushGP (https://github.com/lspector/Clojush), copyright (c) 2010, 2011 Lee Spector
-Rush/RushGP (https://github.com/lvilnis/RushGP), copyright (c) 2011 Luke Vilnis
-
-which are distributed under version 3 of the GNU General Public License as published by the
-Free Software Foundation, available from http://www.gnu.org/licenses/gpl.txt.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of version 3 of the GNU General Public License as published by the
-Free Software Foundation, available from http://www.gnu.org/licenses/gpl.txt.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License (http://www.gnu.org/licenses/)
-for more details.
-
-CAVEAT:
-
-I still think there may be some bugs to shake out. I need a test suite like crazy.
-
-HOW TO USE:
-
-Look at the example1/2/3 functions at the end of the source for a demonstration
-of how to use this implementation of PushGP. To actually run the program, I recommend
-Intellij IDEA Community Edition and the Scala plugin, and change it so Ctrl+Y is "Redo" and
-not "Delete Line", because that will make you lose a bunch of work.
-
-HISTORY:
-
-10/22/2011: Started work.
-11/1/2011: First version released - very very alpha, for feedback only.
-11/5/2011: First working version - completed instruction set, fixed a bunch of bugs, added 3 examples
-11/12/2011: Got error scaling working, and changed to use parallel constructs where appropriate
-
- **/
+ * scalushgp.scala
+ *
+ * This file implements a version of the Push programming language (http://hampshire.edu/lspector/push.html)
+ * and the PushGP genetic programming system in Scala (http://scala-lang.org/).
+ *
+ * LICENSE:
+ *
+ * Copyright (c) 2011 Luke Vilnis
+ *
+ * This work is based on (versions as of 11/1/2011):
+ *
+ * Schush/SchushGP (http://hampshire.edu/lspector/schush.ss), copyright (c) 2009, 2010 Lee Spector
+ * Clojush/ClojushGP (https://github.com/lspector/Clojush), copyright (c) 2010, 2011 Lee Spector
+ * Rush/RushGP (https://github.com/lvilnis/RushGP), copyright (c) 2011 Luke Vilnis
+ *
+ * which are distributed under version 3 of the GNU General Public License as published by the
+ * Free Software Foundation, available from http://www.gnu.org/licenses/gpl.txt.
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of version 3 of the GNU General Public License as published by the
+ * Free Software Foundation, available from http://www.gnu.org/licenses/gpl.txt.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License (http://www.gnu.org/licenses/)
+ * for more details.
+ *
+ * CAVEAT:
+ *
+ * I still think there may be some bugs to shake out. I need a test suite like crazy.
+ *
+ * HOW TO USE:
+ *
+ * Look at the example1/2/3 functions at the end of the source for a demonstration
+ * of how to use this implementation of PushGP. To actually run the program, I recommend
+ * Intellij IDEA Community Edition and the Scala plugin, and change it so Ctrl+Y is "Redo" and
+ * not "Delete Line", because that will make you lose a bunch of work.
+ *
+ * HISTORY:
+ *
+ * 10/22/2011: Started work.
+ * 11/1/2011: First version released - very very alpha, for feedback only.
+ * 11/5/2011: First working version - completed instruction set, fixed a bunch of bugs, added 3 examples
+ * 11/12/2011: Got error scaling working, and changed to use parallel constructs where appropriate
+ *
+ * */
 
 package com.yaskovdev.gp.push
 
+import com.yaskovdev.gp.push.node.{InstructionNode, Node, ProgramNode}
+
 import scala.collection.parallel.CollectionConverters._
 import util.Random
+import java.util
 import annotation.tailrec
+import scala.collection.mutable
+import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.language.{implicitConversions, postfixOps}
 import scala.sys.error
 
@@ -633,7 +638,7 @@ object MainModule {
   }
 
   def flattenProgram: Program => Program = {
-    case PList(ps) => PList(ps map flattenProgram map ensureList flatten)
+    case PList(ps) => PList(ps map flattenProgram flatMap ensureList)
     case prog => prog
   }
 
@@ -691,7 +696,8 @@ object MainModule {
       }
     val stateWithExec = stateWithPushed push(EXEC, code)
     if (shouldPrint) {
-      println("State after 0 steps:"); println(stateWithExec)
+      println("State after 0 steps:")
+      println(stateWithExec)
     }
     val stateEvaluated = execute(stateWithExec, 0, Nil, shouldPrint)
     val stateWithPopped =
@@ -765,7 +771,7 @@ object MainModule {
     println("\n;; -*- Report at generation %s" format (generation))
     val sorted = population sortBy (_.totalError getOrElse 10000f)
     val best :: _ = sorted
-    println("Best program: %s" format (programToString(best.program)))
+    println("Best program: %s" format programToString(best.program))
     println("Partial simplification (may beat best): %s" format
       (programToString(autoSimplify(best.program, errorFunc, numSimplifications, true, 1000).program)))
     println("Errors: %s" format (best.errors))
@@ -912,7 +918,7 @@ object MainModule {
                            Generator(() => randInt(100): Program),
                            Generator(() => randFloat(): Program)
                          ): List[AtomGenerator]),
-                       maxGenerations: Int = 1001,
+                       maxGenerations: Int = 5001,
                        mutationProbability: Float = 0.4f,
                        mutationMaxPoints: Int = 20,
                        crossoverProbability: Float = 0.4f,
@@ -1034,7 +1040,7 @@ object MainModule {
         0 to 10 map { input =>
           val state = ProgramState() push(INTEGER, input)
           runRush(program, state, shouldPrint = false) match {
-            case INTEGER(topInt :: _) => abs(topInt - (input * input)): Float
+            case INTEGER(head :: _) => abs(head - (input * input)): Float
             case _ => 1000f
           }
         } toList
@@ -1083,7 +1089,7 @@ object MainModule {
       errorFunction = { program =>
         1 to 6 map { input =>
           val state = ProgramState() push(INTEGER, input) push(AUXILIARY, PLiteral(LInt(input)))
-          runRush(program, state, false) match {
+          runRush(program, state, shouldPrint = false) match {
             case INTEGER(topInt :: _) => abs(topInt - factorial(input)): Float
             case _ => 1000000000000f
           }
@@ -1102,6 +1108,32 @@ object MainModule {
     ))
   }
 
+//  def example4(): Option[Individual] =
+//    pushgp(GpConfig(
+//      errorFunction = { program =>
+//        0 to 10 map { input =>
+//          val state = ProgramState() push(INTEGER, input)
+//          runRush(program, state, shouldPrint = false) match {
+//            case BOOLEAN(head :: _) => if ((input % 2 == 0) == head) 0 else 1000: Float
+//            case _ => 1000f
+//          }
+//        } toList
+//      }
+//    ))
+
+  def example5(): Option[Individual] =
+    pushgp(GpConfig(
+      errorFunction = { program =>
+        0 to 12 map { input =>
+          val state = ProgramState() push(INTEGER, input)
+          runRush(program, state, shouldPrint = false) match {
+            case INTEGER(head :: _) => if (input % 4 == head) 0 else 1000: Float
+            case _ => 1000f
+          }
+        } toList
+      }
+    ))
+
   def programToString(prog: Program): String = {
     prog match {
       case PLiteral(lit) =>
@@ -1110,13 +1142,33 @@ object MainModule {
           case LFloat(f) => f.toString + "f"
           case LBool(b) => b.toString
         }
-      case PInstruction(Instruction(name)) => name.toString
+      case PInstruction(Instruction(name)) => name.name
       case PList(ps@_ :: _) => "(" + (ps map programToString reduceLeft (_ + " " + _)) + ")"
       case _ => "()"
     }
   }
 
+  import scala.jdk.CollectionConverters._
+
+  def createProgram(nodes: java.util.List[com.yaskovdev.gp.push.node.Node]): Program = {
+    val values: List[Node] = nodes.asScala.toList
+    PList(values.map(it => createNode(it)))
+  }
+
+  def createNode(node: Node): Program = node match {
+    case instructionNode: InstructionNode =>
+      PInstruction(Instruction(Symbol(instructionNode.getName)))
+    case programNode: ProgramNode =>
+      createProgram(programNode.getInstructions)
+    case _ =>
+      PList(List())
+  }
+
+  def createState(): ProgramState = {
+    ProgramState() push(INTEGER, 12);
+  }
+
   def main(args: Array[String]): Unit = {
-    example3()
+    example5()
   }
 }
