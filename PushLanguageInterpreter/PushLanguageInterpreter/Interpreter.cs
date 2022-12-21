@@ -33,7 +33,7 @@ public class Interpreter
             }
             else if (node is InstructionNode instructionNode)
             {
-                if (instructionNode.Name == "EXEC_EQUAL")
+                if (instructionNode.Type == NodeType.Exec && instructionNode.Name == "EQUAL")
                 {
                     if (_execStack.Count >= 2)
                     {
@@ -42,7 +42,7 @@ public class Interpreter
                         _boolStack.Push(x.Equals(y));
                     }
                 }
-                else if (instructionNode.Name == "EXEC_YANKDUP")
+                else if (instructionNode.Type == NodeType.Exec && instructionNode.Name == "YANKDUP")
                 {
                     if (_intStack.Count >= 1)
                     {
@@ -54,31 +54,30 @@ public class Interpreter
                         }
                     }
                 }
-                else if (instructionNode.Name == "EXEC_Y")
+                else if (instructionNode.Type == NodeType.Exec && instructionNode.Name == "Y")
                 {
                     if (_execStack.Count >= 1)
                     {
                         var topItem = _execStack.Pop();
-                        _execStack.Push(new ProgramNode(ImmutableList.Create(new InstructionNode("EXEC_Y"), topItem)));
+                        _execStack.Push(new ProgramNode(ImmutableList.Create(new InstructionNode(NodeType.Exec, "Y"), topItem)));
                         _execStack.Push(topItem);
                     }
                 }
-                else if (instructionNode.Name == "INTEGER_STACKDEPTH")
+                else if (instructionNode.Type == NodeType.Integer && instructionNode.Name == "STACKDEPTH")
                 {
                     _intStack.Push(_intStack.Count);
                 }
-                else if (instructionNode.Name == "INTEGER_YANK")
+                else if (instructionNode.Type == NodeType.Integer && instructionNode.Name == "YANK")
                 {
                     if (_intStack.Count >= 1)
                     {
                         var index = _intStack.Pop();
                         if (index < _intStack.Count)
                         {
-                            
                         }
                     }
                 }
-                else if (instructionNode.Name == "FLOAT_MULT")
+                else if (instructionNode.Type == NodeType.Float && instructionNode.Name == "MULT")
                 {
                     if (_floatStack.Count >= 2)
                     {
@@ -87,7 +86,7 @@ public class Interpreter
                         _floatStack.Push(x * y);
                     }
                 }
-                else if (instructionNode.Name == "BOOLEAN_SWAP")
+                else if (instructionNode.Type == NodeType.Boolean && instructionNode.Name == "SWAP")
                 {
                     if (_boolStack.Count >= 2)
                     {
@@ -97,7 +96,7 @@ public class Interpreter
                         _boolStack.Push(y);
                     }
                 }
-                else if (instructionNode.Name.StartsWith("CODE_"))
+                else if (instructionNode.Type == NodeType.Code)
                 {
                     Console.WriteLine("Ignoring CODE_* for now");
                 }

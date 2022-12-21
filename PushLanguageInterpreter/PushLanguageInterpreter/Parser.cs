@@ -22,14 +22,24 @@ public class Parser
 
                 result.Add(new ProgramNode(instructions));
             }
+            else if (program[_position].Value.Contains('_'))
+            {
+                result.Add(ParseInstruction(program[_position]));
+            }
             else
             {
-                result.Add(new InstructionNode(program[_position].Value));
+                result.Add(new FloatNode(double.Parse(program[_position].Value)));
             }
 
             _position++;
         }
 
         return result;
+    }
+
+    private static InstructionNode ParseInstruction(Token token)
+    {
+        var parts = token.Value.Split('_');
+        return new InstructionNode(Enum.Parse<NodeType>(parts[0], true), parts[1]);
     }
 }

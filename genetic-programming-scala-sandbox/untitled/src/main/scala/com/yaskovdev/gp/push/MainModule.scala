@@ -50,14 +50,12 @@ package com.yaskovdev.gp.push
 
 import com.yaskovdev.gp.push.node.{InstructionNode, Node, ProgramNode}
 
+import scala.annotation.tailrec
 import scala.collection.parallel.CollectionConverters._
-import util.Random
-import java.util
-import annotation.tailrec
-import scala.collection.mutable
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.language.{implicitConversions, postfixOps}
 import scala.sys.error
+import scala.util.Random
 
 object MainModule {
 
@@ -241,7 +239,7 @@ object MainModule {
       stackInstruction(BOOLEAN)(name)(defn.apply)
     }
 
-    def instructions(name: Symbol)(defn: PtypeInst) {
+    def instructions(name: Symbol)(defn: PtypeInst): Unit = {
       instruction(EXEC)(name)(defn as EXEC)
       instruction(CODE)(name)(defn as CODE)
       instruction(INTEGER)(name)(defn as INTEGER)
@@ -907,8 +905,7 @@ object MainModule {
     report(population, generation, cfg.errorFunction, cfg.reportSimplifications)
 
   case class GpConfig(
-                       errorFunction: Program => List[Float] =
-                       (_ => error("Need to specify an error function!")),
+                       errorFunction: Program => List[Float] = _ => error("Need to specify an error function!"),
                        errorThreshold: Float = 0,
                        populationSize: Int = 1000,
                        maxPoints: Int = 50,
@@ -1148,24 +1145,19 @@ object MainModule {
     }
   }
 
-  import scala.jdk.CollectionConverters._
-
   def createProgram(nodes: java.util.List[com.yaskovdev.gp.push.node.Node]): Program = {
     val values: List[Node] = nodes.asScala.toList
     PList(values.map(it => createNode(it)))
   }
 
   def createNode(node: Node): Program = node match {
-    case instructionNode: InstructionNode =>
-      PInstruction(Instruction(Symbol(instructionNode.getName)))
-    case programNode: ProgramNode =>
-      createProgram(programNode.getInstructions)
-    case _ =>
-      PList(List())
+    case instructionNode: InstructionNode => PInstruction(Instruction(Symbol(instructionNode.getName)))
+    case programNode: ProgramNode => createProgram(programNode.getInstructions)
+    case _ => PList(List())
   }
 
   def createState(): ProgramState = {
-    ProgramState() push(INTEGER, 12);
+    ProgramState() push(INTEGER, 12)
   }
 
   def main(args: Array[String]): Unit = {

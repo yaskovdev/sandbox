@@ -1,7 +1,10 @@
 package com.yaskovdev.gp.push;
 
+import com.yaskovdev.gp.push.MainModule.GpConfig;
+import com.yaskovdev.gp.push.MainModule.Program;
 import com.yaskovdev.gp.push.node.Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

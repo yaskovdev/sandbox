@@ -8,7 +8,7 @@ public record ProgramNode(IReadOnlyCollection<INode> Nodes) : INode
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return Nodes.Count == other.Nodes.Count && Nodes.Zip(other.Nodes).All(it => it.First.Equals(it.Second));
+        return Nodes.Count == other.Nodes.Count && Nodes.Zip(other.Nodes).All(it => it.Item1.Equals(it.Item2));
     }
 
     public override int GetHashCode()
