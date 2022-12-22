@@ -19,11 +19,12 @@ public class RectanglesDrawingExample extends JFrame {
 
     private final Interpreter interpreter = new Interpreter();
 
-    // TODO: maybe vice versa
-    private float cartPosition = -1;
-    private float cartVelocity = -1.0f;
+    private float cartPosition = 0.5f;
+    private float cartVelocity = 1.0f;
 
-    private float cartAcceleration = 0.5f;
+    private final float cartAccelerationAbs = 0.5f;
+
+    private boolean positiveForce;
 
     int time = 0;
 
@@ -33,7 +34,10 @@ public class RectanglesDrawingExample extends JFrame {
 
     @SneakyThrows
     public RectanglesDrawingExample() {
-        final Program program = new Program(interpreter, "(float.% float.neg 8.789999 input.in1 float.% float.% input.inallrev float.+ float.>)");
+        // (float.- (float.- (float.- input.in1 ((input.inallrev)) float.neg) ((input.inallrev)) float.neg) input.in1 (((((input.inallrev) (-1.4300003)))) (float.*)) (((float.< input.in0) float.neg)))
+        // (float.% float.neg 8.789999 input.in1 float.% float.% input.inallrev float.+ float.>)
+        // (input.inall input.stackdepth float./ float.% input.index float.- float.<)
+        final Program program = new Program(interpreter, "(input.inall ((input.inall) (float./ float.%)) input.inall float.+ (float.> float./ -7.9300003 float.neg input.inall (float.neg input.inall)))");
 
         add(drawPanel);
         pack();
@@ -41,7 +45,7 @@ public class RectanglesDrawingExample extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         Thread thread = new Thread(() -> {
-            while (time < 1000) {
+            while (true) {
                 interpreter.ClearStacks();
                 final FloatStack floatStack = interpreter.floatStack();
                 final ObjectStack inputStack = interpreter.inputStack();
@@ -51,12 +55,12 @@ public class RectanglesDrawingExample extends JFrame {
                 inputStack.push(cartPosition);
                 inputStack.push(cartVelocity);
                 interpreter.Execute(program, 150);
-                final boolean positiveForce = booleanStack.pop();
-                cartVelocity += (positiveForce ? 1 : -1) * cartAcceleration;
-                cartPosition += cartVelocity / 1000;
+                positiveForce = booleanStack.pop();
+                cartVelocity += (positiveForce ? 1 : -1) * cartAccelerationAbs;
+                cartPosition += cartVelocity / 100;
                 drawPanel.repaint();
                 try {
-                    Thread.sleep(40);
+                    Thread.sleep(20);
                 } catch (Exception ignored) {
 
                 }
@@ -74,6 +78,7 @@ public class RectanglesDrawingExample extends JFrame {
             g.fillRect((int) (cartPosition * 1000) + 1000, y, CART_WIDTH, CART_HEIGHT);
             g.setColor(Color.GRAY);
             g.fillRect(0, y + CART_HEIGHT, D_W, 10);
+            g.fillPolygon(new int[]{75, positiveForce ? 100 : 50, 75}, new int[]{25, 50, 75}, 3);
         }
 
         public Dimension getPreferredSize() {
