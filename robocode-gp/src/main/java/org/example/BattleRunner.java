@@ -19,9 +19,9 @@ public class BattleRunner {
         final int numberOfRounds = 1;
 
         for (int i = 0; i < 70; i++) {
-            BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600);
-            RobotSpecification[] selectedRobots = engine.getLocalRepository("org.example.PushRobot,sample.Tracker");
-            BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
+            final BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600);
+            final RobotSpecification[] selectedRobots = engine.getLocalRepository("org.example.PushRobot,sample.Tracker");
+            final BattleSpecification battleSpec = new BattleSpecification(numberOfRounds, battlefield, selectedRobots);
             engine.runBattle(battleSpec, true);
             System.out.println("Battle " + i + " is over");
         }
