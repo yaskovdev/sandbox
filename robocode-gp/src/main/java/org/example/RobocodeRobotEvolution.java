@@ -14,6 +14,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class RobocodeRobotEvolution extends PushGP {
+
+    private final BattleRunner battleRunner;
+
+    public RobocodeRobotEvolution() {
+        this.battleRunner = new BattleRunner();
+    }
+
     @Override
     protected void InitInterpreter(final Interpreter interpreter) {
         // TODO: add number generators somehow?
@@ -32,6 +39,7 @@ public class RobocodeRobotEvolution extends PushGP {
         } catch (final IOException e) {
             throw new RuntimeException("Could not save robot program", e);
         }
+        battleRunner.runBattle();
         return 10;
     }
 }
