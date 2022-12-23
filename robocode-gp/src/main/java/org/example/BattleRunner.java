@@ -9,16 +9,14 @@ import robocode.control.RobotSpecification;
 import java.io.File;
 
 public class BattleRunner {
-    public static void main(String[] args) {
-        System.setProperty("NOSECURITY", "true");
-        System.setProperty("robocode.options.battle.desiredTPS", "10000");
-//        System.setProperty("robocode.options.battle.desiredTPS", "27");
+    public static void main(final String[] args) {
+        allowRobotsReadExternalFiles();
         RobocodeEngine.setLogMessagesEnabled(false);
 
-        RobocodeEngine engine = new RobocodeEngine(new File("/Users/yaskovdev/robocode"));
+        final RobocodeEngine engine = new RobocodeEngine(new File("/Users/yaskovdev/robocode"));
         engine.addBattleListener(new BattleObserver());
         engine.setVisible(false);
-        int numberOfRounds = 1;
+        final int numberOfRounds = 1;
 
         for (int i = 0; i < 70; i++) {
             BattlefieldSpecification battlefield = new BattlefieldSpecification(800, 600);
@@ -30,5 +28,9 @@ public class BattleRunner {
 
         engine.close();
         System.exit(0);
+    }
+
+    private static void allowRobotsReadExternalFiles() {
+        System.setProperty("NOSECURITY", "true");
     }
 }
