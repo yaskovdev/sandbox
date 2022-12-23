@@ -39,7 +39,8 @@ public class RobocodeRobotEvolution extends PushGP {
         } catch (final IOException e) {
             throw new RuntimeException("Could not save robot program", e);
         }
-        battleRunner.runBattle();
-        return 10;
+        final Results results = battleRunner.runBattle();
+        final int diff = results.myResults().getScore() - results.enemyResults().getScore();
+        return diff >= 0 ? 0 : -diff;
     }
 }
