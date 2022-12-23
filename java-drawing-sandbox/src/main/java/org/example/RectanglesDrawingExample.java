@@ -12,14 +12,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RectanglesDrawingExample extends JFrame {
-    private static final int D_W = 2000;
+    private static final int D_W = 1500;
     private static final int D_H = 200;
     private static final int CART_WIDTH = 50;
     private static final int CART_HEIGHT = 50;
 
-    private final Interpreter interpreter = new Interpreter();
+    private final Interpreter interpreter;
 
-    private float cartPosition = 0.5f;
+    private float cartPosition = 0.9f;
     private float cartVelocity = 1.0f;
 
     private final float cartAccelerationAbs = 0.5f;
@@ -34,10 +34,12 @@ public class RectanglesDrawingExample extends JFrame {
 
     @SneakyThrows
     public RectanglesDrawingExample() {
+        interpreter = new Interpreter();
+        interpreter.SetRandomParameters(-10, 10, 1, -10, 10, 0.01f, 40, 100);
         // (float.- (float.- (float.- input.in1 ((input.inallrev)) float.neg) ((input.inallrev)) float.neg) input.in1 (((((input.inallrev) (-1.4300003)))) (float.*)) (((float.< input.in0) float.neg)))
         // (float.% float.neg 8.789999 input.in1 float.% float.% input.inallrev float.+ float.>)
         // (input.inall input.stackdepth float./ float.% input.index float.- float.<)
-        final Program program = new Program(interpreter, "(input.inall ((input.inall) (float./ float.%)) input.inall float.+ (float.> float./ -7.9300003 float.neg input.inall (float.neg input.inall)))");
+        final Program program = new Program(interpreter, "((float.neg) float.shove (((((((integer.rand) boolean.shove integer.rot) integer.min) exec.s (exec.do*times) ((float.sin) (code.shove))) integer.swap)) ((code.do*times) (((boolean.shove (code.shove))) float.< name.dup) integer.min integer.=)) code.do*times)");
 
         add(drawPanel);
         pack();
@@ -46,15 +48,15 @@ public class RectanglesDrawingExample extends JFrame {
         setVisible(true);
         Thread thread = new Thread(() -> {
             while (true) {
-                interpreter.ClearStacks();
+                interpreter.clearStacks();
                 final FloatStack floatStack = interpreter.floatStack();
                 final ObjectStack inputStack = interpreter.inputStack();
-                final BooleanStack booleanStack = interpreter.boolStack();
                 floatStack.push(cartPosition);
                 floatStack.push(cartVelocity);
                 inputStack.push(cartPosition);
                 inputStack.push(cartVelocity);
                 interpreter.Execute(program, 150);
+                final BooleanStack booleanStack = interpreter.boolStack();
                 positiveForce = booleanStack.pop();
                 cartVelocity += (positiveForce ? 1 : -1) * cartAccelerationAbs;
                 cartPosition += cartVelocity / 100;
@@ -75,7 +77,7 @@ public class RectanglesDrawingExample extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.setColor(Color.BLACK);
-            g.fillRect((int) (cartPosition * 1000) + 1000, y, CART_WIDTH, CART_HEIGHT);
+            g.fillRect((int) (cartPosition * 500) + 750, y, CART_WIDTH, CART_HEIGHT);
             g.setColor(Color.GRAY);
             g.fillRect(0, y + CART_HEIGHT, D_W, 10);
             g.fillPolygon(new int[]{75, positiveForce ? 100 : 50, 75}, new int[]{25, 50, 75}, 3);
