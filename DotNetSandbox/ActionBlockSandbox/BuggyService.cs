@@ -13,7 +13,9 @@ namespace ActionBlockSandbox
 
         public void BuggyActionBackground(Context context)
         {
-            _actionBlock.Post(context);
+            Console.WriteLine($"Posting {context.Index}");
+            bool accepted = _actionBlock.Post(context);
+            Console.WriteLine(accepted ? $"Accepted {context.Index}" : $"Did not accept {context.Index}");
         }
 
         private void BuggyAction(Context context)
@@ -27,8 +29,8 @@ namespace ActionBlockSandbox
 
         public async ValueTask DisposeAsync()
         {
-            // _actionBlock.Complete();
-            // await _actionBlock.Completion;
+            _actionBlock.Complete();
+            await _actionBlock.Completion;
         }
     }
 }
