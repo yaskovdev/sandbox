@@ -1,19 +1,21 @@
+#include <fstream>
+#include <vector>
+#include <iostream>
+
 extern "C" {
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-    #include <libavcodec/avcodec.h>
+#include <libavcodec/avcodec.h>
 
-    #include <libavutil/opt.h>
-    #include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
+#include <libavutil/imgutils.h>
 }
 
 #define FPS 16
 
-static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt,
-                   FILE *outfile)
-{
+static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfile) {
     int ret;
 
     /* send the frame to the encoder */
@@ -41,16 +43,21 @@ static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt,
     }
 }
 
-int main(int argc, char **argv)
-{
+inline std::vector<uint8_t> read_all_bytes(const std::string &file_path) {
+    std::ifstream input_stream(file_path, std::ios::in | std::ios::binary);
+    std::vector<uint8_t> data((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
+    return data;
+}
+
+int main(int argc, char **argv) {
     const char *filename, *codec_name;
     const AVCodec *codec;
-    AVCodecContext *c= NULL;
-    int i, ret, x, y;
+    AVCodecContext *c = NULL;
+    int ret;
     FILE *f;
     AVFrame *frame;
     AVPacket *pkt;
-    uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+    uint8_t endcode[] = {0, 0, 1, 0xb7};
 
     if (argc <= 1) {
         fprintf(stderr, "Usage: %s <output file> <codec name>\n", argv[0]);
@@ -102,7 +109,7 @@ int main(int argc, char **argv)
         av_opt_set(c->priv_data, "preset", "ultrafast", 0);
 
     /* open it */
-    ret = avcodec_open2(c, codec, NULL);
+    ret = avcodec_open2(c, nullptr, nullptr);
     if (ret < 0) {
         fprintf(stderr, "Could not open codec: %i\n", ret);
         exit(1);
@@ -120,7 +127,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     frame->format = c->pix_fmt;
-    frame->width  = c->width;
+    frame->width = c->width;
     frame->height = c->height;
 
     ret = av_frame_get_buffer(frame, 0);
@@ -129,49 +136,23 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    /* encode 30 seconds of video */
-    for (i = 0; i < FPS * 30; i++) {
+    for (int i = 0; i < 800; i++) {
         fflush(stdout);
-
-        /* Make sure the frame data is writable.
-           On the first round, the frame is fresh from av_frame_get_buffer()
-           and therefore we know it is writable.
-           But on the next rounds, encode() will have called
-           avcodec_send_frame(), and the codec may have kept a reference to
-           the frame in its internal structures, that makes the frame
-           unwritable.
-           av_frame_make_writable() checks that and allocates a new buffer
-           for the frame only if necessary.
-         */
-        ret = av_frame_make_writable(frame);
-        if (ret < 0)
+        char file_name[48];
+        snprintf(file_name, 48, R"(c:\dev\tasks\2437932\experiment\frames\%04d.raw)", i + 1);
+        const std::vector<uint8_t> bytes = read_all_bytes(file_name);
+        if (av_frame_make_writable(frame) < 0) // TODO: can it be because we are not using this in Transcoder?
             exit(1);
 
-        /* Prepare a dummy image.
-           In real code, this is where you would have your own logic for
-           filling the frame. FFmpeg does not care what you put in the
-           frame.
-         */
-        /* Y */
-        for (y = 0; y < c->height; y++) {
-            for (x = 0; x < c->width; x++) {
-                frame->data[0][y * frame->linesize[0] + x] = x + y + i * 3;
-            }
-        }
-
-        /* Cb and Cr */
-        for (y = 0; y < c->height/2; y++) {
-            for (x = 0; x < c->width/2; x++) {
-                frame->data[1][y * frame->linesize[1] + x] = 128 + y + i * 2;
-                frame->data[2][y * frame->linesize[2] + x] = 64 + x + i * 5;
-            }
-        }
+        if (av_image_fill_arrays(frame->data, frame->linesize, &bytes[0], c->pix_fmt, frame->width, frame->height, 1) < 0)
+            exit(1);
 
         frame->pts = i;
 
         /* encode the image */
         encode(c, frame, pkt, f);
     }
+    // TODO: interesting! From logs you can see that it only writes packet 0 after frame 13 was sent, i.e., it buffers the frames out. What does the Transcoder do?
 
     /* flush the encoder */
     encode(c, NULL, pkt, f);
