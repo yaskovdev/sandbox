@@ -15,7 +15,7 @@ extern "C" {
 
 #define FPS 16
 
-static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE *outfile) {
+static void encode(AVCodecContext *enc_ctx, AVFrame *frame, FILE *outfile) {
     int ret;
 
     /* send the frame to the encoder */
@@ -28,7 +28,9 @@ static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt, FILE 
         exit(1);
     }
 
-    while (ret >= 0) {
+    while (true) {
+        auto *pkt = new AVPacket();
+        memset(pkt, 0, sizeof(AVPacket));
         ret = avcodec_receive_packet(enc_ctx, pkt);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
             return;
@@ -50,13 +52,12 @@ inline std::vector<uint8_t> read_all_bytes(const std::string &file_path) {
 }
 
 int main(int argc, char **argv) {
+//    av_log_set_level(56);
     const char *filename, *codec_name;
     const AVCodec *codec;
     AVCodecContext *c = NULL;
     int ret;
     FILE *f;
-    AVFrame *frame;
-    AVPacket *pkt;
     uint8_t endcode[] = {0, 0, 1, 0xb7};
 
     if (argc <= 1) {
@@ -77,7 +78,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    pkt = av_packet_alloc();
+    AVPacket *pkt = av_packet_alloc();
     if (!pkt)
         exit(1);
 
@@ -87,8 +88,8 @@ int main(int argc, char **argv) {
     c->width = 1920;
     c->height = 1080;
     /* frames per second */
-    c->time_base = av_make_q(1, FPS);
-    c->framerate = av_make_q(FPS, 1);
+    c->time_base = av_make_q(1, FPS * 1000); // NOTE: setting c->time_base and frame->pts like this and not setting c->framerate reproduce the first blurry frames!
+//    c->framerate = av_make_q(FPS, 1);
 
     /* emit one intra frame every ten frames
      * check frame pict_type before passing frame
@@ -105,8 +106,15 @@ int main(int argc, char **argv) {
     c->profile = 77;
 //    c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; // TODO: maybe this one (tried, looks unlikely)?
 
-    if (codec->id == AV_CODEC_ID_H264)
+    if (codec->id == AV_CODEC_ID_H264) {
+        uint8_t *value = nullptr;
         av_opt_set(c->priv_data, "preset", "ultrafast", 0);
+//        ret = av_opt_set_int(c->priv_data, "rc-lookahead", 0, 0);
+//        ret = av_opt_set_int(c->priv_data, "keyint_min", 9, 0);
+//        ret = av_opt_set_int(c->priv_data, "keyint", 96, 0);
+//        av_opt_get_int(c->priv_data, "rc-lookahead", 0, &value);
+//        std::cout << value << std::endl;
+    }
 
     /* open it */
     ret = avcodec_open2(c, nullptr, nullptr);
@@ -121,41 +129,34 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    frame = av_frame_alloc();
-    if (!frame) {
-        fprintf(stderr, "Could not allocate video frame\n");
-        exit(1);
-    }
-    frame->format = c->pix_fmt;
-    frame->width = c->width;
-    frame->height = c->height;
 
-    ret = av_frame_get_buffer(frame, 0);
-    if (ret < 0) {
-        fprintf(stderr, "Could not allocate the video frame data\n");
-        exit(1);
-    }
-
-    for (int i = 0; i < 800; i++) {
+    for (int i = 0; i < 80; i++) {
         fflush(stdout);
         char file_name[48];
         snprintf(file_name, 48, R"(c:\dev\tasks\2437932\experiment\frames\%04d.raw)", i + 1);
         const std::vector<uint8_t> bytes = read_all_bytes(file_name);
-        if (av_frame_make_writable(frame) < 0) // TODO: can it be because we are not using this in Transcoder?
+        AVFrame *frame = av_frame_alloc();
+        if (!frame) {
+            fprintf(stderr, "Could not allocate video frame\n");
             exit(1);
+        }
+        frame->format = c->pix_fmt;
+        frame->width = c->width;
+        frame->height = c->height;
 
         if (av_image_fill_arrays(frame->data, frame->linesize, &bytes[0], c->pix_fmt, frame->width, frame->height, 1) < 0)
             exit(1);
 
-        frame->pts = i;
+        frame->pts = i * 1000;
 
         /* encode the image */
-        encode(c, frame, pkt, f);
+        encode(c, frame, f);
+        av_frame_free(&frame);
     }
     // TODO: interesting! From logs you can see that it only writes packet 0 after frame 13 was sent, i.e., it buffers the frames out. What does the Transcoder do?
 
     /* flush the encoder */
-    encode(c, NULL, pkt, f);
+    encode(c, nullptr, f);
 
     /* Add sequence end code to have a real MPEG file.
        It makes only sense because this tiny examples writes packets
@@ -168,8 +169,7 @@ int main(int argc, char **argv) {
     fclose(f);
 
     avcodec_free_context(&c);
-    av_frame_free(&frame);
-    av_packet_free(&pkt);
+//    av_packet_free(&pkt);
 
     return 0;
 }
