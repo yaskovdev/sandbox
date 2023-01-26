@@ -1,14 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-
 extern "C" {
 #include "libavutil/imgutils.h"
 #include "libavutil/parseutils.h"
 #include "libswscale/swscale.h"
 }
 
-static void fill_yuv_image(uint8_t *data[4], int linesize[4], int width, int height, int frame_index)
+static void fill_yuv_image(uint8_t *data[4], const int linesize[4], int width, int height, int frame_index)
 {
     int x, y;
 
@@ -32,8 +28,8 @@ int main(int argc, char **argv)
     int src_linesize[4], dst_linesize[4];
     int src_w = 320, src_h = 240, dst_w, dst_h;
     enum AVPixelFormat src_pix_fmt = AV_PIX_FMT_YUV420P, dst_pix_fmt = AV_PIX_FMT_RGB24;
-    const char *dst_size = nullptr;
-    const char *dst_filename = nullptr;
+    const char *dst_size;
+    const char *dst_filename;
     FILE *dst_file;
     int dst_bufsize;
     struct SwsContext *sws_ctx;
@@ -51,9 +47,7 @@ int main(int argc, char **argv)
     dst_size     = argv[2];
 
     if (av_parse_video_size(&dst_w, &dst_h, dst_size) < 0) {
-        fprintf(stderr,
-                "Invalid size '%s', must be in the form WxH or a valid size abbreviation\n",
-                dst_size);
+        fprintf(stderr, "Invalid size '%s', must be in the form WxH or a valid size abbreviation\n", dst_size);
         exit(1);
     }
 
@@ -64,29 +58,22 @@ int main(int argc, char **argv)
     }
 
     /* create scaling context */
-    sws_ctx = sws_getContext(src_w, src_h, src_pix_fmt,
-                             dst_w, dst_h, dst_pix_fmt,
-                             SWS_BILINEAR, NULL, NULL, NULL);
+    sws_ctx = sws_getContext(src_w, src_h, src_pix_fmt, dst_w, dst_h, dst_pix_fmt, SWS_BILINEAR, nullptr, nullptr, nullptr);
     if (!sws_ctx) {
-        fprintf(stderr,
-                "Impossible to create scale context for the conversion "
-                "fmt:%s s:%dx%d -> fmt:%s s:%dx%d\n",
-                av_get_pix_fmt_name(src_pix_fmt), src_w, src_h,
+        fprintf(stderr, "Impossible to create scale context for the conversion fmt:%s s:%dx%d -> fmt:%s s:%dx%d\n", av_get_pix_fmt_name(src_pix_fmt), src_w, src_h,
                 av_get_pix_fmt_name(dst_pix_fmt), dst_w, dst_h);
         ret = AVERROR(EINVAL);
         goto end;
     }
 
     /* allocate source and destination image buffers */
-    if ((ret = av_image_alloc(src_data, src_linesize,
-                              src_w, src_h, src_pix_fmt, 16)) < 0) {
+    if ((ret = av_image_alloc(src_data, src_linesize, src_w, src_h, src_pix_fmt, 16)) < 0) {
         fprintf(stderr, "Could not allocate source image\n");
         goto end;
     }
 
     /* buffer is going to be written to rawvideo file, no alignment */
-    if ((ret = av_image_alloc(dst_data, dst_linesize,
-                              dst_w, dst_h, dst_pix_fmt, 1)) < 0) {
+    if ((ret = av_image_alloc(dst_data, dst_linesize, dst_w, dst_h, dst_pix_fmt, 1)) < 0) {
         fprintf(stderr, "Could not allocate destination image\n");
         goto end;
     }
@@ -97,16 +84,14 @@ int main(int argc, char **argv)
         fill_yuv_image(src_data, src_linesize, src_w, src_h, i);
 
         /* convert to destination format */
-        sws_scale(sws_ctx, (const uint8_t * const*)src_data,
-                  src_linesize, 0, src_h, dst_data, dst_linesize);
+        sws_scale(sws_ctx, (const uint8_t *const *) src_data, src_linesize, 0, src_h, dst_data, dst_linesize);
 
         /* write scaled image to file */
         fwrite(dst_data[0], 1, dst_bufsize, dst_file);
     }
 
-    fprintf(stderr, "Scaling succeeded. Play the output file with the command:\n"
-                    "ffplay -f rawvideo -pix_fmt %s -video_size %dx%d %s\n",
-            av_get_pix_fmt_name(dst_pix_fmt), dst_w, dst_h, dst_filename);
+    fprintf(stderr, "Scaling succeeded. Play the output file with the command:\nffplay -f rawvideo -pix_fmt %s -video_size %dx%d %s\n", av_get_pix_fmt_name(dst_pix_fmt), dst_w,
+            dst_h, dst_filename);
 
     end:
     fclose(dst_file);
