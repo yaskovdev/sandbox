@@ -90,7 +90,7 @@ int main(int argc, char **argv)
         fwrite(dst_data[0], 1, dst_bufsize, dst_file);
     }
 
-    fprintf(stderr, "Scaling succeeded. Play the output file with the command:\nffplay -f rawvideo -pix_fmt %s -video_size %dx%d %s\n", av_get_pix_fmt_name(dst_pix_fmt), dst_w,
+    fprintf(stderr, "Scaling succeeded. Play the output file with the command:\nffplay -f rawvideo -pixel_format %s -video_size %dx%d %s\n", av_get_pix_fmt_name(dst_pix_fmt), dst_w,
             dst_h, dst_filename);
 
     end:

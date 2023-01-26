@@ -6,4 +6,4 @@ To build and run using CLion on Windows, make sure that:
    to `C:\dev\ffmpeg\include;C:\dev\ffmpeg\lib`.
 4. `Build, Execution, Deployment -> Toolchains -> Visual Studio -> Architecture` is `amd64`.
 5. Pass as "Program arguments" file name with input packet and file name to write the output frame to,
-   e.g., `c:\dev\212.encoded c:\dev\212.raw`.
+   e.g., `c:\dev\sws_output 1920x1080`.
