@@ -46,15 +46,21 @@ for (int i = 1; i <= 3; i++)
 
 Console.WriteLine(nameof(System.Numerics));
 
-List<Frame> oldWindowOfDownloadedFragments = null;
-Console.WriteLine($"Count is {oldWindowOfDownloadedFragments?.Count}");
+// List<Frame> oldWindowOfDownloadedFragments = null;
+// Console.WriteLine($"Count is {oldWindowOfDownloadedFragments?.Count}");
+//
+// foreach (var f in oldWindowOfDownloadedFragments)
+// {
+//   
+// }
+//
+// for (var indexInWindow = 0; indexInWindow < oldWindowOfDownloadedFragments?.Count; ++indexInWindow)
+// {
+//   
+// }
 
-foreach (var f in oldWindowOfDownloadedFragments)
-{
-  
-}
-
-for (var indexInWindow = 0; indexInWindow < oldWindowOfDownloadedFragments?.Count; ++indexInWindow)
-{
-  
-}
+var settings = new Settings();
+settings.Type = MediaType.Video;
+Console.WriteLine("Before " + settings.Type.GetValueOrDefault());
+settings.Type = null;
+Console.WriteLine("After " + settings.Type.GetValueOrDefault());
