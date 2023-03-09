@@ -1,0 +1,7 @@
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\bin\Debug\net472\win-x64\MsBuildBugDependency.dll
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\bin\Debug\net472\win-x64\MsBuildBugDependency.pdb
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\obj\Debug\net472\win-x64\MsBuildBugDependency.csproj.AssemblyReference.cache
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\obj\Debug\net472\win-x64\MsBuildBugDependency.GeneratedMSBuildEditorConfig.editorconfig
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\obj\Debug\net472\win-x64\MsBuildBugDependency.csproj.CoreCompileInputs.cache
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\obj\Debug\net472\win-x64\MsBuildBugDependency.dll
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\obj\Debug\net472\win-x64\MsBuildBugDependency.pdb

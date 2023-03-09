@@ -40,14 +40,32 @@ using ActionBlockSandbox;
 // ----
 
 
-await using var service = new BuggyService();
+// await using var service = new BuggyService();
+//
+// for (var i = 0; i < 5; i++)
+// {
+//     service.BuggyActionBackground(new Context(i));
+//     Console.WriteLine($"Posted {i}");
+// }
+//
+// Thread.Sleep(10000);
+//
+// Console.WriteLine("Completed everything");
 
-for (var i = 0; i < 5; i++)
+// ----
+
+var updateMediaStateParams = new UpdateMediaStateParams();
+updateMediaStateParams.sequenceNumber = null;
+
+if (1 >= updateMediaStateParams.sequenceNumber)
 {
-    service.BuggyActionBackground(new Context(i));
-    Console.WriteLine($"Posted {i}");
+    Console.WriteLine("true");
 }
 
-Thread.Sleep(10000);
-
-Console.WriteLine("Completed everything");
+var actionBlockHolder = new ActionBlockHolder();
+for (var i = 0; i < 100_000_000; i++)
+{
+    actionBlockHolder.IncreaseCounter();
+}
+actionBlockHolder.CompleteAndWaitForCompletion();
+actionBlockHolder.PrintCounter();

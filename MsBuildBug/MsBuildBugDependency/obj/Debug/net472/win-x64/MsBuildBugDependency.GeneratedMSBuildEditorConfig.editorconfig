@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = MsBuildBugDependency
+build_property.ProjectDir = C:\dev\git_home\sandbox\MsBuildBug\MsBuildBugDependency\

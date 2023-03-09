@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutOfMemoryException", "Out
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActionBlockSandbox", "ActionBlockSandbox\ActionBlockSandbox.csproj", "{137DC263-AC8D-41DB-A9BA-A1925CD546D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvParser", "CsvParser\CsvParser.csproj", "{ABC449FD-0A43-4147-B329-41FE351CCA87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,5 +104,9 @@ Global
 		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{137DC263-AC8D-41DB-A9BA-A1925CD546D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABC449FD-0A43-4147-B329-41FE351CCA87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC449FD-0A43-4147-B329-41FE351CCA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC449FD-0A43-4147-B329-41FE351CCA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC449FD-0A43-4147-B329-41FE351CCA87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

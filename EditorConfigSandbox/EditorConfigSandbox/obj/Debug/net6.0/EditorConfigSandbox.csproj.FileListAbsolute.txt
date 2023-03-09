@@ -1,0 +1,15 @@
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\bin\Debug\net6.0\EditorConfigSandbox.exe
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\bin\Debug\net6.0\EditorConfigSandbox.deps.json
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\bin\Debug\net6.0\EditorConfigSandbox.runtimeconfig.json
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\bin\Debug\net6.0\EditorConfigSandbox.dll
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\bin\Debug\net6.0\EditorConfigSandbox.pdb
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.csproj.AssemblyReference.cache
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.GeneratedMSBuildEditorConfig.editorconfig
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.AssemblyInfoInputs.cache
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.AssemblyInfo.cs
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.csproj.CoreCompileInputs.cache
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.dll
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\refint\EditorConfigSandbox.dll
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.pdb
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\EditorConfigSandbox.genruntimeconfig.cache
+C:\dev\git_home\sandbox\EditorConfigSandbox\EditorConfigSandbox\obj\Debug\net6.0\ref\EditorConfigSandbox.dll

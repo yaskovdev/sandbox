@@ -1,0 +1,10 @@
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.csproj.AssemblyReference.cache
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.GeneratedMSBuildEditorConfig.editorconfig
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.csproj.CoreCompileInputs.cache
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\bin\Debug\net472\win-x64\MsBuildBug.dll
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\bin\Debug\net472\win-x64\MsBuildBug.pdb
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.dll
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.pdb
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\bin\Debug\net472\win-x64\MsBuildBugDependency.dll
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\bin\Debug\net472\win-x64\MsBuildBugDependency.pdb
+C:\dev\git_home\sandbox\MsBuildBug\MsBuildBug\obj\Debug\net472\win-x64\MsBuildBug.csproj.CopyComplete

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     dst_filename = argv[1];
-    dst_size     = argv[2];
+    dst_size = argv[2];
 
     if (av_parse_video_size(&dst_w, &dst_h, dst_size) < 0) {
         fprintf(stderr, "Invalid size '%s', must be in the form WxH or a valid size abbreviation\n", dst_size);
