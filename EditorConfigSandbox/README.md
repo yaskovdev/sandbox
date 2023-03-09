@@ -15,7 +15,7 @@ Outcome: the C# compiler is taking the `.editorconfig` into consideration.
 # Experiment 2
 
 1. Add `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` to `EditorConfigSandbox.csproj`.
-2. Set dotnet_diagnostic.CA1036.severity to warning in `.editorconfig`.
+2. Set `dotnet_diagnostic.CA1036.severity` to `warning` in `.editorconfig`.
 3. Try building from the command line with the above command.
 
 The build should fail because compiler respects both `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` and `.editorconfig`.
