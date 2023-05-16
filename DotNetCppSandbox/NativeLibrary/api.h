@@ -10,4 +10,4 @@ extern "C" __declspec(dllexport) int multiply(const multiplier* multiplier, int 
 
 extern "C" __declspec(dllexport) void destroy_multiplier(const multiplier* multiplier);
 
-extern "C" __declspec(dllexport) void fill_array(uint8_t* array);
+extern "C" __declspec(dllexport) void fill_array(uint8_t* array, int length);
