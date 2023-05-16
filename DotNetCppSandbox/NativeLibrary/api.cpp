@@ -17,3 +17,11 @@ void destroy_multiplier(const multiplier* multiplier)
     delete multiplier;
     std::cout << "Native: multiplier deleted" << "\n";
 }
+
+void fill_array(uint8_t* array)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        array[i] = 1;
+    }
+}

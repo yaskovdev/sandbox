@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCppSandbox", "DotNetC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeLibrary", "NativeLibrary\NativeLibrary.vcxproj", "{0266CB48-3B98-4432-AB6B-ECBDAC445A42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillArraySandbox", "FillArraySandbox\FillArraySandbox.csproj", "{0C6A4B02-BA81-47A3-986D-3D722726149D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -18,5 +20,9 @@ Global
 		{0266CB48-3B98-4432-AB6B-ECBDAC445A42}.Release|x64.Build.0 = Release|x64
 		{0266CB48-3B98-4432-AB6B-ECBDAC445A42}.Debug|x64.ActiveCfg = Debug|x64
 		{0266CB48-3B98-4432-AB6B-ECBDAC445A42}.Debug|x64.Build.0 = Debug|x64
+		{0C6A4B02-BA81-47A3-986D-3D722726149D}.Release|x64.ActiveCfg = Release|x64
+		{0C6A4B02-BA81-47A3-986D-3D722726149D}.Release|x64.Build.0 = Release|x64
+		{0C6A4B02-BA81-47A3-986D-3D722726149D}.Debug|x64.ActiveCfg = Debug|x64
+		{0C6A4B02-BA81-47A3-986D-3D722726149D}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 EndGlobal
