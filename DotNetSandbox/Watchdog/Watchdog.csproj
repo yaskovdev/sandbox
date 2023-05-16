@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+<!--        <TargetFramework>net6.0</TargetFramework> &lt;!&ndash; Compiles &ndash;&gt;-->
+<!--        <TargetFramework>netstandard2.0</TargetFramework> &lt;!&ndash; Does not compile &ndash;&gt;-->
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>9.0</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Skype.Calling.Common" Version="5.20.2860" />
+        <PackageReference Include="Microsoft.R9.Extensions.Diagnostics.ResourceUtilization.Windows" Version="1.17.1" />
+        <PackageReference Include="Microsoft.Azure.DocumentDB" Version="2.8.1" />
+    </ItemGroup>
+
+</Project>

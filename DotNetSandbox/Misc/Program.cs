@@ -64,3 +64,50 @@ settings.Type = MediaType.Video;
 Console.WriteLine("Before " + settings.Type.GetValueOrDefault());
 settings.Type = null;
 Console.WriteLine("After " + settings.Type.GetValueOrDefault());
+
+bool value = true;
+string stringValue = value.ToString();
+Console.WriteLine(stringValue);
+
+// ----
+
+IDictionary<string, string?>? dictionary = new Dictionary<string, string?>();
+dictionary.Add("key", "value");
+
+if ((dictionary?.TryGetValue("key", out var serviceFqdn) ?? false) && serviceFqdn != null)
+{
+  Console.WriteLine("Value exists in the dictionary");
+}
+else
+{
+  Console.WriteLine("Value does not exist in the dictionary");
+}
+
+// ----
+
+List<string>? nullableList = null;
+var contains = nullableList?.Contains("123") == true;
+if (!contains)
+{
+  Console.WriteLine("Not contains!");
+}
+
+// ----
+
+var emulated = bool.Parse(Environment.GetEnvironmentVariable("IS_EMULATED100500") ?? bool.FalseString);
+Console.WriteLine("Emulated: " + emulated);
+
+// ----
+
+// throw new ArgumentNullException("param");
+
+// ----
+
+var classWithReadonlyStruct = new ClassWithReadonlyStruct();
+classWithReadonlyStruct.PrintReadonlyStructValue();
+
+// ----
+
+var orderedIds = new List<OrderedId>();
+var maxOrderedId = orderedIds.Max();
+Console.WriteLine(maxOrderedId is null);

@@ -1,9 +1,18 @@
-﻿namespace EditorConfigSandbox;
-
-public class RatingInformation : IComparable
+﻿namespace EditorConfigSandbox
 {
-    public int CompareTo(object? obj)
+    using System;
+
+    public class RatingInformation : IComparable
     {
-        return 0;
+        public int CompareTo(object? obj)
+        {
+            try
+            {
+            }
+            catch (Exception e)
+            {
+            }
+            return 0;
+        }
     }
 }

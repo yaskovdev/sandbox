@@ -1,5 +1,7 @@
 ﻿namespace Threading;
 
+using ReaderWriterLockSlim;
+
 internal static class Program
 {
     private const int NumberOfDisposables = 100_000;
@@ -7,7 +9,8 @@ internal static class Program
     public static void Main()
     {
         // TestDisposables();
-        new VolatileDemo().Run();
+        // new VolatileDemo().Run();
+        new Demo().Run();
     }
 
     private static void TestDisposables()

@@ -1,3 +1,0 @@
-[*.cs]
-
-dotnet_diagnostic.CA1036.severity = error
