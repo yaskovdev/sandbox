@@ -95,6 +95,16 @@ int main(int argc, char **argv) {
             if (image_alloc_res < 0) {
                 exit(image_alloc_res);
             }
+
+            int srcSliceY = 0;
+            const AVPixFmtDescriptor *descriptor = av_pix_fmt_desc_get(AV_PIX_FMT_YUV420P);
+            uint8_t chrSrcVSubSample = descriptor->log2_chroma_h;
+            int srcSliceH = decoded_frame->height;
+            int macro_height_src = !!(descriptor->flags & AV_PIX_FMT_FLAG_BAYER) ? 2 : (1 << chrSrcVSubSample);
+            if ((srcSliceY & (macro_height_src - 1)) || ((srcSliceH & (macro_height_src - 1)) && srcSliceY + srcSliceH != announced_height) || srcSliceY + srcSliceH > announced_height) {
+                exit(-1);
+            }
+
             const int scale_res = sws_scale(sws_context, decoded_frame->data, decoded_frame->linesize, 0, decoded_frame->height, dst_data, dst_line_size);
             if (scale_res < 0) {
                 exit(scale_res);
