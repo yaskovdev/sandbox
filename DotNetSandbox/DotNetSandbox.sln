@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watchdog", "Watchdog\Watchd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncLocalSandbox", "AsyncLocalSandbox\AsyncLocalSandbox.csproj", "{BAB2D896-DF20-48C1-BFEE-6C517B070921}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetFrameworkProject", "DotNetFrameworkProject\DotNetFrameworkProject.csproj", "{C181FC2F-103C-4AFF-8347-7476FFADAE18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetStandardProject", "DotNetStandardProject\DotNetStandardProject.csproj", "{28E3D15B-C0D1-4C85-B4BD-379B0E4FD8B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,5 +124,13 @@ Global
 		{BAB2D896-DF20-48C1-BFEE-6C517B070921}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAB2D896-DF20-48C1-BFEE-6C517B070921}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAB2D896-DF20-48C1-BFEE-6C517B070921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C181FC2F-103C-4AFF-8347-7476FFADAE18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C181FC2F-103C-4AFF-8347-7476FFADAE18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C181FC2F-103C-4AFF-8347-7476FFADAE18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C181FC2F-103C-4AFF-8347-7476FFADAE18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E3D15B-C0D1-4C85-B4BD-379B0E4FD8B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E3D15B-C0D1-4C85-B4BD-379B0E4FD8B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E3D15B-C0D1-4C85-B4BD-379B0E4FD8B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E3D15B-C0D1-4C85-B4BD-379B0E4FD8B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -6,7 +6,10 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/frame.h"
 #include "libavutil/imgutils.h"
+#include "libswscale/swscale.h"
 }
+
+#define SCALE true
 
 static int read_input(char *file_name, uint8_t **input_buffer) {
     std::ifstream input_stream(file_name, std::ios::binary);
@@ -80,13 +83,39 @@ int main(int argc, char **argv) {
         std::cout << line_size[2] << ", " << FFALIGN(line_size[2], align) << "\n";
         auto pixel_format = static_cast<AVPixelFormat>(decoded_frame->format);
         std::cout << pixel_format << "\n";
-        int buffer_size = av_image_get_buffer_size(pixel_format, width, height, align);
-        std::cout << "Buffer size is " << buffer_size << "\n";
-        auto *buffer = new uint8_t[buffer_size];
-        int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, line_size, pixel_format, width, height, align);
-        std::cout << "Copied to buffer " << number_of_bytes_written << " bytes" << "\n";
-        write_output_as_raw_frame(argv[2], buffer, buffer_size);
-        delete[] buffer;
+
+        if (SCALE) {
+            // The width and height of the decoded frames announced by the sender. They are different from the actual width and height of the decoded frames, and that is the problem.
+            int announced_width = 1920;
+            int announced_height = 1080;
+            SwsContext* sws_context = sws_getContext(announced_width, announced_height, AV_PIX_FMT_YUV420P, announced_width, announced_height, AV_PIX_FMT_NV12, SWS_BILINEAR, nullptr, nullptr, nullptr);
+            uint8_t* dst_data[4];
+            int dst_line_size[4];
+            const int image_alloc_res = av_image_alloc(dst_data, dst_line_size, announced_width, announced_height, AV_PIX_FMT_NV12, align);
+            if (image_alloc_res < 0) {
+                exit(image_alloc_res);
+            }
+            const int scale_res = sws_scale(sws_context, decoded_frame->data, decoded_frame->linesize, 0, decoded_frame->height, dst_data, dst_line_size);
+            if (scale_res < 0) {
+                exit(scale_res);
+            }
+
+            int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_NV12, announced_width, announced_height, align);
+            std::cout << "Buffer size is " << buffer_size << "\n";
+            auto *buffer = new uint8_t[buffer_size];
+            int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, dst_data, dst_line_size, AV_PIX_FMT_NV12, announced_width, announced_height, align);
+            std::cout << "Copied to buffer " << number_of_bytes_written << " bytes" << "\n";
+            write_output_as_raw_frame(argv[2], buffer, buffer_size);
+            delete[] buffer;
+        } else {
+            int buffer_size = av_image_get_buffer_size(pixel_format, width, height, align);
+            std::cout << "Buffer size is " << buffer_size << "\n";
+            auto *buffer = new uint8_t[buffer_size];
+            int number_of_bytes_written = av_image_copy_to_buffer(buffer, buffer_size, decoded_frame->data, line_size, pixel_format, width, height, align);
+            std::cout << "Copied to buffer " << number_of_bytes_written << " bytes" << "\n";
+            write_output_as_raw_frame(argv[2], buffer, buffer_size);
+            delete[] buffer;
+        }
     }
 
     av_frame_free(&decoded_frame);

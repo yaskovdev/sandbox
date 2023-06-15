@@ -14,7 +14,22 @@ internal static class Program
         
         // ----
 
-        var service = new LongRunningService();
-        await service.Run();
+        // var service = new LongRunningService();
+        // await service.Run();
+        var bytes = new int[1000000];
+        foreach(var item in bytes)
+        {
+            Console.WriteLine(item.ToString());
+        }
+    }
+    
+    private static async Task RunAsync()
+    {
+        await Task.CompletedTask;
+    }
+    
+    private static async Task<int> GetNumberAsync()
+    {
+        return await Task.FromResult(42);
     }
 }
