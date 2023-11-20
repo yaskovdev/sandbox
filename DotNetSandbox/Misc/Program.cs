@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Web;
 using Misc;
@@ -76,11 +77,11 @@ dictionary.Add("key", "value");
 
 if ((dictionary?.TryGetValue("key", out var serviceFqdn) ?? false) && serviceFqdn != null)
 {
-  Console.WriteLine("Value exists in the dictionary");
+    Console.WriteLine("Value exists in the dictionary");
 }
 else
 {
-  Console.WriteLine("Value does not exist in the dictionary");
+    Console.WriteLine("Value does not exist in the dictionary");
 }
 
 // ----
@@ -89,7 +90,7 @@ List<string>? nullableList = null;
 var contains = nullableList?.Contains("123") == true;
 if (!contains)
 {
-  Console.WriteLine("Not contains!");
+    Console.WriteLine("Not contains!");
 }
 
 // ----
@@ -111,3 +112,12 @@ classWithReadonlyStruct.PrintReadonlyStructValue();
 var orderedIds = new List<OrderedId>();
 var maxOrderedId = orderedIds.Max();
 Console.WriteLine(maxOrderedId is null);
+
+// ----
+
+// var context = ExecutionContext.Capture();
+// ExecutionContext.Run(null, async (context) => { Console.WriteLine("Hello from execution context!"); }, null);
+
+// ----
+
+new InterlockedSandbox().Run();
