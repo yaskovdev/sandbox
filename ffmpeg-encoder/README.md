@@ -1,3 +1,8 @@
+# FFmpeg Encoder And Muxer
+
+The official FFmpeg encoder and muxer example. The original code
+is [here](https://github.com/FFmpeg/FFmpeg/blob/master/doc/examples/mux.c).
+
 To build and run with Rider on Windows, make sure that:
 
 1. You have ffmpeg build for x64 located in, say, `c:\dev\ffmpeg`.
