@@ -3,7 +3,8 @@
 The official FFmpeg demuxer and decoder example. The original code
 is [here](https://github.com/FFmpeg/FFmpeg/blob/master/doc/examples/demux_decode.c).
 
-The program prints instructions how to play the output after successful demuxing.
+The program prints instructions how to play the output after successful demuxing. You may want to adjust a video frame
+rate by specifying, e.g., `-framerate 16`.
 
 ## Building And Running On Windows Using CLion
 
