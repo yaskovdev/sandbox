@@ -98,7 +98,40 @@ public class SemaphoreService : IDisposable
     }
 }
 
-public class AsyncSemaphoreService : IAsyncDisposable
+public class SemaphoreSlimService : IDisposable
+{
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private long _iteration;
+
+    public void Process()
+    {
+        try
+        {
+            _semaphore.Wait();
+            _iteration += 1;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _semaphore.Wait();
+            Console.WriteLine("SemaphoreSlimService disposed after " + _iteration + " iterations");
+            _iteration = 0;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+}
+
+public class AsyncSemaphoreSlimService : IAsyncDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private long _iteration;
@@ -131,13 +164,14 @@ public class AsyncSemaphoreService : IAsyncDisposable
     }
 }
 
-public class NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore
+public class NoLockVsLockVsAsyncLockVsSemaphoreVsSemaphoreSlimVsAsyncSemaphoreSlim
 {
     private NoLockService _noLockService;
     private LockService _lockService;
     private AsyncLockService _asyncLockService;
     private SemaphoreService _semaphoreService;
-    private AsyncSemaphoreService _asyncSemaphoreService;
+    private SemaphoreSlimService _semaphoreSlimService;
+    private AsyncSemaphoreSlimService _asyncSemaphoreSlimService;
 
     [GlobalSetup]
     public void Setup()
@@ -146,7 +180,8 @@ public class NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore
         _lockService = new LockService();
         _asyncLockService = new AsyncLockService();
         _semaphoreService = new SemaphoreService();
-        _asyncSemaphoreService = new AsyncSemaphoreService();
+        _semaphoreSlimService = new SemaphoreSlimService();
+        _asyncSemaphoreSlimService = new AsyncSemaphoreSlimService();
     }
 
     [Benchmark]
@@ -174,9 +209,15 @@ public class NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore
     }
 
     [Benchmark]
-    public async Task AsyncSemaphoreService()
+    public void SemaphoreSlimService()
     {
-        await _asyncSemaphoreService.Process();
+        _semaphoreSlimService.Process();
+    }
+
+    [Benchmark]
+    public async Task AsyncSemaphoreSlimService()
+    {
+        await _asyncSemaphoreSlimService.Process();
     }
 
     [GlobalCleanup]
@@ -186,6 +227,7 @@ public class NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore
         _lockService.Dispose();
         await _asyncLockService.DisposeAsync();
         _semaphoreService.Dispose();
-        await _asyncSemaphoreService.DisposeAsync();
+        _semaphoreSlimService.Dispose();
+        await _asyncSemaphoreSlimService.DisposeAsync();
     }
 }
