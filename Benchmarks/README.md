@@ -1,10 +1,11 @@
 # Benchmarks
 
 ```
-| Method           | Mean       | Error     | StdDev    |
-|----------------- |-----------:|----------:|----------:|
-| NoLockService    |   2.172 ms | 0.0427 ms | 0.0769 ms |
-| LockService      |  21.976 ms | 0.4254 ms | 0.6748 ms |
-| AsyncLockService | 134.429 ms | 2.6469 ms | 5.7541 ms |
-| SemaphoreService |  63.389 ms | 2.0297 ms | 5.8887 ms |
+| Method                | Mean        | Error      | StdDev     | Median      |
+|---------------------- |------------:|-----------:|-----------:|------------:|
+| NoLockService         |   0.7513 ns |  0.1014 ns |  0.2991 ns |   0.6164 ns |
+| LockService           |  19.9286 ns |  0.3845 ns |  0.3211 ns |  19.9778 ns |
+| AsyncLockService      | 150.0560 ns |  3.0314 ns |  5.6938 ns | 148.8215 ns |
+| SemaphoreService      | 604.1106 ns | 11.7264 ns | 16.0513 ns | 601.9850 ns |
+| AsyncSemaphoreService |  63.4153 ns |  1.3999 ns |  3.9941 ns |  61.8692 ns |
 ```

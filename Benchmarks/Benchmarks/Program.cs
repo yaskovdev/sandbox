@@ -3,4 +3,4 @@ using Benchmarks;
 
 Console.WriteLine("Running benchmarks");
 
-Console.WriteLine(BenchmarkRunner.Run<NoLockVsLockVsAsyncLockVsSemaphore>());
+Console.WriteLine(BenchmarkRunner.Run<NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore>());

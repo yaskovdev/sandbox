@@ -14,14 +14,14 @@ public class NoLockService : IDisposable
 
     public void Dispose()
     {
-        Console.WriteLine("NoLock disposed after " + _iteration + " iterations");
+        Console.WriteLine("NoLockService disposed after " + _iteration + " iterations");
         _iteration = 0;
     }
 }
 
 public class LockService : IDisposable
 {
-    private readonly object _lock = new object();
+    private readonly object _lock = new();
     private long _iteration;
 
     public void Process()
@@ -36,7 +36,7 @@ public class LockService : IDisposable
     {
         lock (_lock)
         {
-            Console.WriteLine("NoLock disposed after " + _iteration + " iterations");
+            Console.WriteLine("LockService disposed after " + _iteration + " iterations");
             _iteration = 0;
         }
     }
@@ -59,13 +59,46 @@ public class AsyncLockService : IAsyncDisposable
     {
         using (await _asyncLock.LockAsync())
         {
-            Console.WriteLine("NoLock disposed after " + _iteration + " iterations");
+            Console.WriteLine("AsyncLockService disposed after " + _iteration + " iterations");
             _iteration = 0;
         }
     }
 }
 
-public class SemaphoreService : IAsyncDisposable
+public class SemaphoreService : IDisposable
+{
+    private readonly Semaphore _semaphore = new(1, 1);
+    private long _iteration;
+
+    public void Process()
+    {
+        try
+        {
+            _semaphore.WaitOne();
+            _iteration += 1;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            _semaphore.WaitOne();
+            Console.WriteLine("SemaphoreService disposed after " + _iteration + " iterations");
+            _iteration = 0;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+}
+
+public class AsyncSemaphoreService : IAsyncDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private long _iteration;
@@ -88,7 +121,7 @@ public class SemaphoreService : IAsyncDisposable
         try
         {
             await _semaphore.WaitAsync();
-            Console.WriteLine("NoLock disposed after " + _iteration + " iterations");
+            Console.WriteLine("AsyncSemaphoreService disposed after " + _iteration + " iterations");
             _iteration = 0;
         }
         finally
@@ -98,12 +131,13 @@ public class SemaphoreService : IAsyncDisposable
     }
 }
 
-public class NoLockVsLockVsAsyncLockVsSemaphore
+public class NoLockVsLockVsAsyncLockVsSemaphoreVsAsyncSemaphore
 {
     private NoLockService _noLockService;
     private LockService _lockService;
     private AsyncLockService _asyncLockService;
     private SemaphoreService _semaphoreService;
+    private AsyncSemaphoreService _asyncSemaphoreService;
 
     [GlobalSetup]
     public void Setup()
@@ -112,42 +146,37 @@ public class NoLockVsLockVsAsyncLockVsSemaphore
         _lockService = new LockService();
         _asyncLockService = new AsyncLockService();
         _semaphoreService = new SemaphoreService();
+        _asyncSemaphoreService = new AsyncSemaphoreService();
     }
 
     [Benchmark]
     public void NoLockService()
     {
-        for (var i = 0; i < 1000000; i++)
-        {
-            _noLockService.Process();
-        }
+        _noLockService.Process();
     }
 
     [Benchmark]
     public void LockService()
     {
-        for (var i = 0; i < 1000000; i++)
-        {
-            _lockService.Process();
-        }
+        _lockService.Process();
     }
 
     [Benchmark]
     public async Task AsyncLockService()
     {
-        for (var i = 0; i < 1000000; i++)
-        {
-            await _asyncLockService.Process();
-        }
+        await _asyncLockService.Process();
     }
 
     [Benchmark]
-    public async Task SemaphoreService()
+    public void SemaphoreService()
     {
-        for (var i = 0; i < 1000000; i++)
-        {
-            await _semaphoreService.Process();
-        }
+        _semaphoreService.Process();
+    }
+
+    [Benchmark]
+    public async Task AsyncSemaphoreService()
+    {
+        await _asyncSemaphoreService.Process();
     }
 
     [GlobalCleanup]
@@ -156,6 +185,7 @@ public class NoLockVsLockVsAsyncLockVsSemaphore
         _noLockService.Dispose();
         _lockService.Dispose();
         await _asyncLockService.DisposeAsync();
-        await _semaphoreService.DisposeAsync();
+        _semaphoreService.Dispose();
+        await _asyncSemaphoreService.DisposeAsync();
     }
 }
