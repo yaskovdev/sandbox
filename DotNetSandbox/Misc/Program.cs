@@ -121,3 +121,8 @@ Console.WriteLine(maxOrderedId is null);
 // ----
 
 new InterlockedSandbox().Run();
+
+// ----
+
+var eventSource = new CustomEventSource();
+Console.WriteLine(eventSource.Name);
