@@ -12,7 +12,6 @@
     <ItemGroup>
         <ProjectReference Include="..\NativeLibrary\NativeLibrary.vcxproj" />
         <Content Include="..\$(Platform)\$(Configuration)\*.dll">
-            <Link>NativeLibrary.dll</Link>
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
