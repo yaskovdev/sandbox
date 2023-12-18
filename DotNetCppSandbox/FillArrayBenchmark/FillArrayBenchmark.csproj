@@ -18,10 +18,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NativeLibrary\NativeLibrary.vcxproj" />
         <Content Include="..\$(Platform)\$(Configuration)\NativeLibrary.dll">
-            <Link>NativeLibrary.dll</Link>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 

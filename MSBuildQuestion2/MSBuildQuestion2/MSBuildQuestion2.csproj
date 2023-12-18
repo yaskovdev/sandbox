@@ -13,4 +13,10 @@
         <ProjectReference Include="..\NativeLibraryWrapper\NativeLibraryWrapper.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="..\$(Platform)\$(Configuration)\*.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>
