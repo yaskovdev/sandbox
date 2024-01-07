@@ -86,8 +86,8 @@ int main(int argc, char **argv) {
 
         if (SCALE) {
             // The width and height of the decoded frames announced by the sender. They are different from the actual width and height of the decoded frames, and that is the problem.
-            int announced_width = 1920;
-            int announced_height = 1080;
+            int announced_width = 424;
+            int announced_height = 240;
             SwsContext* sws_context = sws_getContext(announced_width, announced_height, AV_PIX_FMT_YUV420P, announced_width, announced_height, AV_PIX_FMT_NV12, SWS_BILINEAR, nullptr, nullptr, nullptr);
             uint8_t* dst_data[4];
             int dst_line_size[4];

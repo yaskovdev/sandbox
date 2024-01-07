@@ -126,3 +126,13 @@ new InterlockedSandbox().Run();
 
 var eventSource = new CustomEventSource();
 Console.WriteLine(eventSource.Name);
+
+// ----
+
+// object? arg = null;
+// var state = (bool) arg;
+
+// ----
+
+var strings = new List<string> { "a", "b", "c" };
+Console.WriteLine(string.Join(", ", strings));
