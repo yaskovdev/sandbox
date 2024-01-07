@@ -1,7 +1,10 @@
 import os
 
+os.environ["KERAS_BACKEND"] = "torch"
+
 import numpy as np
 import regex as re
+import keras_core as keras
 import torch
 
 cwd = os.path.dirname(__file__)
@@ -61,15 +64,23 @@ def get_batch(vectorized_songs, seq_length, batch_size):
     # randomly choose the starting indices for the examples in the training batch
     idx = np.random.choice(n - seq_length, batch_size)
 
-    '''TODO: construct a list of input sequences for the training batch'''
     input_batch = [vectorized_songs[i:i + seq_length] for i in idx]
-    '''TODO: construct a list of output sequences for the training batch'''
     output_batch = [vectorized_songs[i + 1:i + seq_length + 1] for i in idx]
 
     # x_batch, y_batch provide the true inputs and targets for network training
     x_batch = np.reshape(input_batch, [batch_size, seq_length])
     y_batch = np.reshape(output_batch, [batch_size, seq_length])
     return x_batch, y_batch
+
+
+def LSTM(rnn_units):
+    return keras.layers.LSTM(
+        rnn_units,
+        return_sequences=True,
+        recurrent_initializer='glorot_uniform',
+        recurrent_activation='sigmoid',
+        stateful=True,
+    )
 
 
 if __name__ == '__main__':
@@ -118,5 +129,7 @@ if __name__ == '__main__':
         print("Step {:3d}".format(i))
         print("  input: {} ({:s})".format(input_idx, repr(idx2char[input_idx])))
         print("  expected output: {} ({:s})".format(target_idx, repr(idx2char[target_idx])))
+
+    print(LSTM(4))
 
     pass
