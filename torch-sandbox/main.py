@@ -1,10 +1,8 @@
 import os
 
-os.environ["KERAS_BACKEND"] = "torch"
-
+import keras_core as keras
 import numpy as np
 import regex as re
-import keras_core as keras
 import torch
 
 cwd = os.path.dirname(__file__)
@@ -79,7 +77,7 @@ def LSTM(rnn_units):
         return_sequences=True,
         recurrent_initializer='glorot_uniform',
         recurrent_activation='sigmoid',
-        stateful=True,
+        stateful=True
     )
 
 

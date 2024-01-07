@@ -8,6 +8,10 @@
 4. Follow [this guide](https://pytorch.org/get-started/locally/) to install PyTorch.
 5. If you are using PyCharm, make sure to [pick the Conda environment](https://stackoverflow.com/a/46133678/1862286) you
    have just created.
-6. `pip install keras-core==0.1.2`
-7. Create new environment variable `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION` and set it to `python`.
-8. Make sure that `backend` is `torch` in `keras.json`.
+6. `pip install keras-core==0.1.5` (you can try the latest available)
+7. Make sure that `backend` is `torch` in `keras.json`. On Windows, the file is usually located
+   in `$env:USERPROFILE\.keras`.
+
+## Troubleshooting
+
+1. Draft: `pip uninstall tensorflow`, ` pip uninstall keras`.
