@@ -96,8 +96,6 @@ if __name__ == '__main__':
     # Join our list of song strings into a single string containing all songs
     songs_joined = "\n\n".join(songs)
 
-    print(songs_joined)
-
     # Find all unique characters in the joined string
     vocab = sorted(set(songs_joined))
     print("There are", len(vocab), "unique characters in the dataset")
@@ -139,8 +137,12 @@ if __name__ == '__main__':
     model.summary()
 
     x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
-    pred = model(x)
+    prediction = model(x)
     print("Input shape:      ", x.shape, " # (batch_size, sequence_length)")
-    print("Prediction shape: ", pred.shape, "# (batch_size, sequence_length, vocab_size)")
+    print("Prediction shape: ", prediction.shape, "# (batch_size, sequence_length, vocab_size)")
+    # TODO: check if this is the correct replacement of tf.random.categorical
+    sampled_indices = torch.squeeze(torch.multinomial(torch.exp(prediction[0]), 1, replacement=True)).numpy()
+    print("Prediction: ", sampled_indices)
 
-    pass
+    print("Input: \n", repr("".join(idx2char[x[0]])))
+    print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
