@@ -71,20 +71,19 @@ def get_batch(vectorized_songs, seq_length, batch_size):
     return x_batch, y_batch
 
 
-def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
-    embedding_layer = keras.layers.Embedding(vocab_size, embedding_dim)
+def build_model(vocabulary_size, embedding_dim, rnn_units, batch_size):
     return keras.Sequential([
-        keras.layers.Input(shape=(None,), batch_size=batch_size), # TODO: check the shape parameter docs
+        keras.layers.Input(shape=(None,), batch_size=batch_size),  # TODO: check the shape parameter docs
         # Layer 1: Embedding layer to transform indices into dense vectors
         #   of a fixed embedding size
-        embedding_layer,
+        keras.layers.Embedding(vocabulary_size, embedding_dim),
 
         # Layer 2: LSTM with `rnn_units` number of units.
         keras.layers.LSTM(rnn_units, return_sequences=True, recurrent_initializer='glorot_uniform', recurrent_activation='sigmoid', stateful=True),
 
         # Layer 3: Dense (fully-connected) layer that transforms the LSTM output
         #   into the vocabulary size.
-        keras.layers.Dense(vocab_size),
+        keras.layers.Dense(vocabulary_size),
     ])
 
 
