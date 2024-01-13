@@ -61,6 +61,11 @@ def build_model(vocabulary_size, embedding_dim, rnn_units, batch_size):
     ])
 
 
+def compute_loss(labels, logits):
+    loss = torch.nn.CrossEntropyLoss()
+    return loss(labels, logits)
+
+
 if __name__ == '__main__':
     # assert_gpu_available()
     print("Ready to go")
@@ -110,3 +115,5 @@ if __name__ == '__main__':
 
     print("Input: \n", repr("".join(idx2char[x[0]])))
     print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
+
+    example_batch_loss = compute_loss(prediction, torch.from_numpy(y))
