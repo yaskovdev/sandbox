@@ -61,9 +61,9 @@ def build_model(vocabulary_size, embedding_dim, rnn_units, batch_size):
     ])
 
 
-def compute_loss(labels, logits):
-    loss = torch.nn.CrossEntropyLoss()
-    return loss(labels, logits)
+def compute_loss(input, target):
+    loss = torch.nn.CrossEntropyLoss(reduction='none')  # TODO: check if have to reduce
+    return loss(input.cpu().permute((0, 2, 1)), target.long())  # TODO: cpu()
 
 
 if __name__ == '__main__':
@@ -110,10 +110,11 @@ if __name__ == '__main__':
     print("Input shape:      ", x.shape, " # (batch_size, sequence_length)")
     print("Prediction shape: ", prediction.shape, "# (batch_size, sequence_length, vocab_size)")
     # TODO: check if this is the correct replacement of tf.random.categorical
-    sampled_indices = torch.squeeze(torch.multinomial(torch.exp(prediction[0]), 1, replacement=True)).numpy()
+    sampled_indices = torch.squeeze(torch.multinomial(torch.exp(prediction[0]), 1, replacement=True)).cpu()
     print("Prediction: ", sampled_indices)
 
     print("Input: \n", repr("".join(idx2char[x[0]])))
+    print("Target: \n", repr("".join(idx2char[y[0]])))
     print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
 
-    example_batch_loss = compute_loss(prediction, torch.from_numpy(y))
+    print(compute_loss(prediction, torch.from_numpy(y)))
