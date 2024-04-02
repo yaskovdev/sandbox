@@ -52,11 +52,14 @@ AVPixelFormat GetFormatAndLogSupportedFormats(AVCodecContext *context, const AVP
 }
 
 int main(int argc, char **argv) {
+    char buff[AV_ERROR_MAX_STRING_SIZE];
+    av_make_error_string(buff, AV_ERROR_MAX_STRING_SIZE, -542398533);
+    std::cout << buff << "\n";
+    std::cout << "Decoding started..." << "\n";
     if (argc < 3) {
         std::cout << "Specify full path to input packet and output frame" << "\n";
         exit(-1);
     }
-    std::cout << "Decoding started..." << "\n";
 
     int align = 1;
 

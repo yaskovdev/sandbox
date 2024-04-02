@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Numerics;
 using System.Web;
 using Misc;
@@ -136,3 +137,14 @@ Console.WriteLine(eventSource.Name);
 
 var strings = new List<string> { "a", "b", "c" };
 Console.WriteLine(string.Join(", ", strings));
+
+// ----
+
+const ulong unsignedLongValue = 1234567890;
+Console.WriteLine(unsignedLongValue.ToString());
+Console.WriteLine(unsignedLongValue.ToString(CultureInfo.InvariantCulture));
+
+// ----
+
+bool val = false;
+Console.WriteLine(val.ToString() + " " + val.ToString(CultureInfo.InvariantCulture));

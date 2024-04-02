@@ -1,4 +1,6 @@
-﻿namespace HttpClient
+﻿using System.Net.Http;
+
+namespace HttpClient
 {
     using System;
     using System.Collections.Generic;
@@ -34,19 +36,40 @@
 
             // ----
 
-            var downloader = new FileDownloader();
-            foreach (var url in Urls)
+            // var downloader = new FileDownloader();
+            // foreach (var url in Urls)
+            // {
+            //     Console.WriteLine("URL is " + url);
+            //     try
+            //     {
+            //         Console.WriteLine("Downloaded " + await downloader.DownloadFile(new Uri(url)) + " bytes from the URL " + url);
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         Console.WriteLine("Error happened" + e);
+            //     }
+            // }
+
+            // ----
+
+            try
             {
-                Console.WriteLine("URL is " + url);
-                try
-                {
-                    Console.WriteLine("Downloaded " + await downloader.DownloadFile(new Uri(url)) + " bytes from the URL " + url);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error happened" + e);
-                }
+                using var request = new HttpRequestMessage(HttpMethod.Post, "https://s2s.config.ecs.infra.gov.teams.microsoft.us/config/v1/ATM/1.0/Monitoring")
+                // {
+                //     Content = ThrowExceptionWhileCreatingContent()
+                // }
+                    ;
+                request.Content = ThrowExceptionWhileCreatingContent();
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception happened while creating content: " + e);
+            }
+        }
+
+        private static HttpContent ThrowExceptionWhileCreatingContent()
+        {
+            throw new Exception("Oops");
         }
     }
 }
