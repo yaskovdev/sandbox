@@ -4,6 +4,7 @@ import keras_core as keras
 import numpy as np
 import regex as re
 import torch
+from torchvision.models import resnet18, ResNet18_Weights
 
 cwd = os.path.dirname(__file__)
 
@@ -46,22 +47,29 @@ def get_batch(vectorized_songs, seq_length, batch_size):
 
 
 def build_model(vocabulary_size, embedding_dim, rnn_units, batch_size):
+    shape = (100,)  # TODO: check the shape parameter docs, it was (None, ) previously
+    stateful = False  # TODO: check why setting it to True fails the call to loss.backward()
     return keras.Sequential([
-        keras.layers.Input(shape=(None,), batch_size=batch_size),  # TODO: check the shape parameter docs
+        keras.layers.Input(shape=shape, batch_size=batch_size),
         keras.layers.Embedding(vocabulary_size, embedding_dim),
-        keras.layers.LSTM(rnn_units, return_sequences=True, recurrent_initializer='glorot_uniform', recurrent_activation='sigmoid', stateful=True),
+        keras.layers.LSTM(rnn_units, return_sequences=True, recurrent_initializer='glorot_uniform', recurrent_activation='sigmoid', stateful=stateful),
         keras.layers.Dense(vocabulary_size)
     ])
 
 
-def compute_loss(input, target):
-    loss = torch.nn.CrossEntropyLoss(reduction='none')  # TODO: check if have to reduce
-    return loss(input.cpu().permute((0, 2, 1)), target.long())  # TODO: cpu()
-
-
 if __name__ == '__main__':
+    torch.autograd.set_detect_anomaly(True)
     # assert_gpu_available()
     print("Ready to go")
+
+    # model = resnet18(weights=ResNet18_Weights.DEFAULT)
+    # data = torch.rand(1, 3, 64, 64)
+    # labels = torch.rand(1, 1000)
+    # prediction = model(data)  # forward pass
+    # loss = (prediction - labels).sum()
+    # loss.backward()  # backward pass
+    # print("Done")
+
     songs = load_training_data()
     example_song = songs[0]
 
@@ -100,6 +108,13 @@ if __name__ == '__main__':
 
     x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
     prediction = model(x)
+    # y = torch.rand(32, 83).long().cuda()
+
+    loss_fn = torch.nn.CrossEntropyLoss(reduction='sum')
+    loss = loss_fn(prediction.permute((0, 2, 1)), torch.from_numpy(y).long().cuda())
+    print(loss)
+    loss.backward()
+
     print("Input shape:      ", x.shape, " # (batch_size, sequence_length)")
     print("Prediction shape: ", prediction.shape, "# (batch_size, sequence_length, vocab_size)")
     # TODO: check if this is the correct replacement of tf.random.categorical
@@ -109,5 +124,3 @@ if __name__ == '__main__':
     print("Input: \n", repr("".join(idx2char[x[0]])))
     print("Target: \n", repr("".join(idx2char[y[0]])))
     print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
-
-    print(compute_loss(prediction, torch.from_numpy(y)))
