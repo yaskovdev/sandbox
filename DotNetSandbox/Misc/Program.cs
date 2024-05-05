@@ -148,3 +148,14 @@ Console.WriteLine(unsignedLongValue.ToString(CultureInfo.InvariantCulture));
 
 bool val = false;
 Console.WriteLine(val.ToString() + " " + val.ToString(CultureInfo.InvariantCulture));
+
+// ----
+
+
+await Task.Run(() =>
+{
+    Console.WriteLine("Hello from task!");
+    throw new NullReferenceException();
+});
+
+await Task.Delay(1000);

@@ -4,15 +4,16 @@ namespace Threading;
 
 public class Participant
 {
-    private IImmutableSet<int> _states = ImmutableHashSet.Create(2);
+    private IImmutableSet<int> _states = ImmutableHashSet.Create(1);
 
     public bool UpdatePublishedStateTypes(IImmutableSet<int> newPublishedStateTypes, out IImmutableSet<int> oldPublishedStateTypes)
     {
-        oldPublishedStateTypes = _states;
-        Thread.Sleep(2000);
-        while (oldPublishedStateTypes != Interlocked.CompareExchange(ref _states, newPublishedStateTypes, oldPublishedStateTypes))
+        do
         {
-        }
+            oldPublishedStateTypes = _states;
+        } while (oldPublishedStateTypes != Interlocked.CompareExchange(ref _states, newPublishedStateTypes, oldPublishedStateTypes));
+        
+        Thread.Sleep(1000);
 
         return !newPublishedStateTypes.SetEquals(oldPublishedStateTypes);
     }

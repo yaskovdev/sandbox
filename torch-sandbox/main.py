@@ -4,6 +4,7 @@ import keras_core as keras
 import numpy as np
 import regex as re
 import torch
+from torch.nn.functional import log_softmax, softmax
 from torchvision.models import resnet18, ResNet18_Weights
 
 cwd = os.path.dirname(__file__)
@@ -61,6 +62,8 @@ if __name__ == '__main__':
     torch.autograd.set_detect_anomaly(True)
     # assert_gpu_available()
     print("Ready to go")
+    # m = torch.nn.LogSoftmax(dim=-1)
+    # print(softmax(torch.Tensor([0, 0, 0, 1])))
 
     # model = resnet18(weights=ResNet18_Weights.DEFAULT)
     # data = torch.rand(1, 3, 64, 64)
@@ -106,21 +109,28 @@ if __name__ == '__main__':
 
     model.summary()
 
-    x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
-    prediction = model(x)
-    # y = torch.rand(32, 83).long().cuda()
+    loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')  # TODO: reduction
+    optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+    for i in range(100):
+        x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
+        optim.zero_grad()
+        prediction = model(x)
+        loss = loss_fn(prediction.permute((0, 2, 1)).cpu(), torch.from_numpy(y).long())  # TODO: use CUDA
+        if i % 1 == 0:
+            print(i, loss.item())
+        loss.backward()
+        optim.step()
 
-    loss_fn = torch.nn.CrossEntropyLoss(reduction='sum')
-    loss = loss_fn(prediction.permute((0, 2, 1)), torch.from_numpy(y).long().cuda())
-    print(loss)
-    loss.backward()
-
-    print("Input shape:      ", x.shape, " # (batch_size, sequence_length)")
-    print("Prediction shape: ", prediction.shape, "# (batch_size, sequence_length, vocab_size)")
+    x_answer, y_answer = get_batch(vectorized_songs, seq_length=100, batch_size=32)
+    answer = model(x_answer)
+    print("Input shape:      ", x_answer.shape, " # (batch_size, sequence_length)")
+    print("Prediction shape: ", answer.shape, "# (batch_size, sequence_length, vocab_size)")
+    # softmax(answer[0])
     # TODO: check if this is the correct replacement of tf.random.categorical
-    sampled_indices = torch.squeeze(torch.multinomial(torch.exp(prediction[0]), 1, replacement=True)).cpu()
+    # TODO: check softmax documentation, there is also log_softmax and torch.nn.LogSoftmax(dim=0)
+    sampled_indices = torch.squeeze(torch.multinomial(softmax(answer[0], dim=0), 1, replacement=True)).cpu()
     print("Prediction: ", sampled_indices)
 
-    print("Input: \n", repr("".join(idx2char[x[0]])))
-    print("Target: \n", repr("".join(idx2char[y[0]])))
+    print("Input: \n", repr("".join(idx2char[x_answer[0]])))
+    print("Target: \n", repr("".join(idx2char[y_answer[0]])))
     print("Next Char Predictions: \n", repr("".join(idx2char[sampled_indices])))
