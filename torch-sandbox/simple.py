@@ -1,9 +1,6 @@
-import math
-
 import keras_core as keras
 import numpy as np
 import torch
-from PIL import Image
 from torch.nn.functional import softmax
 
 import mnist_loader
@@ -61,11 +58,11 @@ validation_targets = validation_data[1]
 validation_input_batches = split_into_batches(validation_inputs, BATCH_SIZE)
 validation_target_batches = split_into_batches(validation_targets, BATCH_SIZE)
 
-for i in range(min(10, len(validation_input_batches))):
+for i in range(min(100, len(validation_input_batches))):
     input_batch = validation_input_batches[i]
     target_batch = validation_target_batches[i]
     prediction = model(input_batch)
     distribution = softmax(prediction, dim=1)
     answer = torch.squeeze(torch.multinomial(distribution, 1, replacement=True))
-    print(distribution)
-    print(answer)
+    right_answers = np.sum(answer.cpu().numpy() == target_batch)
+    print("Got ", right_answers, " out of ", len(target_batch))
