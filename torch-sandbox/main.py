@@ -4,8 +4,7 @@ import keras_core as keras
 import numpy as np
 import regex as re
 import torch
-from torch.nn.functional import log_softmax, softmax
-from torchvision.models import resnet18, ResNet18_Weights
+from torch.nn.functional import softmax
 
 cwd = os.path.dirname(__file__)
 

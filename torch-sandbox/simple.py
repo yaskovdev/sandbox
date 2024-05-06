@@ -5,10 +5,14 @@ from torch.nn.functional import softmax
 
 import mnist_loader
 
-batch_size = 20
+BATCH_SIZE = 20
 
 
-def build_model():
+def split_into_batches(array, batch_size):
+    return np.array_split(array, range(batch_size, len(array), batch_size))
+
+
+def build_model(batch_size):
     return keras.Sequential([
         keras.layers.Input(shape=(784,), batch_size=batch_size),
         keras.layers.Dense(units=16),
@@ -19,7 +23,7 @@ def build_model():
 
 print("Ready to go")
 
-model = build_model()
+model = build_model(BATCH_SIZE)
 
 model.summary()
 
@@ -29,13 +33,18 @@ model.summary()
 # Image.fromarray((255 * np.reshape(image, (math.isqrt(image.size), -1))).astype('uint8')).show()
 
 data = mnist_loader.load_data()
+
 training_data = data[0]
+training_inputs = training_data[0]
+training_targets = training_data[1]
+training_input_batches = split_into_batches(training_inputs, BATCH_SIZE)
+training_target_batches = split_into_batches(training_targets, BATCH_SIZE)
+
 validation_data = data[1]
 validation_inputs = validation_data[0]
 validation_targets = validation_data[1]
-
-validation_input_batches = np.array_split(validation_inputs, range(batch_size, len(validation_inputs), batch_size))
-validation_target_batches = np.array_split(validation_targets, range(batch_size, len(validation_targets), batch_size))
+validation_input_batches = split_into_batches(validation_inputs, BATCH_SIZE)
+validation_target_batches = split_into_batches(validation_targets, BATCH_SIZE)
 
 for i in range(min(10, len(validation_input_batches))):
     input_batch = validation_input_batches[i]
