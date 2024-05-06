@@ -1,6 +1,9 @@
+import math
+
 import keras_core as keras
 import numpy as np
 import torch
+from PIL import Image
 from torch.nn.functional import softmax
 
 import mnist_loader
@@ -27,18 +30,30 @@ model = build_model(BATCH_SIZE)
 
 model.summary()
 
-# data = mnist_loader.load_data()
+data = mnist_loader.load_data()
 # image_index = 2
 # image = data[image_index][0][0]
 # Image.fromarray((255 * np.reshape(image, (math.isqrt(image.size), -1))).astype('uint8')).show()
-
-data = mnist_loader.load_data()
 
 training_data = data[0]
 training_inputs = training_data[0]
 training_targets = training_data[1]
 training_input_batches = split_into_batches(training_inputs, BATCH_SIZE)
 training_target_batches = split_into_batches(training_targets, BATCH_SIZE)
+
+loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
+
+optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+
+for i in range(len(training_input_batches)):
+    input_batch = training_input_batches[i]
+    target_batch = training_target_batches[i]
+    optim.zero_grad()
+    prediction = model(input_batch)
+    loss = loss_fn(prediction, torch.from_numpy(target_batch).long().cuda())
+    print(i, loss.item())
+    loss.backward()
+    optim.step()
 
 validation_data = data[1]
 validation_inputs = validation_data[0]
