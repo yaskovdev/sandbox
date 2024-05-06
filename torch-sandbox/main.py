@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     print('{} ---- characters mapped to int ----> {}'.format(repr(songs_joined[:10]), vectorized_songs[:10]))
 
-    x_batch, y_batch = get_batch(vectorized_songs, seq_length=5, batch_size=1)
+    x_batch, y_batch = get_batch(vectorized_songs, seq_length=5, batch_size=32)
 
     for i, (input_idx, target_idx) in enumerate(zip(np.squeeze(x_batch), np.squeeze(y_batch))):
         print("Step {:3d}".format(i))

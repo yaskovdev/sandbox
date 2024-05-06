@@ -5,7 +5,7 @@ from torch.nn.functional import softmax
 
 import mnist_loader
 
-BATCH_SIZE = 20
+BATCH_SIZE = 64
 
 
 def split_into_batches(array, batch_size):
@@ -42,12 +42,13 @@ loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
 
 optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
-for i in range(len(training_input_batches)):
-    input_batch = training_input_batches[i]
-    target_batch = training_target_batches[i]
+for i in range(5000):
+    idx = np.random.choice(len(training_inputs), BATCH_SIZE)
+    input_batch = np.reshape([training_inputs[j] for j in idx], [BATCH_SIZE, 784])
+    target_batch = [training_targets[j] for j in idx]
     optim.zero_grad()
     prediction = model(input_batch)
-    loss = loss_fn(prediction, torch.from_numpy(target_batch).long().cuda())
+    loss = loss_fn(prediction, torch.LongTensor(target_batch).cuda())
     print(i, loss.item())
     loss.backward()
     optim.step()
