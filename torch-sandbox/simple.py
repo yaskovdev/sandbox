@@ -43,9 +43,9 @@ loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
 optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
 for i in range(5000):
-    idx = np.random.choice(len(training_inputs), BATCH_SIZE)
-    input_batch = np.reshape([training_inputs[j] for j in idx], [BATCH_SIZE, 784])
-    target_batch = [training_targets[j] for j in idx]
+    indexes = np.random.choice(len(training_inputs), BATCH_SIZE)
+    input_batch = np.reshape([training_inputs[j] for j in indexes], [BATCH_SIZE, -1])
+    target_batch = [training_targets[j] for j in indexes]
     optim.zero_grad()
     prediction = model(input_batch)
     loss = loss_fn(prediction, torch.LongTensor(target_batch).cuda())
