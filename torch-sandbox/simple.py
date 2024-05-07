@@ -5,7 +5,7 @@ from torch.nn.functional import softmax
 
 import mnist_loader
 
-BATCH_SIZE = 64
+BATCH_SIZE = 50000
 
 
 def split_into_batches(array, batch_size):
@@ -40,18 +40,20 @@ training_target_batches = split_into_batches(training_targets, BATCH_SIZE)
 
 loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
 
-optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
 for i in range(5000):
-    indexes = np.random.choice(len(training_inputs), BATCH_SIZE)
-    input_batch = np.reshape([training_inputs[j] for j in indexes], [BATCH_SIZE, -1])
-    target_batch = [training_targets[j] for j in indexes]
-    optim.zero_grad()
+    input_batch = np.reshape(training_inputs, [BATCH_SIZE, -1])
+    target_batch = training_targets
     prediction = model(input_batch)
+
     loss = loss_fn(prediction, torch.LongTensor(target_batch).cuda())
-    print(i, loss.item())
+
     loss.backward()
-    optim.step()
+    optimizer.step()
+    optimizer.zero_grad()
+    if i % 10 == 0:
+        print(i, loss.item())
 
 validation_data = data[1]
 validation_inputs = validation_data[0]
