@@ -40,6 +40,15 @@ def save_digit(file_name, image):
     as_image(image).save(os.path.join(temp_dir_name, file_name + ".png"))
 
 
+def pick_max_p(distribution):
+    return [np.argmax(distribution[index].cpu().detach()) for index in range(len(distribution))]
+
+
+def sample(distribution):
+    answer = torch.squeeze(torch.multinomial(distribution, 1, replacement=True))
+    return answer.cpu().numpy()
+
+
 print("Ready to go")
 
 model = build_model(BATCH_SIZE)
@@ -56,7 +65,7 @@ loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
 
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
-for i in range(2000):
+for i in range(5000):
     input_batch = np.reshape(training_inputs, [BATCH_SIZE, -1])
     target_batch = training_targets
     prediction = model(input_batch)
@@ -82,8 +91,7 @@ for i in range(min(100, len(validation_input_batches))):
     target_batch = validation_target_batches[i]
     prediction = model(input_batch)
     distribution = softmax(prediction, dim=1)
-    answer = torch.squeeze(torch.multinomial(distribution, 1, replacement=True))
-    answer_np = answer.cpu().numpy()
+    answer_np = sample(distribution)
     right_answers = np.sum(answer_np == target_batch)
     for j in range(len(target_batch)):
         if target_batch[j] != answer_np[j]:
