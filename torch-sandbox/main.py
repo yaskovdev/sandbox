@@ -10,6 +10,7 @@ cwd = os.path.dirname(__file__)
 
 BATCH_SIZE = 128
 
+
 def assert_gpu_available():
     assert torch.cuda.is_available(), "GPU is not available"
 
@@ -111,7 +112,7 @@ if __name__ == '__main__':
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')  # TODO: reduction
     optimizer = torch.optim.Adam(model.parameters(), lr=5e-3)
-    for i in range(2000):
+    for i in range(3000):
         input_batch, target_batch = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
 
         prediction = model(input_batch)
@@ -122,6 +123,9 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         if i % 10 == 0:
             print(i, loss.item())
+        if i and i % 100 == 0:
+            torch.save(model.state_dict(), os.path.join(cwd, "models", "model_" + str(i) + ".pt"))
+            print("Model has been saved")
 
     x_answer, y_answer = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
     answer = model(x_answer)
