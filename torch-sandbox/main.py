@@ -5,10 +5,11 @@ import numpy as np
 import regex as re
 import torch
 from torch.nn.functional import softmax
+from tqdm import tqdm
 
 cwd = os.path.dirname(__file__)
 
-BATCH_SIZE = 128
+BATCH_SIZE = 64
 
 
 def assert_gpu_available():
@@ -59,10 +60,28 @@ def build_model(vocabulary_size, embedding_dim, rnn_units, batch_size):
     ])
 
 
+def generate_text(model, char_to_index, index_to_char, start_string, generation_length=1000):
+    input_eval = [char_to_index[s] for s in start_string]
+    input_eval = torch.unsqueeze(torch.tensor(input_eval), 0)
+
+    text_generated = []
+
+    tqdm._instances.clear()
+
+    for i in tqdm(range(generation_length)):
+        predictions = torch.squeeze(model(input_eval), 0)
+        predicted_index = torch.multinomial(softmax(predictions, dim=0), 1, replacement=True)[-1, 0]
+        input_eval = torch.unsqueeze(torch.unsqueeze(predicted_index, 0), 0)
+        text_generated.append(index_to_char[predicted_index.item()])
+
+    return start_string + ''.join(text_generated)
+
+
 if __name__ == '__main__':
     torch.autograd.set_detect_anomaly(True)
-    # assert_gpu_available()
+    assert_gpu_available()
     print("Ready to go")
+    torch.cuda.device_count()
     # m = torch.nn.LogSoftmax(dim=-1)
     # print(softmax(torch.Tensor([0, 0, 0, 1])))
 
@@ -88,6 +107,10 @@ if __name__ == '__main__':
 
     idx2char = np.array(vocab)
 
+    # model = build_model(len(vocab), embedding_dim=256, rnn_units=1024, batch_size=BATCH_SIZE)
+    # model.load_state_dict(torch.load(os.path.join(cwd, "models", "example_model_1400.pt"), map_location='cpu'))
+    # model.eval()
+
     print('{')
     for char, _ in zip(char2idx, range(20)):
         print('  {:4s}: {:3d},'.format(repr(char), char2idx[char]))
@@ -112,13 +135,13 @@ if __name__ == '__main__':
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')  # TODO: reduction
     optimizer = torch.optim.Adam(model.parameters(), lr=5e-3)
-    for i in range(3000):
+    for i in range(1200):
         input_batch, target_batch = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
 
         prediction = model(input_batch)
         loss = loss_fn(prediction.permute((0, 2, 1)).cpu(), torch.from_numpy(target_batch).long())  # TODO: use CUDA
 
-        loss.backward()
+        loss.backward(retain_graph=True)
         optimizer.step()
         optimizer.zero_grad()
         if i % 10 == 0:
@@ -127,6 +150,7 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), os.path.join(cwd, "models", "model_" + str(i) + ".pt"))
             print("Model has been saved")
 
+    print(generate_text(model, char2idx, idx2char, 'X'))
     x_answer, y_answer = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
     answer = model(x_answer)
     print("Input shape:      ", x_answer.shape, " # (batch_size, sequence_length)")
