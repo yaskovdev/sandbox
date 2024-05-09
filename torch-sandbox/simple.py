@@ -68,8 +68,8 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 for i in range(5000):
     input_batch = np.reshape(training_inputs, [BATCH_SIZE, -1])
     target_batch = training_targets
-    prediction = model(input_batch)
 
+    prediction = model(input_batch)
     loss = loss_fn(prediction, torch.LongTensor(target_batch).cuda())
 
     loss.backward()

@@ -8,6 +8,7 @@ from torch.nn.functional import softmax
 
 cwd = os.path.dirname(__file__)
 
+BATCH_SIZE = 128
 
 def assert_gpu_available():
     assert torch.cuda.is_available(), "GPU is not available"
@@ -97,30 +98,32 @@ if __name__ == '__main__':
 
     print('{} ---- characters mapped to int ----> {}'.format(repr(songs_joined[:10]), vectorized_songs[:10]))
 
-    x_batch, y_batch = get_batch(vectorized_songs, seq_length=5, batch_size=32)
+    x_batch, y_batch = get_batch(vectorized_songs, seq_length=5, batch_size=BATCH_SIZE)
 
     for i, (input_idx, target_idx) in enumerate(zip(np.squeeze(x_batch), np.squeeze(y_batch))):
         print("Step {:3d}".format(i))
         print("  input: {} ({:s})".format(input_idx, repr(idx2char[input_idx])))
         print("  expected output: {} ({:s})".format(target_idx, repr(idx2char[target_idx])))
 
-    model = build_model(len(vocab), embedding_dim=256, rnn_units=1024, batch_size=32)
+    model = build_model(len(vocab), embedding_dim=256, rnn_units=1024, batch_size=BATCH_SIZE)
 
     model.summary()
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')  # TODO: reduction
-    optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
-    for i in range(100):
-        x, y = get_batch(vectorized_songs, seq_length=100, batch_size=32)
-        optim.zero_grad()
-        prediction = model(x)
-        loss = loss_fn(prediction.permute((0, 2, 1)).cpu(), torch.from_numpy(y).long())  # TODO: use CUDA
-        if i % 1 == 0:
-            print(i, loss.item())
-        loss.backward()
-        optim.step()
+    optimizer = torch.optim.Adam(model.parameters(), lr=5e-3)
+    for i in range(2000):
+        input_batch, target_batch = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
 
-    x_answer, y_answer = get_batch(vectorized_songs, seq_length=100, batch_size=32)
+        prediction = model(input_batch)
+        loss = loss_fn(prediction.permute((0, 2, 1)).cpu(), torch.from_numpy(target_batch).long())  # TODO: use CUDA
+
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        if i % 10 == 0:
+            print(i, loss.item())
+
+    x_answer, y_answer = get_batch(vectorized_songs, seq_length=100, batch_size=BATCH_SIZE)
     answer = model(x_answer)
     print("Input shape:      ", x_answer.shape, " # (batch_size, sequence_length)")
     print("Prediction shape: ", answer.shape, "# (batch_size, sequence_length, vocab_size)")
