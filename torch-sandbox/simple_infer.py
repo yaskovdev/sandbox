@@ -4,8 +4,8 @@ import tempfile
 
 import keras_core as keras
 import numpy as np
+import torch
 from PIL import Image
-from torch.nn.functional import softmax
 
 import mnist_loader
 from simple_common import BATCH_SIZE
@@ -27,8 +27,13 @@ def save_digit(file_name, image):
     as_image(image).save(os.path.join(temp_dir_name, file_name + ".png"))
 
 
-def pick_max_p(distribution):
+def pick_max_probability(distribution):
     return [np.argmax(distribution[index].cpu().detach()) for index in range(len(distribution))]
+
+
+def sample_probability_distribution(distribution):
+    answer = torch.squeeze(torch.multinomial(distribution, 1, replacement=True))
+    return answer.cpu().numpy()
 
 
 print("Ready to go")
@@ -51,8 +56,7 @@ for i in range(min(100, len(validation_input_batches))):
     input_batch = validation_input_batches[i]
     target_batch = validation_target_batches[i]
     prediction = model(input_batch)
-    distribution = softmax(prediction, dim=1)
-    answer_np = pick_max_p(distribution)
+    answer_np = sample_probability_distribution(prediction)
     right_answers = np.sum(answer_np == target_batch)
     for j in range(len(target_batch)):
         if target_batch[j] != answer_np[j]:
