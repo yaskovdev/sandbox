@@ -20,9 +20,9 @@ training_targets = training_data[1]
 
 loss_fn = nn.CrossEntropyLoss(reduction='mean')
 
-optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = optim.Adam(model.parameters(), lr=5e-3)
 
-for epoch in range(1000):
+for epoch in range(400):
     input_batch = np.reshape(training_inputs, [BATCH_SIZE, -1])
     target_batch = training_targets
 
