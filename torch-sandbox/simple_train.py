@@ -2,6 +2,8 @@ import os
 
 import numpy as np
 import torch
+import torch.nn as nn
+import torch.optim as optim
 
 import mnist_loader
 from simple_common import build_model, cwd, BATCH_SIZE
@@ -16,11 +18,11 @@ training_data = data[0]
 training_inputs = training_data[0]
 training_targets = training_data[1]
 
-loss_fn = torch.nn.CrossEntropyLoss(reduction='mean')
+loss_fn = nn.CrossEntropyLoss(reduction='mean')
 
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
-for i in range(1000):
+for epoch in range(1000):
     input_batch = np.reshape(training_inputs, [BATCH_SIZE, -1])
     target_batch = training_targets
 
@@ -30,8 +32,8 @@ for i in range(1000):
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
-    if i % 10 == 0:
-        print(i, loss.item())
+    if epoch % 10 == 0:
+        print(epoch, loss.item())
 
 file_name = "simple_model.keras"
 model.save(os.path.join(cwd, "models", file_name))
