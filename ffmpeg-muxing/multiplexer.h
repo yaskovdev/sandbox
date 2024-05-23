@@ -59,38 +59,39 @@ public:
     void finalize();
 
 private:
+    char *buf_ = nullptr;
     output_stream audio_stream_ = {};
     output_stream video_stream_ = {};
     AVFormatContext *format_context_;
     int has_audio_ = 0;
     int has_video_ = 0;
 
-    static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
+    void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
-    static int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
+    int write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStream *st, AVFrame *frame, AVPacket *pkt);
 
     static void add_stream(output_stream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, audio_config audio_config,
         video_config video_config);
 
-    static void open_audio(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
+    void open_audio(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
 
-    static void open_video(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
+    void open_video(const AVCodec *codec, output_stream *ost, AVDictionary *opt_arg);
 
     static void close_stream(output_stream *ost);
 
     static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
 
-    static char *error_to_string(int errnum);
+    char *error_to_string(int errnum);
 
     static char *make_error_string(char *errbuf, size_t errbuf_size, int errnum);
 
     static char *ts_make_string(char *buf, int64_t ts);
 
-    static char *ts_to_string(int64_t ts);
+    char *ts_to_string(int64_t ts);
 
     static char *ts_make_time_string(char *buf, int64_t ts, AVRational *tb);
 
-    static char *time_to_string(int64_t ts, AVRational *tb);
+    char *time_to_string(int64_t ts, AVRational *tb);
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H

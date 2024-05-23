@@ -4,6 +4,7 @@
 
 multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config audio_config,
                          video_config video_config) {
+    buf_ = new char[AV_TS_MAX_STRING_SIZE];
     const AVCodec *audio_codec;
     const AVCodec *video_codec;
     int ret;
@@ -373,8 +374,7 @@ void multiplexer::close_stream(output_stream *ost) {
 }
 
 char *multiplexer::time_to_string(int64_t ts, AVRational *tb) {
-    char buf[AV_TS_MAX_STRING_SIZE];
-    return ts_make_time_string(buf, ts, tb);
+    return ts_make_time_string(buf_, ts, tb);
 }
 
 char *multiplexer::ts_make_time_string(char *buf, int64_t ts, AVRational *tb) {
@@ -384,8 +384,7 @@ char *multiplexer::ts_make_time_string(char *buf, int64_t ts, AVRational *tb) {
 }
 
 char *multiplexer::ts_to_string(int64_t ts) {
-    char buf[AV_TS_MAX_STRING_SIZE];
-    return av_ts_make_string(buf, ts);
+    return av_ts_make_string(buf_, ts);
 }
 
 char *multiplexer::ts_make_string(char *buf, int64_t ts) {
@@ -395,8 +394,7 @@ char *multiplexer::ts_make_string(char *buf, int64_t ts) {
 }
 
 char *multiplexer::error_to_string(int errnum) {
-    char buf[AV_TS_MAX_STRING_SIZE];
-    return make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum);
+    return make_error_string(buf_, AV_ERROR_MAX_STRING_SIZE, errnum);
 }
 
 char *multiplexer::make_error_string(char *errbuf, size_t errbuf_size, int errnum) {
