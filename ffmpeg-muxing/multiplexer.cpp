@@ -2,7 +2,8 @@
 #include <cstdlib>
 #include <cstdio>
 
-multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config audio_config, video_config video_config) {
+multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config audio_config,
+                         video_config video_config) {
     const AVCodec *audio_codec;
     const AVCodec *video_codec;
     int ret;
@@ -23,11 +24,13 @@ multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config a
     // Add the audio and video streams using the default format codecs and initialize the codecs.
     if (output_format->video_codec != AV_CODEC_ID_NONE) {
         printf("Video codec is %d\n", output_format->video_codec);
-        add_stream(&video_stream_, format_context_, &video_codec, output_format->video_codec, audio_config, video_config);
+        add_stream(&video_stream_, format_context_, &video_codec, output_format->video_codec, audio_config,
+                   video_config);
         has_video_ = 1;
     }
     if (output_format->audio_codec != AV_CODEC_ID_NONE) {
-        add_stream(&audio_stream_, format_context_, &audio_codec, output_format->audio_codec, audio_config, video_config);
+        add_stream(&audio_stream_, format_context_, &audio_codec, output_format->audio_codec, audio_config,
+                   video_config);
         has_audio_ = 1;
     }
 
@@ -45,7 +48,7 @@ multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config a
     if (!(output_format->flags & AVFMT_NOFILE)) {
         ret = avio_open(&format_context_->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
-            fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
+            fprintf(stderr, "Could not open '%s': %s\n", filename, error_to_string(ret));
             exit(1);
         }
     }
@@ -53,7 +56,7 @@ multiplexer::multiplexer(const char *filename, AVDictionary *opt, audio_config a
     /* Write the stream header, if any. */
     ret = avformat_write_header(format_context_, &opt);
     if (ret < 0) {
-        fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
+        fprintf(stderr, "Error occurred when opening output file: %s\n", error_to_string(ret));
         exit(1);
     }
 }
@@ -64,7 +67,7 @@ int multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
     // send the frame_ to the encoder
     ret = avcodec_send_frame(c, frame);
     if (ret < 0) {
-        fprintf(stderr, "Error sending a frame_ to the encoder: %s\n", av_err2str(ret));
+        fprintf(stderr, "Error sending a frame_ to the encoder: %s\n", error_to_string(ret));
         exit(1);
     }
 
@@ -73,7 +76,7 @@ int multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
             break;
         else if (ret < 0) {
-            fprintf(stderr, "Error encoding a frame_: %s\n", av_err2str(ret));
+            fprintf(stderr, "Error encoding a frame_: %s\n", error_to_string(ret));
             exit(1);
         }
 
@@ -88,7 +91,7 @@ int multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
          * its contents and resets pkt), so that no unreferencing is necessary.
          * This would be different if one used av_write_frame(). */
         if (ret < 0) {
-            fprintf(stderr, "Error while writing output packet: %s\n", av_err2str(ret));
+            fprintf(stderr, "Error while writing output packet: %s\n", error_to_string(ret));
             exit(1);
         }
     }
@@ -99,15 +102,16 @@ int multiplexer::write_frame(AVFormatContext *fmt_ctx, AVCodecContext *c, AVStre
 void multiplexer::log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt) {
     AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
     printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
-        av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),
-        av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),
-        av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),
-        pkt->stream_index);
+           ts_to_string(pkt->pts), time_to_string(pkt->pts, time_base),
+           ts_to_string(pkt->dts), time_to_string(pkt->dts, time_base),
+           ts_to_string(pkt->duration), time_to_string(pkt->duration, time_base),
+           pkt->stream_index);
 }
 
 /* Add an output stream. */
-void multiplexer::add_stream(output_stream *ost, AVFormatContext *format_context, const AVCodec **codec, enum AVCodecID codec_id, audio_config audio_config,
-    video_config video_config) {
+void multiplexer::add_stream(output_stream *ost, AVFormatContext *format_context, const AVCodec **codec,
+                             enum AVCodecID codec_id, audio_config audio_config,
+                             video_config video_config) {
     AVCodecContext *c;
     int i;
 
@@ -203,7 +207,7 @@ void multiplexer::open_audio(const AVCodec *codec, output_stream *ost, AVDiction
     ret = avcodec_open2(c, codec, &opt);
     av_dict_free(&opt);
     if (ret < 0) {
-        fprintf(stderr, "Could not open audio codec: %s\n", av_err2str(ret));
+        fprintf(stderr, "Could not open audio codec: %s\n", error_to_string(ret));
         exit(1);
     }
 
@@ -236,7 +240,8 @@ void multiplexer::open_audio(const AVCodec *codec, output_stream *ost, AVDiction
     }
 }
 
-AVFrame *multiplexer::alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples) {
+AVFrame *multiplexer::alloc_audio_frame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate,
+                                        int nb_samples) {
     AVFrame *frame = av_frame_alloc();
     int ret;
 
@@ -275,11 +280,13 @@ int multiplexer::write_audio_frame(AVFrame *frame) {
     if (frame) {
         /* convert samples from native format to destination codec format, using the resampler */
         /* compute destination number of samples */
-        dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_stream_.swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(audio_stream_.swr_ctx, c->sample_rate) + frame->nb_samples,
+                                        c->sample_rate, c->sample_rate, AV_ROUND_UP);
         av_assert0(dst_nb_samples == frame->nb_samples);
 
         if (audio_stream_.frame == nullptr) {
-            audio_stream_.frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, frame->nb_samples);
+            audio_stream_.frame = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate,
+                                                    frame->nb_samples);
         }
 
         /* when we pass a frame_ to the encoder, it may keep a reference to it
@@ -291,7 +298,8 @@ int multiplexer::write_audio_frame(AVFrame *frame) {
             exit(1);
 
         /* convert to destination format */
-        ret = swr_convert(audio_stream_.swr_ctx, audio_stream_.frame->data, dst_nb_samples, (const uint8_t **) frame->data, frame->nb_samples);
+        ret = swr_convert(audio_stream_.swr_ctx, audio_stream_.frame->data, dst_nb_samples,
+                          (const uint8_t **) frame->data, frame->nb_samples);
         if (ret < 0) {
             fprintf(stderr, "Error while converting\n");
             exit(1);
@@ -316,7 +324,7 @@ void multiplexer::open_video(const AVCodec *codec, output_stream *ost, AVDiction
     ret = avcodec_open2(c, codec, &opt);
     av_dict_free(&opt);
     if (ret < 0) {
-        fprintf(stderr, "Could not open video codec: %s\n", av_err2str(ret));
+        fprintf(stderr, "Could not open video codec: %s\n", error_to_string(ret));
         exit(1);
     }
 
@@ -362,4 +370,36 @@ void multiplexer::close_stream(output_stream *ost) {
     av_frame_free(&ost->frame);
     av_packet_free(&ost->tmp_pkt);
     swr_free(&ost->swr_ctx);
+}
+
+char *multiplexer::time_to_string(int64_t ts, AVRational *tb) {
+    char buf[AV_TS_MAX_STRING_SIZE];
+    return ts_make_time_string(buf, ts, tb);
+}
+
+char *multiplexer::ts_make_time_string(char *buf, int64_t ts, AVRational *tb) {
+    if (ts == AV_NOPTS_VALUE) snprintf(buf, AV_TS_MAX_STRING_SIZE, "NOPTS");
+    else snprintf(buf, AV_TS_MAX_STRING_SIZE, "%.6g", av_q2d(*tb) * ts);
+    return buf;
+}
+
+char *multiplexer::ts_to_string(int64_t ts) {
+    char buf[AV_TS_MAX_STRING_SIZE];
+    return av_ts_make_string(buf, ts);
+}
+
+char *multiplexer::ts_make_string(char *buf, int64_t ts) {
+    if (ts == AV_NOPTS_VALUE) snprintf(buf, AV_TS_MAX_STRING_SIZE, "NOPTS");
+    else snprintf(buf, AV_TS_MAX_STRING_SIZE, "%" PRId64, ts);
+    return buf;
+}
+
+char *multiplexer::error_to_string(int errnum) {
+    char buf[AV_TS_MAX_STRING_SIZE];
+    return make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum);
+}
+
+char *multiplexer::make_error_string(char *errbuf, size_t errbuf_size, int errnum) {
+    av_strerror(errnum, errbuf, errbuf_size);
+    return errbuf;
 }

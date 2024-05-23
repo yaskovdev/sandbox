@@ -79,6 +79,18 @@ private:
     static void close_stream(output_stream *ost);
 
     static AVFrame *alloc_audio_frame(AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
+
+    static char *error_to_string(int errnum);
+
+    static char *make_error_string(char *errbuf, size_t errbuf_size, int errnum);
+
+    static char *ts_make_string(char *buf, int64_t ts);
+
+    static char *ts_to_string(int64_t ts);
+
+    static char *ts_make_time_string(char *buf, int64_t ts, AVRational *tb);
+
+    static char *time_to_string(int64_t ts, AVRational *tb);
 };
 
 #endif //FFMPEG_MUXING_MULTIPLEXER_H
