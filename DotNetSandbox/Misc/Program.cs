@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Web;
 using Misc;
 using Misc.Model;
+using Newtonsoft.Json;
 
 Console.WriteLine("Hello, World!");
 
@@ -152,10 +153,16 @@ Console.WriteLine(val.ToString() + " " + val.ToString(CultureInfo.InvariantCultu
 // ----
 
 
-await Task.Run(() =>
-{
-    Console.WriteLine("Hello from task!");
-    throw new NullReferenceException();
-});
+// await Task.Run(() =>
+// {
+//     Console.WriteLine("Hello from task!");
+//     throw new NullReferenceException();
+// });
+//
+// await Task.Delay(1000);
 
-await Task.Delay(1000);
+// ----
+
+var deserialize = JsonConvert.DeserializeObject<Dummy>("{\"InstanceUuid\":\"newValue\",\"Title\":\"title\"}");
+Console.WriteLine("Title: " + deserialize?.Title);// --> "Title: title"
+Console.WriteLine("InstanceUuid: " + deserialize?.InstanceUuid); // --> "InstanceUuid: " <---- lost during deserialization
