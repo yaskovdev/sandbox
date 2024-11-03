@@ -1,0 +1,6 @@
+@AspNetSandbox_HostAddress = http://localhost:5007
+
+GET {{AspNetSandbox_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
