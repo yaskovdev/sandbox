@@ -8,7 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IStatelessService, StatelessService>();
 builder.Services.AddSingleton<ISingletonDependency, SingletonDependency>();
-builder.Services.AddSingleton<IStatefulServiceFactory, StatefulServiceFactory>();
+builder.Services.AddSingleton<ISocketHandlerFactory, SocketHandlerFactory>();
 
 var app = builder.Build();
 
