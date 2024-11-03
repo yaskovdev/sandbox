@@ -5,6 +5,7 @@ namespace AspNetSandbox;
 public class Socket : IDisposable
 {
     private readonly Timer _timer;
+    private int _disposed;
 
     public Socket(SocketId id, Action<SocketId, byte[]> processData)
     {
@@ -20,7 +21,20 @@ public class Socket : IDisposable
 
     public void Dispose()
     {
-        _timer.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 1)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _timer.Dispose();
+        }
     }
 }

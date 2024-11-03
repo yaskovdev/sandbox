@@ -19,9 +19,9 @@ public class DataProcessingService(ISocketHandlerFactory socketHandlerFactory, I
 
     public void StopProcessing(SocketId socketId)
     {
-        if (_socketHandlers.TryRemove(socketId, out var session))
+        if (_socketHandlers.TryRemove(socketId, out var socketHandler))
         {
-            session.Dispose();
+            socketHandler.Dispose();
         }
         else
         {
