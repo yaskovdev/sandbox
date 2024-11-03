@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace AspNetSandbox;
 
 /// <summary>
@@ -5,12 +7,25 @@ namespace AspNetSandbox;
 /// <see cref="SocketHandler"/> class uses (e.g., <see cref="ISingletonDependency"/> or <see cref="ILogger{SocketHandler}"/>).
 /// The <see cref="SocketHandlerFactory"/> does not contain those dependencies either.
 /// </summary>
-/// <param name="socketHandlerFactory"></param>
-public class DataProcessingService(ISocketHandlerFactory socketHandlerFactory) : IDataProcessingService
+public class DataProcessingService(ISocketHandlerFactory socketHandlerFactory, ILogger<DataProcessingService> logger)
+    : IDataProcessingService
 {
+    private readonly ConcurrentDictionary<SocketId, SocketHandler> _socketHandlers = new();
+
     public void StartProcessing(SocketId socketId)
     {
-        var socketHandler = socketHandlerFactory.CreateSocketHandler(socketId);
-        socketHandler.Start();
+        _socketHandlers.GetOrAdd(socketId, _ => socketHandlerFactory.CreateSocketHandler(socketId));
+    }
+
+    public void StopProcessing(SocketId socketId)
+    {
+        if (_socketHandlers.TryRemove(socketId, out var session))
+        {
+            session.Dispose();
+        }
+        else
+        {
+            logger.LogWarning("Socket handler for socket ID {SocketId} not found", socketId);
+        }
     }
 }

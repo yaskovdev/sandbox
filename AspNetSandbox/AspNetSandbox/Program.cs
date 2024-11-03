@@ -21,9 +21,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/sockets/{socketId:int}/process",
+app.MapPost("/sockets/{socketId:int}/subscribe",
         (int socketId, IDataProcessingService service) => service.StartProcessing(new SocketId(socketId)))
-    .WithName("GetWeatherForecast")
+    .WithName("SubscribeToSocketWithId")
     .WithOpenApi();
 
+app.MapPost("/sockets/{socketId:int}/unsubscribe",
+        (int socketId, IDataProcessingService service) => service.StopProcessing(new SocketId(socketId)))
+    .WithName("UnsubscribeFromSocketWithId")
+    .WithOpenApi();
 app.Run();

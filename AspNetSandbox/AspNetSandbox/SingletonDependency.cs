@@ -4,6 +4,6 @@ public class SingletonDependency(ILogger<SingletonDependency> logger) : ISinglet
 {
     public void Handle(SocketId socketId)
     {
-        logger.LogInformation("Handling socket {SocketId}", socketId);
+        logger.LogInformation("Handling data from socket {SocketId}", socketId);
     }
 }
