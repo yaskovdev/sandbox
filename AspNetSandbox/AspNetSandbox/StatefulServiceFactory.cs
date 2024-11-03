@@ -4,5 +4,5 @@ public class StatefulServiceFactory(IServiceProvider serviceProvider) : IStatefu
 {
     // You could create a new instance of StatefulService here, but then you would have to inject its dependencies into the factory.
     public IStatefulService CreateStatefulService(SocketId socketId) =>
-        serviceProvider.GetService<StatefulService>(socketId);
+        serviceProvider.CreateInstance<StatefulService>(socketId);
 }
