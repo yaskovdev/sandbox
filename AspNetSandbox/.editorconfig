@@ -7,3 +7,5 @@ csharp_style_var_for_built_in_types = true
 csharp_style_var_elsewhere = true
 
 insert_final_newline = true
+
+max_line_length = 160

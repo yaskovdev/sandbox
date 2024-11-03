@@ -1,5 +1,7 @@
 namespace AspNetSandbox;
 
+using System.Security.Cryptography;
+
 public class SocketHandler : IDisposable
 {
     private readonly ISingletonDependency _singletonDependency;
@@ -23,7 +25,14 @@ public class SocketHandler : IDisposable
 
     private void ProcessData(SocketId socketId, byte[] data)
     {
-        _logger.LogInformation("Processing {Length} bytes data from socket {SocketId}", data.Length, socketId);
+        using (var algorithm = SHA256.Create())
+        {
+            _logger.LogInformation("Processing data with hash {Hash} from socket {SocketId}", GetHash(algorithm, data), socketId);
+        }
+
         _singletonDependency.Handle(socketId);
     }
+
+    private static string GetHash(HashAlgorithm algorithm, byte[] input) =>
+        string.Join("", algorithm.ComputeHash(input).Select(it => it.ToString("x2")));
 }
