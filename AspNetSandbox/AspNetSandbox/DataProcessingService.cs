@@ -1,6 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace AspNetSandbox;
+
+using System.Collections.Concurrent;
 
 /// <summary>
 /// Note that it does not contain any pass-through dependencies, i.e., dependencies that it does not use, but that the
@@ -14,7 +14,7 @@ public class DataProcessingService(ISocketHandlerFactory socketHandlerFactory, I
 
     public void StartProcessing(SocketId socketId)
     {
-        _socketHandlers.GetOrAdd(socketId, _ => socketHandlerFactory.CreateSocketHandler(socketId));
+        _socketHandlers.GetOrAdd(socketId, socketHandlerFactory.CreateSocketHandler);
     }
 
     public void StopProcessing(SocketId socketId)
