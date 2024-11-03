@@ -2,6 +2,7 @@ namespace AspNetSandbox;
 
 public class StatefulServiceFactory(IServiceProvider serviceProvider) : IStatefulServiceFactory
 {
-    public StatefulService Create(SocketId socketId) =>
+    // You could create a new instance of StatefulService here, but then you would have to inject its dependencies to the factory.
+    public IStatefulService CreateStatefulService(SocketId socketId) =>
         ActivatorUtilities.CreateInstance<StatefulService>(serviceProvider, socketId);
 }

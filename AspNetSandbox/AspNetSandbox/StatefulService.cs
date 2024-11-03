@@ -9,5 +9,6 @@ public class StatefulService(
     public void Handle()
     {
         logger.LogInformation("Handling socket {SocketId} using {Dependency}", socketId, singletonDependency);
+        singletonDependency.Handle(socketId);
     }
 }
