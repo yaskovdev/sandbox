@@ -9,3 +9,9 @@ csharp_style_var_elsewhere = true
 insert_final_newline = true
 
 max_line_length = 160
+
+# ReSharper properties
+# Settings... | Editor | Code Style | C# | Line Breaks and Wrapping | Wrap long lines
+# If you see a message like "EditorConfig for ServiceProviderExtensions.cs override(s) 
+# some Code Style settings on this page", click "Edit" next to the message.
+resharper_csharp_wrap_lines = false
