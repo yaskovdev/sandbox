@@ -4,7 +4,7 @@ public class LimitedInterpreter
 {
     public void Interpret(string code)
     {
-        var memory = new int[203]; // [0...99][100...200][201...202]: registers, stack, variables
+        var memory = new int[203]; // [REGISTERS][STACK][VARIABLES]: [0...99][100...200][201...202] 
         memory[2 - 1] = 6;
         memory[3 - 1] = 3;
         Console.WriteLine("Before: " + string.Join(", ", memory));
@@ -22,17 +22,17 @@ public class LimitedInterpreter
             }
             else if (code[memory[201]] == '(')
             {
-                var b = 1;
-                while (b > 0)
+                memory[202] = 1;
+                while (memory[202] > 0)
                 {
                     memory[201]++;
                     switch (code[memory[201]])
                     {
                         case '(':
-                            b++;
+                            memory[202]++;
                             break;
                         case ')':
-                            b--;
+                            memory[202]--;
                             break;
                     }
                 }
@@ -41,20 +41,19 @@ public class LimitedInterpreter
             }
             else if (code[memory[201]] == ')')
             {
-                var register = memory[code[memory[201] + 1] - '0' - 1];
-                if (register > 0)
+                if (memory[code[memory[201] + 1] - '0' - 1] > 0)
                 {
-                    var b = 1;
-                    while (b > 0)
+                    memory[202] = 1;
+                    while (memory[202] > 0)
                     {
                         memory[201]--;
                         switch (code[memory[201]])
                         {
                             case ')':
-                                b++;
+                                memory[202]++;
                                 break;
                             case '(':
-                                b--;
+                                memory[202]--;
                                 break;
                         }
                     }
