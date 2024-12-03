@@ -10,7 +10,7 @@ var mapping = new Dictionary<char, int>
     { 's', -2 },
     { '(', -3 },
     { ')', -4 },
-    { '1', 1 }, // TODO: make it 0-based probably
+    { '1', 1 },
     { '2', 2 },
     { '3', 3 },
     { '4', 4 },
@@ -27,8 +27,8 @@ code
     .ToList()
     .ForEach(it => memory[i++] = it);
 
-memory[2 - 1] = 6;
-memory[3 - 1] = 3;
+memory[2] = 6;
+memory[3] = 3;
 Console.WriteLine("Before: " + string.Join(", ", memory));
 new LimitedInterpreter().Interpret(memory);
 Console.WriteLine("After: " + string.Join(", ", memory));

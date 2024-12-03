@@ -7,18 +7,17 @@ public class LimitedInterpreter
 {
     public void Interpret(int[] memory)
     {
-        
         while (memory[100 + memory[201]] != 0)
         {
             if (memory[100 + memory[201]] == -1)
             {
                 memory[201] += 1;
-                memory[memory[100 + memory[201]] - 1] += 1;
+                memory[memory[100 + memory[201]]] += 1;
             }
             else if (memory[100+ memory[201]] == -2)
             {
                 memory[201] += 1;
-                memory[memory[100 + memory[201]] - 1] -= 1;
+                memory[memory[100 + memory[201]]] -= 1;
             }
             else if (memory[100 + memory[201]] == -3)
             {
@@ -41,7 +40,7 @@ public class LimitedInterpreter
             }
             else if (memory[100 + memory[201]] == -4)
             {
-                if (memory[memory[100 + memory[201] + 1] - 1] > 0)
+                if (memory[memory[100 + memory[201] + 1]] > 0)
                 {
                     memory[202] = 1;
                     while (memory[202] > 0)
