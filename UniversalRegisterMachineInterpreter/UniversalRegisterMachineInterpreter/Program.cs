@@ -17,7 +17,7 @@ var mapping = new Dictionary<char, int>
     { '5', 5 }
 };
 
-var memory = new int[203]; // [REGISTERS][CODE][VARIABLES]: [0...5][6...59][60...61]
+var memory = new int[62]; // [REGISTERS][CODE][VARIABLES]: [0...5][6...59][60...61]
 
 var i = 6;
 const int unknownCharacter = -100;
