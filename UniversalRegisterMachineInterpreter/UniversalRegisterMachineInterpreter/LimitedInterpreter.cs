@@ -9,65 +9,65 @@ public class LimitedInterpreter
     {
         while (true)
         {
-            if (memory[100 + memory[201]] == 0)
+            if (memory[6 + memory[60]] == 0)
             {
                 break;
             }
-            else if (memory[100 + memory[201]] == -1)
+            else if (memory[6 + memory[60]] == -1)
             {
-                memory[201] += 1;
-                memory[memory[100 + memory[201]]] += 1;
+                memory[60] += 1;
+                memory[memory[6 + memory[60]]] += 1;
             }
-            else if (memory[100+ memory[201]] == -2)
+            else if (memory[6 + memory[60]] == -2)
             {
-                memory[201] += 1;
-                memory[memory[100 + memory[201]]] -= 1;
+                memory[60] += 1;
+                memory[memory[6 + memory[60]]] -= 1;
             }
-            else if (memory[100 + memory[201]] == -3)
+            else if (memory[6 + memory[60]] == -3)
             {
-                memory[202] = 1;
-                while (memory[202] > 0)
+                memory[61] = 1;
+                while (memory[61] > 0)
                 {
-                    memory[201]++;
-                    switch (memory[100 + memory[201]])
+                    memory[60]++;
+                    switch (memory[6 + memory[60]])
                     {
                         case -3:
-                            memory[202]++;
+                            memory[61]++;
                             break;
                         case -4:
-                            memory[202]--;
+                            memory[61]--;
                             break;
                     }
                 }
         
-                memory[201]--;
+                memory[60]--;
             }
-            else if (memory[100 + memory[201]] == -4)
+            else if (memory[6 + memory[60]] == -4)
             {
-                if (memory[memory[100 + memory[201] + 1]] > 0)
+                if (memory[memory[6 + memory[60] + 1]] > 0)
                 {
-                    memory[202] = 1;
-                    while (memory[202] > 0)
+                    memory[61] = 1;
+                    while (memory[61] > 0)
                     {
-                        memory[201]--;
-                        switch (memory[100 + memory[201]])
+                        memory[60]--;
+                        switch (memory[6 + memory[60]])
                         {
                             case -4:
-                                memory[202]++;
+                                memory[61]++;
                                 break;
                             case -3:
-                                memory[202]--;
+                                memory[61]--;
                                 break;
                         }
                     }
                 }
                 else
                 {
-                    memory[201]++;
+                    memory[60]++;
                 }
             }
         
-            memory[201]++;
+            memory[60]++;
         }
     }
 }

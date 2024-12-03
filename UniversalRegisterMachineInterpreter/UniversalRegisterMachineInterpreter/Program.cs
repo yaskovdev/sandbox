@@ -17,9 +17,9 @@ var mapping = new Dictionary<char, int>
     { '5', 5 }
 };
 
-var memory = new int[203]; // [REGISTERS][CODE][VARIABLES]: [0...99][100...200][201...202]
+var memory = new int[203]; // [REGISTERS][CODE][VARIABLES]: [0...5][6...59][60...61]
 
-var i = 100;
+var i = 6;
 const int unknownCharacter = -100;
 code
     .Select(it => mapping.GetValueOrDefault(it, unknownCharacter))
