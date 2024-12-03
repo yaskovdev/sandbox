@@ -1,4 +1,34 @@
 ﻿using UniversalRegisterMachineInterpreter;
 
-new FullyFunctionalInterpreter().Interpret("(a4;a5;s2)2; ((a2;s4)4; s3; (a1;a4;s5)5; (a5;s1)1)3.");
-new LimitedInterpreter().Interpret("(a4;a5;s2)2; ((a2;s4)4; s3; (a1;a4;s5)5; (a5;s1)1)3.");
+var code = "(a4;a5;s2)2; ((a2;s4)4; s3; (a1;a4;s5)5; (a5;s1)1)3.";
+new FullyFunctionalInterpreter().Interpret(code);
+
+var mapping = new Dictionary<char, int>
+{
+    { '.', 0 },
+    { 'a', -1 },
+    { 's', -2 },
+    { '(', -3 },
+    { ')', -4 },
+    { '1', 1 }, // TODO: make it 0-based probably
+    { '2', 2 },
+    { '3', 3 },
+    { '4', 4 },
+    { '5', 5 }
+};
+
+var memory = new int[203]; // [REGISTERS][CODE][VARIABLES]: [0...99][100...200][201...202]
+
+var i = 100;
+const int unknownCharacter = -100;
+code
+    .Select(it => mapping.GetValueOrDefault(it, unknownCharacter))
+    .Where(it => it != unknownCharacter)
+    .ToList()
+    .ForEach(it => memory[i++] = it);
+
+memory[2 - 1] = 6;
+memory[3 - 1] = 3;
+Console.WriteLine("Before: " + string.Join(", ", memory));
+new LimitedInterpreter().Interpret(memory);
+Console.WriteLine("After: " + string.Join(", ", memory));

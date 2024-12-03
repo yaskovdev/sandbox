@@ -1,37 +1,37 @@
 namespace UniversalRegisterMachineInterpreter;
 
+/// <summary>
+/// Registers can be from 1 to 5 inclusively.
+/// </summary>
 public class LimitedInterpreter
 {
-    public void Interpret(string code)
+    public void Interpret(int[] memory)
     {
-        var memory = new int[203]; // [REGISTERS][STACK][VARIABLES]: [0...99][100...200][201...202] 
-        memory[2 - 1] = 6;
-        memory[3 - 1] = 3;
-        Console.WriteLine("Before: " + string.Join(", ", memory));
-        while (code[memory[201]] != '.')
+        
+        while (memory[100 + memory[201]] != 0)
         {
-            if (code[memory[201]] == 'a')
+            if (memory[100 + memory[201]] == -1)
             {
                 memory[201] += 1;
-                memory[code[memory[201]] - '0' - 1] += 1;
+                memory[memory[100 + memory[201]] - 1] += 1;
             }
-            else if (code[memory[201]] == 's')
+            else if (memory[100+ memory[201]] == -2)
             {
                 memory[201] += 1;
-                memory[code[memory[201]] - '0' - 1] -= 1;
+                memory[memory[100 + memory[201]] - 1] -= 1;
             }
-            else if (code[memory[201]] == '(')
+            else if (memory[100 + memory[201]] == -3)
             {
                 memory[202] = 1;
                 while (memory[202] > 0)
                 {
                     memory[201]++;
-                    switch (code[memory[201]])
+                    switch (memory[100 + memory[201]])
                     {
-                        case '(':
+                        case -3:
                             memory[202]++;
                             break;
-                        case ')':
+                        case -4:
                             memory[202]--;
                             break;
                     }
@@ -39,20 +39,20 @@ public class LimitedInterpreter
         
                 memory[201]--;
             }
-            else if (code[memory[201]] == ')')
+            else if (memory[100 + memory[201]] == -4)
             {
-                if (memory[code[memory[201] + 1] - '0' - 1] > 0)
+                if (memory[memory[100 + memory[201] + 1] - 1] > 0)
                 {
                     memory[202] = 1;
                     while (memory[202] > 0)
                     {
                         memory[201]--;
-                        switch (code[memory[201]])
+                        switch (memory[100 + memory[201]])
                         {
-                            case ')':
+                            case -4:
                                 memory[202]++;
                                 break;
-                            case '(':
+                            case -3:
                                 memory[202]--;
                                 break;
                         }
@@ -66,7 +66,5 @@ public class LimitedInterpreter
         
             memory[201]++;
         }
-        
-        Console.WriteLine("After: " + string.Join(", ", memory));
     }
 }
