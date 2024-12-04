@@ -33,10 +33,9 @@ var instructions = code
     .Where(it => it != unknownCharacter)
     .ToImmutableList();
 
-// The input for the URL interpreter in Push:
-Console.WriteLine($"{54 - instructions.Count} exec.do*times ( 0 )");
-Console.WriteLine(string.Join(" ", instructions.Reverse()));
-Console.WriteLine(string.Join(" ", memory.Take(6).Reverse()));
+Console.WriteLine($"The input for the URL interpreter in Push:");
+Console.WriteLine(string.Join(" ", memory.Take(6)));
+Console.WriteLine(string.Join(" ", instructions));
 instructions.ForEach(it => memory[i++] = it);
 
 Console.WriteLine("\nBefore: " + string.Join(" ", memory));
