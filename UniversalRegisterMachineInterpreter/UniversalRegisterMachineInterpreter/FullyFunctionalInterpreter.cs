@@ -1,14 +1,13 @@
 namespace UniversalRegisterMachineInterpreter;
 
-// See https://iwriteiam.nl/Ha_bf_Turing.html for more information
 public class FullyFunctionalInterpreter
 {
-    public void Interpret(string code)
+    /// <summary>
+    /// Note: the registers are 1-indexed.
+    /// </summary>
+    public void Interpret(string code, int[] registers)
     {
-        var registers = new int[100];
-        registers[2 - 1] = 6;
-        registers[3 - 1] = 3;
-        Console.WriteLine("Before: " + string.Join(", ", registers));
+        Console.WriteLine("Before: " + string.Join(" ", registers));
         var pointer = 0;
         while (code[pointer] != '.')
         {
@@ -70,6 +69,6 @@ public class FullyFunctionalInterpreter
             pointer += 1;
         }
 
-        Console.WriteLine("After: " + string.Join(", ", registers));
+        Console.WriteLine("After: " + string.Join(" ", registers));
     }
 }
