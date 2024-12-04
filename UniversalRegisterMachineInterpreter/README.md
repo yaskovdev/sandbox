@@ -1,26 +1,24 @@
-# Universal Register Machine
+# Universal Register Machine (URM) Interpreter
 
-|    |    |
-|----|----|
-| a1 | 1  |
-| a2 | 2  |
-| a3 | 3  |
-| a4 | 4  |
-| a5 | 5  |
-| s1 | -1 |
-| s2 | -2 |
-| s3 | -3 |
-| s4 | -4 |
-| s5 | -5 |
-| (  | 10 |
-| )1 | 11 |
-| )2 | 12 |
-| )3 | 13 |
-| )4 | 14 |
-| )5 | 15 |
+See this page, "URM is BF-complete" for more details about the Universal Register Machine.
 
-`(a4;a5;s2)2; ((a2;s4)4; s3; (a1;a4;s5)5; (a5;s1)1)3.`
+The `FullyFunctionalInterpreter` is an interpreter of a URM with registers ranging from 0 to 9 inclusively.
 
-Encoded: `10 3 4 6 12 10 10 1 8 14 7 10 0 3 9 15 10 4 5 11 13`
+The `LimitedInterpreter` is an interpreter of a URM with five registers. It accepts a program encoded in this way:
 
-Reversed: `13 11 5 4 10 15 9 3 0 10 7 14 8 1 10 10 12 6 4 3 10`
+| URM Symbol | Encoding |
+|------------|----------|
+| .          | 0        |
+| a          | -1       |
+| s          | -2       |
+| (          | -3       |
+| )          | -4       |
+| 1          | 1        |
+| 2          | 2        |
+| 3          | 3        |
+| 4          | 4        |
+| 5          | 5        |
+
+The `LimitedInterpreter` is a step towards a Push implementation of a URM.
+
+See https://gist.github.com/yaskovdev/71010ede2d070ed88c11334160fedc88 for a Push implementation.
