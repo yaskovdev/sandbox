@@ -13,7 +13,7 @@ public class LimitedInterpreter
         {
             if (memory[6 + memory[60]] == 0)
             {
-                break;
+                return;
             }
             else if (memory[6 + memory[60]] == -1)
             {
