@@ -1,6 +1,6 @@
 namespace UniversalRegisterMachineInterpreter;
 
-public class FullyFunctionalInterpreter
+public class OriginalInterpreter
 {
     /// <summary>
     /// Note: the registers are 1-indexed.
