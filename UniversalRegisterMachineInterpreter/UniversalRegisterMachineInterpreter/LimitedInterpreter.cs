@@ -31,15 +31,9 @@ public class LimitedInterpreter
                 while (memory[61] > 0)
                 {
                     memory[60]++;
-                    switch (memory[6 + memory[60]])
-                    {
-                        case -3:
-                            memory[61]++;
-                            break;
-                        case -4:
-                            memory[61]--;
-                            break;
-                    }
+                    if (memory[6 + memory[60]] == -3)
+                        memory[61]++;
+                    else if (memory[6 + memory[60]] == -4) memory[61]--;
                 }
 
                 memory[60]--;
@@ -52,15 +46,9 @@ public class LimitedInterpreter
                     while (memory[61] > 0)
                     {
                         memory[60]--;
-                        switch (memory[6 + memory[60]])
-                        {
-                            case -4:
-                                memory[61]++;
-                                break;
-                            case -3:
-                                memory[61]--;
-                                break;
-                        }
+                        if (memory[6 + memory[60]] == -4)
+                            memory[61]++;
+                        else if (memory[6 + memory[60]] == -3) memory[61]--;
                     }
                 }
                 else

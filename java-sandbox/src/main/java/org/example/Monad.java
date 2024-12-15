@@ -10,3 +10,4 @@ public interface Monad<T> {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
+`
