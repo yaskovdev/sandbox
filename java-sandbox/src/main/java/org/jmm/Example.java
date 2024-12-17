@@ -9,15 +9,13 @@ public class Example {
     private volatile int b = 0;
 
     public void run1() {
-        b = 1;
-        int r2 = a;
-        System.out.println(r2);
+        b = 1; // 1
+        int r2 = a; // 2
     }
 
     public void run2() {
-        a = 2;
-        int r1 = b;
-        System.out.println(r1);
+        a = 2; // 3
+        int r1 = b; // 4
     }
 }
 
@@ -26,3 +24,10 @@ public class Example {
 // int r1 = b;
 // b = 1;
 // a = 2;
+
+// 1 hb 2, 3 hb 4
+
+// 4
+// 2
+// 3
+// 1
