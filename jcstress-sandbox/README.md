@@ -4,5 +4,8 @@ Following along with the https://shipilev.net/blog/2016/close-encounters-of-jmm-
 
 ```shell
 mvn clean verify
+
 java -jar target/jcstress.jar
+# or
+java -jar target/jcstress.jar -t com.yaskovdev.Question79288845Test
 ```
