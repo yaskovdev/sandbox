@@ -8,7 +8,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
 @JCStressTest
+@Outcome(id = "0, 0", expect = Expect.ACCEPTABLE)
+@Outcome(id = "0, 1", expect = Expect.ACCEPTABLE)
 @Outcome(id = "1, 0", expect = Expect.ACCEPTABLE_INTERESTING)
+@Outcome(id = "1, 1", expect = Expect.ACCEPTABLE)
 @State
 public class BetWithArthur {
     private static final VarHandle VH_X, VH_Y;
@@ -40,4 +43,3 @@ public class BetWithArthur {
         r.r2 = (int) VH_X.getOpaque(this);
     }
 }
-
