@@ -9,3 +9,5 @@ java -jar target/jcstress.jar
 # or
 java -jar target/jcstress.jar -t com.yaskovdev.Question79288845Test
 ```
+
+You can also add `-v` to print results of all tests, including passed ones.

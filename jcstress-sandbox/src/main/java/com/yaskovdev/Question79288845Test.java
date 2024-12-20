@@ -12,6 +12,7 @@ import org.openjdk.jcstress.infra.results.II_Result;
 public class Question79288845Test {
 
     // Note: if you remove volatile, then "0, 0" will be possible.
+    // You can also try without volatile but with both actor1 and actor2 synchronized. Then both the "0, 0" and "1, 2" will be impossible.
     private volatile int a = 0;
     private volatile int b = 0;
 
