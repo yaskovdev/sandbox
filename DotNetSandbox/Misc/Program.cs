@@ -166,3 +166,6 @@ Console.WriteLine(val.ToString() + " " + val.ToString(CultureInfo.InvariantCultu
 var deserialize = JsonConvert.DeserializeObject<Dummy>("{\"InstanceUuid\":\"newValue\",\"Title\":\"title\"}");
 Console.WriteLine("Title: " + deserialize?.Title);// --> "Title: title"
 Console.WriteLine("InstanceUuid: " + deserialize?.InstanceUuid); // --> "InstanceUuid: " <---- lost during deserialization
+
+var ticks = DateTime.UtcNow.Ticks;
+Console.WriteLine(ticks);
