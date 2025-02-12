@@ -9,7 +9,10 @@ public class TryCatchVsNoTryCatch
     {
         try
         {
-            var d = Math.Sin(1);
+            for (var i = 0; i < 1000000000; i++)
+            {
+                var d = Math.Sin(1);
+            }
         }
         catch (Exception e)
         {
@@ -20,6 +23,9 @@ public class TryCatchVsNoTryCatch
     [Benchmark]
     public void NoTryCatch()
     {
-        var d = Math.Sin(1);
+        for (var i = 0; i < 1000000000; i++)
+        {
+            var d = Math.Sin(1);
+        }
     }
 }
