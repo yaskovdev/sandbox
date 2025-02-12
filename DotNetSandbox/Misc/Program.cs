@@ -167,5 +167,16 @@ var deserialize = JsonConvert.DeserializeObject<Dummy>("{\"InstanceUuid\":\"newV
 Console.WriteLine("Title: " + deserialize?.Title);// --> "Title: title"
 Console.WriteLine("InstanceUuid: " + deserialize?.InstanceUuid); // --> "InstanceUuid: " <---- lost during deserialization
 
+// ----
+
 var ticks = DateTime.UtcNow.Ticks;
 Console.WriteLine(ticks);
+
+// ----
+
+var cache = new Dictionary<Uri, string>
+{
+    [new Uri("http://example/foo")] = "foo",
+    [new Uri("http://example/foo/")] = "bar"
+};
+Console.WriteLine($"The size of the cache is {cache.Count}");
