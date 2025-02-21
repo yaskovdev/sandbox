@@ -3,7 +3,8 @@
 Try building the project with:
 
 ```powershell
-msbuild /t:"Clean" /t:EditorConfigSandbox:Rebuild
+dotnet clean
+dotnet build EditorConfigSandbox/EditorConfigSandbox.csproj
 ```
 
 The build with fail with the next error: "error CA1036: RatingInformation should define operator(s) '==, !=, <, <=, >, >=' and Equals since it implements IComparable".
