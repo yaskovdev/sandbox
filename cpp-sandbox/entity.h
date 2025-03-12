@@ -10,7 +10,7 @@ public:
 
     entity();
 
-    void print_name();
+    void print_name() const;
 
     void increment();
 

@@ -8,6 +8,6 @@ void clock::tick() {
     _time += 1;
 }
 
-unsigned int clock::get_time() {
+unsigned int clock::get_time() const {
     return _time;
 }

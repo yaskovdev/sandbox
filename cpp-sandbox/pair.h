@@ -1,7 +1,3 @@
-//
-// Created by Sergey Yaskov on 26.12.2021.
-//
-
 #ifndef CPP_SANDBOX_PAIR_H
 #define CPP_SANDBOX_PAIR_H
 

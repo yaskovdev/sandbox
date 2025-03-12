@@ -10,7 +10,7 @@ entity::~entity() {
     std::cout << "Entity deleted" << std::endl;
 }
 
-void entity::print_name() {
+void entity::print_name() const {
     std::cout << "Entity name is " << name_ << std::endl;
 }
 

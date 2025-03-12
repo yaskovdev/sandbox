@@ -8,7 +8,7 @@ public:
 
     void tick();
 
-    unsigned int get_time();
+    unsigned int get_time() const;
 
 private:
     unsigned int _time;
