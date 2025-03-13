@@ -164,7 +164,7 @@ Console.WriteLine(val.ToString() + " " + val.ToString(CultureInfo.InvariantCultu
 // ----
 
 var deserialize = JsonConvert.DeserializeObject<Dummy>("{\"InstanceUuid\":\"newValue\",\"Title\":\"title\"}");
-Console.WriteLine("Title: " + deserialize?.Title);// --> "Title: title"
+Console.WriteLine("Title: " + deserialize?.Title); // --> "Title: title"
 Console.WriteLine("InstanceUuid: " + deserialize?.InstanceUuid); // --> "InstanceUuid: " <---- lost during deserialization
 
 // ----
@@ -180,3 +180,18 @@ var cache = new Dictionary<Uri, string>
     [new Uri("http://example/foo/")] = "bar"
 };
 Console.WriteLine($"The size of the cache is {cache.Count}");
+
+// ----
+
+File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [0, 1, 2]);
+var stream = new FileStream("/Users/yaskovdev/dev/test.bin", FileMode.Open);
+var buffer = new byte[10];
+var buffer2 = new byte[10];
+try
+{
+    await stream.ReadExactlyAsync(buffer, 0, 4);
+}
+catch (EndOfStreamException e)
+{
+    await stream.ReadExactlyAsync(buffer2, 0, 3);
+}
