@@ -7,7 +7,7 @@ mvn clean verify
 
 java -jar target/jcstress.jar
 # or
-java -jar target/jcstress.jar -t com.yaskovdev.Question79288845Test
+java -jar target/jcstress.jar -t com.yaskovdev.BrownbagSequentiallyConsistentExecutions
 ```
 
 You can also add `-v` to print results of all tests, including passed ones.

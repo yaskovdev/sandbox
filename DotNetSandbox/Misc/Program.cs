@@ -183,6 +183,12 @@ Console.WriteLine($"The size of the cache is {cache.Count}");
 
 // ----
 
+// var max = Int32.MaxValue;
+// var size = max + 1;
+// var bytes = new byte[size];
+
+// ----
+
 File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [0, 1, 2]);
 var stream = new FileStream("/Users/yaskovdev/dev/test.bin", FileMode.Open);
 var buffer = new byte[10];
