@@ -11,7 +11,7 @@ public:
     unsigned int get_time() const;
 
 private:
-    unsigned int _time;
+    unsigned int time_;
 };
 
 

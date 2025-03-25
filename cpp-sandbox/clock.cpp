@@ -1,13 +1,13 @@
 #include "clock.h"
 
 clock::clock() {
-    _time = 0;
+    time_ = 0;
 }
 
 void clock::tick() {
-    _time += 1;
+    time_ += 1;
 }
 
 unsigned int clock::get_time() const {
-    return _time;
+    return time_;
 }
