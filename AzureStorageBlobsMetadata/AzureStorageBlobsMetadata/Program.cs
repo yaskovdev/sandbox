@@ -1,4 +1,4 @@
-﻿namespace AzureStorageBlobsBlockSize;
+﻿namespace AzureStorageBlobsMetadata;
 
 using System.Collections.Immutable;
 using Azure.Storage.Blobs;
@@ -11,6 +11,8 @@ internal static class Program
 
     public static async Task Main(string[] args)
     {
+        
+        
         var blobContainerName = $"container-{Guid.NewGuid()}";
         var blobServiceClient = new BlobServiceClient("UseDevelopmentStorage=true");
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(blobContainerName);
@@ -19,15 +21,22 @@ internal static class Program
         {
             throw new Exception($"Unable to create blob container: container {blobContainerName} already exists");
         }
-        var appendBlobClient = blobContainerClient.GetAppendBlobClient($"blob-{Guid.NewGuid()}");
-        var stream = await appendBlobClient.OpenWriteAsync(false, new AppendBlobOpenWriteOptions { BufferSize = WriteBufferSizeInBytes }, CancellationToken.None);
+        Console.WriteLine($"Container created: {containerCreateResponse.Value}");
+        var blob = blobContainerClient.GetAppendBlobClient($"blob-{Guid.NewGuid()}");
 
-        // Write 8000 bytes to the append blob, expect it to be written in one block.
-        // Actually, it will be written in 1000 blocks of 8 bytes each, see the ContentLength and the CommittedBlockCount of the resulting blob.
-        for (var i = 0; i < 1000; i++)
+        var writerTask = Task.Run(async () =>
         {
-            await stream.WriteAsync(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 }, CancellationToken.None);
-            await stream.FlushAsync();
-        }
+            Console.WriteLine("Creating writer");
+            var writer = new BlobWriter(blob);
+            await writer.Start();
+        });
+        // var readerTask = Task.Run(async () =>
+        // {
+        //     await Task.Delay(5000);
+        //     Console.WriteLine("Creating reader");
+        //     var reader = new BlobReader(blob);
+        //     await reader.Start();
+        // });
+        await Task.WhenAll(writerTask);
     }
 }
