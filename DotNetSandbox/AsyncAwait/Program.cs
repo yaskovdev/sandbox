@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace AsyncAwait;
 
@@ -16,11 +17,17 @@ internal static class Program
 
         // var service = new LongRunningService();
         // await service.Run();
-        var bytes = new int[1000000];
-        foreach(var item in bytes)
-        {
-            Console.WriteLine(item.ToString());
-        }
+        // var bytes = new int[1000000];
+        // foreach(var item in bytes)
+        // {
+        //     Console.WriteLine(item.ToString());
+        // }
+        
+        // ----
+
+        var service = new AsyncMethodChainService();
+        service.StartRecordingMode();
+        Thread.Sleep(3000);
     }
     
     private static async Task RunAsync()
