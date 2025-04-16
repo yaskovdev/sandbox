@@ -28,7 +28,13 @@ internal static class Program
         {
             Console.WriteLine("Creating writer");
             var writer = new BlobWriter(blob);
-            await writer.Start();
+            await writer.Start("1");
+        });
+        var writerTask2 = Task.Run(async () =>
+        {
+            Console.WriteLine("Creating writer");
+            var writer = new BlobWriter(blob);
+            await writer.Start("2");
         });
         // var readerTask = Task.Run(async () =>
         // {
@@ -37,6 +43,6 @@ internal static class Program
         //     var reader = new BlobReader(blob);
         //     await reader.Start();
         // });
-        await Task.WhenAll(writerTask);
+        await Task.WhenAll(writerTask, writerTask2);
     }
 }

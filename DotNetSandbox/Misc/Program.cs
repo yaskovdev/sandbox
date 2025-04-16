@@ -189,15 +189,18 @@ Console.WriteLine($"The size of the cache is {cache.Count}");
 
 // ----
 
-File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [0, 1, 2]);
+File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [10, 11, 12]);
 var stream = new FileStream("/Users/yaskovdev/dev/test.bin", FileMode.Open);
 var buffer = new byte[10];
-var buffer2 = new byte[10];
-try
-{
-    await stream.ReadExactlyAsync(buffer, 0, 4);
-}
-catch (EndOfStreamException e)
-{
-    await stream.ReadExactlyAsync(buffer2, 0, 3);
-}
+await stream.ReadExactlyAsync(buffer, 0, 1);
+await stream.ReadExactlyAsync(buffer, 0, 1);
+Console.WriteLine("Stop");
+// var buffer2 = new byte[10];
+// try
+// {
+//     await stream.ReadExactlyAsync(buffer, 0, 4);
+// }
+// catch (EndOfStreamException e)
+// {
+//     await stream.ReadExactlyAsync(buffer2, 0, 3);
+// }
