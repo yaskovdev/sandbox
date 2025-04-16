@@ -52,8 +52,11 @@ AVPixelFormat GetFormatAndLogSupportedFormats(AVCodecContext *context, const AVP
 }
 
 int main(int argc, char **argv) {
+//    AVFrame *bad_pointer = nullptr;
+//    std::cout << (*bad_pointer).buf;
     char buff[AV_ERROR_MAX_STRING_SIZE];
     av_make_error_string(buff, AV_ERROR_MAX_STRING_SIZE, -542398533);
+
     std::cout << buff << "\n";
     std::cout << "Decoding started..." << "\n";
     if (argc < 3) {

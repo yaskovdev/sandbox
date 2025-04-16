@@ -1,4 +1,4 @@
-﻿namespace FillArraySandbox;
+﻿namespace HeapCorruptionSandbox;
 
 using System.Runtime.InteropServices;
 
