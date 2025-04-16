@@ -1,17 +1,10 @@
 #include "api.h"
 #include <iostream>
 
-void fill_array(uint8_t* array, const int length)
+void fill_array()
 {
-    std::cout << "Before filling:";
-    for (int i = 0; i < length; i++)
-    {
-        std::cout << " " << static_cast<unsigned>(array[i]);
-    }
-    std::cout << "\n";
-
-    for (int i = 0; i < length; i++)
-    {
-        array[i] = 1;
-    }
+    int* arr = new int[10];
+    arr[10] = 42;
+    std::cout << "Heap corrupted, but no crash yet\n";
+    delete[] arr;
 }
