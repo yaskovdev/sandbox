@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeapCorruptionSandbox", "He
 		{0266CB48-3B98-4432-AB6B-ECBDAC445A42} = {0266CB48-3B98-4432-AB6B-ECBDAC445A42}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{864A67FB-0391-4A46-BDC7-9552376E45D4}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64

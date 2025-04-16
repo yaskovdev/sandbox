@@ -7,4 +7,5 @@ void fill_array()
     arr[10] = 42;
     std::cout << "Heap corrupted, but no crash yet\n";
     delete[] arr;
+    std::cout << "Deleted arr\n";
 }
