@@ -3,8 +3,8 @@
 
 void corrupt_heap()
 {
-    int* arr = new int[4];
-    arr[4] = 42;
+    char* arr = new char[16];
+    arr[16] = 'x';
     std::cout << "Heap corrupted, but no crash yet\n";
     delete[] arr;
     std::cout << "Deleted arr\n";
