@@ -46,4 +46,8 @@ RUN msbuild /t:HeapCorruptionSandbox:Publish /p:Configuration=Release /p:Platfor
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\heapcorruptionsandbox.exe" /v GlobalFlag /t REG_SZ /d 0x02000000
+RUN REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\heapcorruptionsandbox.exe" /v PageHeapFlags /t REG_SZ /d 0x3
+
 ENTRYPOINT ["HeapCorruptionSandbox.exe"]
