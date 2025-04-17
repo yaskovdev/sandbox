@@ -1,13 +1,15 @@
 ﻿# escape=`
 
 # TODO: try switching back to mcr.microsoft.com/dotnet/runtime:6.0 and install PowerShell
-FROM mcr.microsoft.com/windows:20H2 AS base
+# Note: you can replace the 1809 with 20H2, then you won't need to set the chocolateyVersion env var
+FROM mcr.microsoft.com/windows:1809 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
 RUN powershell Set-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy Bypass
 
+ENV chocolateyVersion=1.4.0
 RUN powershell -Command Invoke-Expression ((New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 RUN choco install -y dotnet-6.0-runtime
 
