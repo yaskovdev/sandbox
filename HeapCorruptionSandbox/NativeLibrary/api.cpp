@@ -1,10 +1,10 @@
 #include "api.h"
 #include <iostream>
 
-void fill_array()
+void corrupt_heap()
 {
-    int* arr = new int[10];
-    arr[10] = 42;
+    int* arr = new int[96];
+    arr[96] = 42;
     std::cout << "Heap corrupted, but no crash yet\n";
     delete[] arr;
     std::cout << "Deleted arr\n";

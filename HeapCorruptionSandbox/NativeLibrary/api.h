@@ -1,5 +1,3 @@
 #pragma once
 
-#include <cstdint>
-
-extern "C" __declspec(dllexport) void fill_array();
+extern "C" __declspec(dllexport) void corrupt_heap();
