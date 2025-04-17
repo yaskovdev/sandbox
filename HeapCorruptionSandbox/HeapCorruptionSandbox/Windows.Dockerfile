@@ -46,4 +46,4 @@ RUN msbuild /t:HeapCorruptionSandbox:Publish /p:Configuration=Release /p:Platfor
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "HeapCorruptionSandbox.dll"]
+ENTRYPOINT ["HeapCorruptionSandbox.exe"]

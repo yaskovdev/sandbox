@@ -38,3 +38,7 @@ work at all.
 docker build -f HeapCorruptionSandbox/Windows.Dockerfile -t yaskovdev/heap-corruption-sandbox .
 docker run -d yaskovdev/heap-corruption-sandbox
 ```
+
+Note: installing the Build Tools (`vs_buildtools.exe`) may take a while, so be patient. It will appear as if the
+`vs_buildtools.exe` is downloaded, but then the installation got stuck. Just wait a bit longer and it will finish
+installing.
