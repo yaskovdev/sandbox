@@ -31,3 +31,10 @@ That's why the `size` in the `corrupt_heap` is 16 bytes.
 
 To make it crash independently on the value of the `size`, you can try passing the `/unaligned` flag (see the above article), but most likely your program won't
 work at all.
+
+## Running in Docker
+
+```powershell
+docker build -f HeapCorruptionSandbox/Windows.Dockerfile -t yaskovdev/heap-corruption-sandbox .
+docker run -d yaskovdev/heap-corruption-sandbox
+```
