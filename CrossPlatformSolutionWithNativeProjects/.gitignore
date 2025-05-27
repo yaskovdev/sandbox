@@ -3,3 +3,4 @@ NativeLibrary/build/
 # .NET build folders
 **/bin/
 **/obj/
+CrossPlatformSolutionWithNativeProjects.MacOS.sln.DotSettings.user
