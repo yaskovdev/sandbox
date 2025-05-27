@@ -12,12 +12,13 @@ brew install cmake
 Then, build the native library and the .NET project:
 
 ```bash
+rm -rf ./NativeLibrary/build
 mkdir ./NativeLibrary/build
 cd ./NativeLibrary/build
 cmake ..
 make
 
-cd ../../
+cd ../..
 dotnet build CrossPlatformSolutionWithNativeProjects/CrossPlatformSolutionWithNativeProjects.csproj
 dotnet run --project CrossPlatformSolutionWithNativeProjects/CrossPlatformSolutionWithNativeProjects.csproj
 ```
