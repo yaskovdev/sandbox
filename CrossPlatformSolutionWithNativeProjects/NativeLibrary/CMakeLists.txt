@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(NativeLibrary)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 26)
 
 # Создаём библиотеку из исходных файлов
 add_library(NativeLibrary SHARED api.cpp api.h)
