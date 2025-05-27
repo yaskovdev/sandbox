@@ -4,25 +4,27 @@ namespace CrossPlatformSolutionWithNativeProjects;
 
 using System.Runtime.InteropServices;
 
-internal static class CorruptHeapApi
+internal static class NativeApi
 {
-    [DllImport("NativeLibrary", EntryPoint = "corrupt_heap")]
-    internal static extern void CorruptHeap();
+    private const string NativeLibraryName = "NativeLibrary";
+
+    [DllImport(NativeLibraryName, EntryPoint = "hello_world")]
+    internal static extern void HelloWorld();
     
-    static CorruptHeapApi()
+    static NativeApi()
     {
-        NativeLibrary.SetDllImportResolver(typeof(CorruptHeapApi).Assembly, (name, assembly, path) =>
+        NativeLibrary.SetDllImportResolver(typeof(NativeApi).Assembly, (name, assembly, path) =>
         {
-            if (name == "NativeLibrary")
+            if (name == NativeLibraryName)
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
                     var appDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-                    var libPath = Path.Combine(appDir, "libNativeLibrary.dylib");
+                    var libPath = Path.Combine(appDir, $"lib{NativeLibraryName}.dylib");
                     return NativeLibrary.Load(libPath);
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
-                    return NativeLibrary.Load("NativeLibrary.dll");
+                    return NativeLibrary.Load($"{NativeLibraryName}.dll");
             }
             return IntPtr.Zero;
         });
