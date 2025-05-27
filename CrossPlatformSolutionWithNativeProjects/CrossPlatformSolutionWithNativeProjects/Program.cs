@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CrossPlatformSolutionWithNativeProjects;
+﻿namespace CrossPlatformSolutionWithNativeProjects;
 
 internal static class Program
 {
