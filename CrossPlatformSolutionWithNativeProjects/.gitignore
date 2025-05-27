@@ -1,0 +1,5 @@
+NativeLibrary/build/
+
+# .NET build folders
+**/bin/
+**/obj/

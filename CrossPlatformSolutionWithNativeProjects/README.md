@@ -1,4 +1,4 @@
-# Heap Corruption Sandbox
+# Cross Platform Solution with Native Projects
 
 Install [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/).
 
@@ -6,31 +6,39 @@ Be sure to pick the `Release` configuration for the build, then build the sandbo
 
 ```powershell
 # You can omit the `/full` flag, then standard heap verification will be enabled
-& "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" /p /enable HeapCorruptionSandbox.exe /full
+& "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" /p /enable CrossPlatformSolutionWithNativeProjects.exe /full
 & "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" /p
-.\HeapCorruptionSandbox\bin\x64\Release\net8.0\HeapCorruptionSandbox.exe; $LastExitCode
+.\CrossPlatformSolutionWithNativeProjects\bin\x64\Release\net9.0\CrossPlatformSolutionWithNativeProjects.exe; $LastExitCode
 ```
 
 To disable the heap verification, run the following command:
 
 ```powershell
-& "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" /p /disable HeapCorruptionSandbox.exe
+& "c:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" /p /disable CrossPlatformSolutionWithNativeProjects.exe
 ```
 
 More details on heap verification can be found in the [documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/gflags-and-pageheap).
 
 ## Building in macOS
 
+Install .NET SDK and CMake if not already installed:
+
 ```bash
+brew install --cask dotnet-sdk
 brew install cmake
+```
+
+Then, build the native library and the .NET project:
+
+```bash
 mkdir ./NativeLibrary/build
 cd ./NativeLibrary/build
 cmake ..
 make
 
 cd ../../
-dotnet build HeapCorruptionSandbox/HeapCorruptionSandbox.csproj
-dotnet run --project HeapCorruptionSandbox/HeapCorruptionSandbox.csproj
+dotnet build CrossPlatformSolutionWithNativeProjects/CrossPlatformSolutionWithNativeProjects.csproj
+dotnet run --project CrossPlatformSolutionWithNativeProjects/CrossPlatformSolutionWithNativeProjects.csproj
 ```
 
 ## Important Notes
@@ -49,8 +57,8 @@ work at all.
 ## Running in Docker
 
 ```powershell
-docker build -f HeapCorruptionSandbox/Windows.Dockerfile -t yaskovdev/heap-corruption-sandbox .
-docker run -d yaskovdev/heap-corruption-sandbox
+docker build -f CrossPlatformSolutionWithNativeProjects/Windows.Dockerfile -t yaskovdev/crossplatformsolutionwithnativeprojects .
+docker run -d yaskovdev/crossplatformsolutionwithnativeprojects
 ```
 
 Note: installing the Build Tools (`vs_buildtools.exe`) may take a while, so be patient. It will appear as if the

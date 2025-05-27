@@ -1,4 +1,6 @@
-﻿namespace HeapCorruptionSandbox;
+﻿using System;
+
+namespace CrossPlatformSolutionWithNativeProjects;
 
 internal static class Program
 {
