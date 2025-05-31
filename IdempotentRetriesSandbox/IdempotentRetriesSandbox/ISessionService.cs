@@ -1,6 +1,6 @@
 namespace IdempotentRetriesSandbox;
 
-public interface IProcessingService
+public interface ISessionService
 {
     SessionEntity CreateSession(string sessionId);
 

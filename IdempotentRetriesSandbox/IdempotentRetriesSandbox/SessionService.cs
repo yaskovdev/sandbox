@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using StackExchange.Redis;
 
-public class ProcessingService(IConnectionMultiplexer redis, ISessionFactory sessionFactory) : IProcessingService
+public class SessionService(IConnectionMultiplexer redis, ISessionFactory sessionFactory) : ISessionService
 {
     private readonly string _setIfNotExistsElseGet = ReadResource("SetIfNotExistsElseGet.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
@@ -32,6 +32,7 @@ public class ProcessingService(IConnectionMultiplexer redis, ISessionFactory ses
         {
             session.Dispose();
             var database = redis.GetDatabase();
+            // TODO: probably should change state to Finished instead of deleting the session
             database.KeyDelete(sessionId);
         }
     }
