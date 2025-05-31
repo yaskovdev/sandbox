@@ -1,20 +1,39 @@
 namespace IdempotentRetriesSandbox;
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using StackExchange.Redis;
 
-public class ProcessingService : IProcessingService
+public class ProcessingService(IConnectionMultiplexer redis, ISessionFactory sessionFactory) : IProcessingService
 {
-    private readonly ConnectionMultiplexer _redis = ConnectionMultiplexer.Connect("localhost");
     private readonly string _setIfNotExistsElseGet = ReadResource("SetIfNotExistsElseGet.lua");
+    private readonly ConcurrentDictionary<string, Session> _sessions = new();
 
-    public Processing StartProcessing(string sessionId)
+    public SessionEntity CreateSession(string sessionId)
     {
-        var database = _redis.GetDatabase();
-        var newProcessing = new Processing(DateTime.Now);
+        var database = redis.GetDatabase();
+        var now = DateTime.Now;
+        var newProcessing = new SessionEntity(now, now);
         var newProcessingJson = JsonSerializer.Serialize(newProcessing);
         var result = database.ScriptEvaluate(_setIfNotExistsElseGet, [sessionId], [newProcessingJson]);
-        return result.IsNull ? newProcessing : JsonSerializer.Deserialize<Processing>((string)result);
+        var sessionEntity = result.IsNull ? newProcessing : JsonSerializer.Deserialize<SessionEntity>((string)result);
+        var session = sessionFactory.CreateSession(sessionId);
+        if (!_sessions.TryAdd(sessionId, session))
+        {
+            session.Dispose();
+        }
+
+        return sessionEntity;
+    }
+
+    public void DeleteSession(string sessionId)
+    {
+        if (_sessions.TryRemove(sessionId, out var session))
+        {
+            session.Dispose();
+            var database = redis.GetDatabase();
+            database.KeyDelete(sessionId);
+        }
     }
 
     private static string ReadResource(string resourceName)

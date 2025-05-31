@@ -1,11 +1,14 @@
 using IdempotentRetriesSandbox;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect("localhost"));
 builder.Services.AddSingleton<IProcessingService, ProcessingService>();
+builder.Services.AddSingleton<ISessionFactory, SessionFactory>();
 
 var app = builder.Build();
 
@@ -36,9 +39,14 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast");
 
-app.MapPost("/processings/{sessionId}",
-        (string sessionId, IProcessingService service) => service.StartProcessing(sessionId))
-    .WithName("StartProcessing")
+app.MapPost("/sessions/{sessionId}",
+        (string sessionId, IProcessingService service) => service.CreateSession(sessionId))
+    .WithName("CreateSession")
+    .WithOpenApi();
+
+app.MapDelete("/sessions/{sessionId}",
+        (string sessionId, IProcessingService service) => service.DeleteSession(sessionId))
+    .WithName("DeleteSession")
     .WithOpenApi();
 
 app.Run();

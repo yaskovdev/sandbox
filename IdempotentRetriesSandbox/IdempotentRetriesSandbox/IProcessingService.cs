@@ -2,5 +2,7 @@ namespace IdempotentRetriesSandbox;
 
 public interface IProcessingService
 {
-    Processing StartProcessing(string sessionId);
+    SessionEntity CreateSession(string sessionId);
+
+    void DeleteSession(string sessionId);
 }
