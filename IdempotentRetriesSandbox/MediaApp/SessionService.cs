@@ -29,14 +29,20 @@ public class SessionService : ISessionService, IAsyncDisposable
         var newProcessing = new SessionEntity(now, now);
         var newProcessingJson = JsonSerializer.Serialize(newProcessing);
         var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newProcessingJson]);
-        var sessionEntity = result.IsNull ? newProcessing : JsonSerializer.Deserialize<SessionEntity>((string)result);
-        var session = _sessionFactory.CreateSession(sessionId);
-        if (!_sessions.TryAdd(sessionId, session))
+
+        if (result.IsNull)
         {
-            session.Dispose();
+            var session = _sessionFactory.CreateSession(sessionId);
+            if (!_sessions.TryAdd(sessionId, session))
+            {
+                session.Dispose();
+            }
+
+            return newProcessing;
         }
 
-        return sessionEntity;
+        _logger.LogInformation("Session with ID {SessionId} is already being processed elsewhere", sessionId);
+        return JsonSerializer.Deserialize<SessionEntity>((string)result);
     }
 
     public void DeleteSession(string sessionId)
