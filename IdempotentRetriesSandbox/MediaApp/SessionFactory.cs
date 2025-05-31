@@ -1,4 +1,4 @@
-namespace IdempotentRetriesSandbox;
+namespace MediaApp;
 
 public class SessionFactory(IServiceProvider serviceProvider) : ISessionFactory
 {

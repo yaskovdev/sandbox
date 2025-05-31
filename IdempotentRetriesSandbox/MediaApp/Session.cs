@@ -1,4 +1,4 @@
-namespace IdempotentRetriesSandbox;
+namespace MediaApp;
 
 using Polly.Contrib.Simmy;
 using Polly.Contrib.Simmy.Outcomes;

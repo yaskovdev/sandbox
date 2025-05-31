@@ -1,4 +1,4 @@
-namespace IdempotentRetriesSandbox;
+namespace MediaApp;
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
