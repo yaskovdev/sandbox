@@ -1,8 +1,11 @@
+using IdempotentRetriesSandbox;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<IProcessingService, ProcessingService>();
 
 var app = builder.Build();
 
@@ -32,6 +35,11 @@ app.MapGet("/weatherforecast", () =>
         return forecast;
     })
     .WithName("GetWeatherForecast");
+
+app.MapPost("/processings/{sessionId}",
+        (string sessionId, IProcessingService service) => service.StartProcessing(sessionId))
+    .WithName("StartProcessing")
+    .WithOpenApi();
 
 app.Run();
 
