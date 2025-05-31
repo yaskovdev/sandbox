@@ -28,7 +28,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         var now = DateTime.Now;
         var newProcessing = new SessionEntity(now, now);
         var newProcessingJson = JsonSerializer.Serialize(newProcessing);
-        var result = database.ScriptEvaluate(_setIfNotExistsElseGet, [sessionId], [newProcessingJson]);
+        var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newProcessingJson]);
         var sessionEntity = result.IsNull ? newProcessing : JsonSerializer.Deserialize<SessionEntity>((string)result);
         var session = _sessionFactory.CreateSession(sessionId);
         if (!_sessions.TryAdd(sessionId, session))
@@ -46,7 +46,7 @@ public class SessionService : ISessionService, IAsyncDisposable
             session.Dispose();
             var database = _redis.GetDatabase();
             // TODO: probably should change state to Finished instead of deleting the session
-            database.KeyDelete(sessionId);
+            database.KeyDelete("session:" + sessionId);
         }
     }
 
@@ -66,11 +66,12 @@ public class SessionService : ISessionService, IAsyncDisposable
         }
     }
 
+    // TODO: should it be atomic?
     private void UpdateSession(string sessionId)
     {
         _logger.LogInformation("Updating session with ID: {SessionId}", sessionId);
         var database = _redis.GetDatabase();
-        var value = database.StringGet(sessionId);
+        var value = database.StringGet("session:" + sessionId);
         if (value.IsNull)
             return;
 
@@ -79,7 +80,7 @@ public class SessionService : ISessionService, IAsyncDisposable
             return;
 
         var updatedSession = session with { UpdatedAt = DateTime.Now };
-        database.StringSet(sessionId, JsonSerializer.Serialize(updatedSession));
+        database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
     }
 
     private static string ReadResource(string resourceName)

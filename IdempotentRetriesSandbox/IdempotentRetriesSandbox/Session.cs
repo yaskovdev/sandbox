@@ -17,7 +17,7 @@ public class Session : IDisposable
         _logger = logger;
         _chaosPolicy = MonkeyPolicy.InjectException(with =>
             with.Fault(new InvalidOperationException("Cannot start session, Media Platform is down"))
-                .InjectionRate(0.3)
+                .InjectionRate(0.4)
                 .Enabled(true)
         );
         Start();
