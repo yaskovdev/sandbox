@@ -29,20 +29,15 @@ public class SessionService : ISessionService, IAsyncDisposable
         var newProcessing = new SessionEntity(now, now);
         var newProcessingJson = JsonSerializer.Serialize(newProcessing);
         var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newProcessingJson]);
-
-        if (result.IsNull)
+        var sessionEntity = result.IsNull ? newProcessing : JsonSerializer.Deserialize<SessionEntity>((string)result);
+        // TODO: if two different instances will receive the same sessionId, they will both start processing it in parallel
+        var session = _sessionFactory.CreateSession(sessionId);
+        if (!_sessions.TryAdd(sessionId, session))
         {
-            var session = _sessionFactory.CreateSession(sessionId);
-            if (!_sessions.TryAdd(sessionId, session))
-            {
-                session.Dispose();
-            }
-
-            return newProcessing;
+            session.Dispose();
         }
 
-        _logger.LogInformation("Session with ID {SessionId} is already being processed elsewhere", sessionId);
-        return JsonSerializer.Deserialize<SessionEntity>((string)result);
+        return sessionEntity;
     }
 
     public void DeleteSession(string sessionId)
