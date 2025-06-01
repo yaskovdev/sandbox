@@ -20,9 +20,11 @@ internal static class Program
     {
         Console.WriteLine("Checking for stale sessions...");
         var redis = (ConnectionMultiplexer)state;
+        var database = redis.GetDatabase();
         foreach (var session in GetStaleSessions(redis))
         {
             Console.WriteLine("Found stale session: " + session);
+            database.StringSet("session:" + session.Id, JsonSerializer.Serialize(new SessionEntity(SessionState.Inactive, session.CreatedAt, session.UpdatedAt)));
             var httpClient = new HttpClient();
             var requestUri = $"http://localhost:5032/sessions/{session.Id}";
             var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");

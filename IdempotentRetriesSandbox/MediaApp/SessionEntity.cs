@@ -1,3 +1,3 @@
 namespace MediaApp;
 
-public record SessionEntity(DateTime CreatedAt, DateTime UpdatedAt);
+public record SessionEntity(SessionState State, DateTime CreatedAt, DateTime UpdatedAt);

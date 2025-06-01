@@ -7,7 +7,7 @@ using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
-    private readonly string _setIfNotExistsElseGet = ReadResource("SetIfNotExistsElseGet.lua");
+    private readonly string _setIfNotExistsElseGet = ReadResource("GetAndActivateSessionOrCreate.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
@@ -22,22 +22,26 @@ public class SessionService : ISessionService, IAsyncDisposable
         _timer = new Timer(UpdateSessions, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(3));
     }
 
-    public SessionEntity CreateSession(string sessionId)
+    public int CreateSession(string sessionId)
     {
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
-        var newProcessing = new SessionEntity(now, now);
-        var newProcessingJson = JsonSerializer.Serialize(newProcessing);
-        var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newProcessingJson]);
-        var sessionEntity = result.IsNull ? newProcessing : JsonSerializer.Deserialize<SessionEntity>((string)result);
-        // TODO: if two different instances will receive the same sessionId, they will both start processing it in parallel
-        var session = _sessionFactory.CreateSession(sessionId);
-        if (!_sessions.TryAdd(sessionId, session))
+        var newSession = new SessionEntity(SessionState.Active, now, now);
+        var newSessionJson = JsonSerializer.Serialize(newSession);
+        var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newSessionJson]);
+        if (SessionHasBeenCreatedOrActivated(result))
         {
-            session.Dispose();
+            var session = _sessionFactory.CreateSession(sessionId);
+            if (!_sessions.TryAdd(sessionId, session))
+            {
+                session.Dispose();
+            }
+
+            return (int)result;
         }
 
-        return sessionEntity;
+        _logger.LogWarning("Session with ID {SessionId} already exists in Redis in {State} state, ignoring the creation request", sessionId, SessionState.Active);
+        return (int)result;
     }
 
     public void DeleteSession(string sessionId)
@@ -88,5 +92,11 @@ public class SessionService : ISessionService, IAsyncDisposable
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", resourceName);
         return File.ReadAllText(path);
+    }
+
+    private static bool SessionHasBeenCreatedOrActivated(RedisResult result)
+    {
+        var status = (int)result;
+        return status is 0 or 1;
     }
 }
