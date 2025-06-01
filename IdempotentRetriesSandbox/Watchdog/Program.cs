@@ -64,12 +64,9 @@ internal static class Program
         }
     }
 
-    private static IImmutableList<string> GetSessionKeys(IConnectionMultiplexer redis)
+    private static ImmutableArray<string> GetSessionKeys(ConnectionMultiplexer redis)
     {
         var server = redis.GetServer(redis.GetEndPoints().First());
-
-        return server.Keys(pattern: "session:*", pageSize: 100)
-            .Select(key => key.ToString())
-            .ToImmutableArray();
+        return [..server.Keys(pattern: "session:*", pageSize: 100).Select(key => key.ToString())];
     }
 }

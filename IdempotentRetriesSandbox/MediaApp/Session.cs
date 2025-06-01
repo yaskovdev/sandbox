@@ -26,15 +26,14 @@ public class Session : IDisposable
                 .Enabled(true)
         );
         _latencyPolicy = MonkeyPolicy.InjectLatency(with =>
-            with.Latency(TimeSpan.FromSeconds(5))
-                .InjectionRate(0.4)
+            with.Latency(TimeSpan.FromSeconds(4))
+                .InjectionRate(0.7)
                 .Enabled(true)
         );
         _faultLatencyPolicy = Policy.Wrap(_faultPolicy, _latencyPolicy);
-        Start();
     }
 
-    private void Start()
+    public void Start()
     {
         _faultLatencyPolicy.Execute(() => _logger.LogInformation("Session with ID: {SessionId} started", _id));
     }

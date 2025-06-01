@@ -2,7 +2,7 @@ namespace MediaApp;
 
 public interface ISessionService
 {
-    int CreateSession(string sessionId);
+    SessionEntity CreateSession(string sessionId);
 
     void DeleteSession(string sessionId);
 }

@@ -2,12 +2,13 @@ namespace MediaApp;
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text.Json;
 using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
-    private readonly string _setIfNotExistsElseGet = ReadResource("GetAndActivateSessionOrCreate.lua");
+    private readonly string _getAndActivateSessionOrCreate = ReadResource("GetAndActivateSessionOrCreate.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
@@ -19,29 +20,38 @@ public class SessionService : ISessionService, IAsyncDisposable
         _redis = redis;
         _sessionFactory = sessionFactory;
         _logger = logger;
-        _timer = new Timer(UpdateSessions, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(3));
+        _timer = new Timer(UpdateSessions, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
-    public int CreateSession(string sessionId)
+    public SessionEntity CreateSession(string sessionId)
     {
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
         var newSession = new SessionEntity(SessionState.Active, now, now);
         var newSessionJson = JsonSerializer.Serialize(newSession);
-        var result = database.ScriptEvaluate(_setIfNotExistsElseGet, ["session:" + sessionId], [newSessionJson]);
-        if (SessionHasBeenCreatedOrActivated(result))
+        var result = (RedisValue[])database.ScriptEvaluate(_getAndActivateSessionOrCreate, ["session:" + sessionId], [newSessionJson]);
+        var sessionEntity = JsonSerializer.Deserialize<SessionEntity>((string)result[1]);
+
+        // It is important to claim (activate) the session in Redis first before starting any processing.
+        if (SessionHasBeenCreatedOrActivated((int)result[0]))
         {
             var session = _sessionFactory.CreateSession(sessionId);
-            if (!_sessions.TryAdd(sessionId, session))
+            if (_sessions.TryAdd(sessionId, session))
             {
+                session.Start();
+            }
+            else
+            {
+                Debug.Fail("Session with ID " + sessionId + " already exists in the dictionary. This should never happen, because the Redis check should prevent this");
                 session.Dispose();
             }
-
-            return (int)result;
+        }
+        else
+        {
+            _logger.LogWarning("Session with ID {SessionId} already exists in Redis in {State} state, ignoring the creation request", sessionId, SessionState.Active);
         }
 
-        _logger.LogWarning("Session with ID {SessionId} already exists in Redis in {State} state, ignoring the creation request", sessionId, SessionState.Active);
-        return (int)result;
+        return sessionEntity;
     }
 
     public void DeleteSession(string sessionId)
@@ -94,9 +104,5 @@ public class SessionService : ISessionService, IAsyncDisposable
         return File.ReadAllText(path);
     }
 
-    private static bool SessionHasBeenCreatedOrActivated(RedisResult result)
-    {
-        var status = (int)result;
-        return status is 0 or 1;
-    }
+    private static bool SessionHasBeenCreatedOrActivated(int status) => status == 1;
 }
