@@ -8,6 +8,7 @@ using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
+    private readonly string _getAndActivateSessionOrCreate = ReadResource("GetAndActivateSessionOrCreate.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
@@ -22,13 +23,20 @@ public class SessionService : ISessionService, IAsyncDisposable
         _timer = new Timer(UpdateSessions, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
-    public SessionEntity CreateSession()
+    // TODO: start recording, check onincomingcallreceived, remove the bot, start recording again, compare onincomingcallreceived-s. What should we use to deduplicate?
+    // Call ID doesn't fit most likely: if someone removes the bot manually, how can it be then added to the same call?
+    public Outcome CreateCall(string callId)
     {
         var sessionId = Guid.NewGuid().ToString();
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
         var newSession = new SessionEntity(SessionState.Active, now, now);
-        database.StringSet("session:" + sessionId, JsonSerializer.Serialize(newSession));
+        var result = (int)database.ScriptEvaluate(_getAndActivateSessionOrCreate, ["call:" + callId, "session:" + sessionId], [JsonSerializer.Serialize(newSession)]);
+
+        if (result == 0)
+        {
+            return Outcome.Unchanged;
+        }
 
         var session = _sessionFactory.CreateSession(sessionId);
         if (_sessions.TryAdd(sessionId, session))
@@ -41,11 +49,12 @@ public class SessionService : ISessionService, IAsyncDisposable
             session.Dispose();
         }
 
-        return newSession;
+        return Outcome.Created;
     }
 
     public void AssignSession(string sessionId)
     {
+        // TODO: create a session with a new ID
         var session = _sessionFactory.CreateSession(sessionId);
         if (_sessions.TryAdd(sessionId, session))
         {
@@ -99,6 +108,13 @@ public class SessionService : ISessionService, IAsyncDisposable
             return;
 
         var updatedSession = session with { UpdatedAt = DateTime.Now };
-        database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
+        ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0.9)
+            .Execute(() => database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession)));
+    }
+
+    private static string ReadResource(string resourceName)
+    {
+        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", resourceName);
+        return File.ReadAllText(path);
     }
 }

@@ -7,7 +7,7 @@ docker run --name redis_instance -d -p 6379:6379 redis
 ## Testing
 
 ```shell
-curl -X POST "http://localhost:5032/sessions" -H "Content-Type: application/json"
+curl -X PUT "http://localhost:5032/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 
 curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 ```
@@ -27,3 +27,6 @@ curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174
     - Worker A is assigned to session S1.
     - Worker A gets partitioned from Redis, which prevents it from extending the lease of the session.
     - Watchdog detects that S1 is not owned by any worker and assigns it to Worker B.
+3. If the `/calls/{callId}` responds with a 200, then the call will be eventually assigned a worker. A call is assigned
+   a worker if one or more of its sessions is assigned a worker.
+4. If the `/calls/{callId}` responds with a code other than 200, then the call may or may not be assigned a worker.

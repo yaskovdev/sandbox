@@ -2,7 +2,7 @@ namespace MediaApp;
 
 public interface ISessionService
 {
-    SessionEntity CreateSession();
+    Outcome CreateCall(string callId);
 
     void AssignSession(string sessionId);
 
