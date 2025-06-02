@@ -7,11 +7,9 @@ docker run --name redis_instance -d -p 6379:6379 redis
 ## Testing
 
 ```shell
-curl -X POST "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
-curl -X POST "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174001" -H "Content-Type: application/json"
+curl -X POST "http://localhost:5032/sessions" -H "Content-Type: application/json"
 
 curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
-curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174001" -H "Content-Type: application/json"
 ```
 
 ## Assumptions
@@ -26,6 +24,6 @@ curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174
 
 1. Each session will be eventually assigned a worker.
 2. More than one worker may be assigned to a session. For example:
-   - Worker A is assigned to session S1.
-   - Worker A gets partitioned from Redis, which prevents it from extending the lease of the session.
-   - Watchdog detects that S1 is not owned by any worker and assigns it to Worker B.
+    - Worker A is assigned to session S1.
+    - Worker A gets partitioned from Redis, which prevents it from extending the lease of the session.
+    - Watchdog detects that S1 is not owned by any worker and assigns it to Worker B.

@@ -30,15 +30,8 @@ internal static class Program
             var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
             try
             {
-                var response = httpClient.PostAsync(requestUri, content).GetAwaiter().GetResult();
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"Successfully assigned session {session.Id}");
-                }
-                else
-                {
-                    Console.WriteLine($"Failed to assign session {session.Id}: {response.StatusCode}");
-                }
+                var response = httpClient.PatchAsync(requestUri, content).GetAwaiter().GetResult();
+                Console.WriteLine(response.IsSuccessStatusCode ? $"Successfully assigned session {session.Id}" : $"Failed to assign session {session.Id}: {response.StatusCode}");
             }
             catch (HttpRequestException e)
             {

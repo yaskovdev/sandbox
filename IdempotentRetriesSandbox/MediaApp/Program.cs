@@ -20,9 +20,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/sessions/{sessionId}",
-        (string sessionId, ISessionService service) => service.CreateSession(sessionId))
+app.MapPost("/sessions",
+        (ISessionService service) => service.CreateSession())
     .WithName("CreateSession")
+    .WithOpenApi();
+
+app.MapPatch("/sessions/{sessionId}",
+        (string sessionId, ISessionService service) => service.AssignSession(sessionId))
+    .WithName("AssignSession")
     .WithOpenApi();
 
 app.MapDelete("/sessions/{sessionId}",
