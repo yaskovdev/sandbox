@@ -8,6 +8,7 @@ using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
+    private static readonly TimeSpan LeaseExtensionPeriod = TimeSpan.FromSeconds(6);
     private readonly string _createCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
     private readonly string _transferSession = ReadResource("TransferSession.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
@@ -32,7 +33,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         var newSessionId = Guid.NewGuid().ToString();
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
-        var newSession = new SessionEntity(callId, SessionState.Active, now, now);
+        var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
         var result = (int)database.ScriptEvaluate(_createCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
 
         if (result == 0)
@@ -62,7 +63,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         // TODO: create a session with a new ID
         var newSessionId = Guid.NewGuid().ToString();
         var now = DateTime.Now;
-        var newSession = new SessionEntity(callId, SessionState.Active, now, now);
+        var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
 
         var database = _redis.GetDatabase();
         database.ScriptEvaluate(_transferSession, ["call:" + callId, "session:" + sessionId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
@@ -121,9 +122,8 @@ public class SessionService : ISessionService, IAsyncDisposable
         if (session == null)
             return;
 
-        var updatedSession = session with { LeaseExpiresAt = DateTime.Now + TimeSpan.FromSeconds(6) };
+        var updatedSession = session with { LeaseExpiresAt = DateTime.Now + LeaseExtensionPeriod };
         database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
-        _logger.LogInformation("Extended a lease for the session with ID: {SessionId}", sessionId);
         // ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0)
         //     .Execute(() =>
         //     {

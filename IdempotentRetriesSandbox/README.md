@@ -1,15 +1,27 @@
 ## Prerequisites
 
+Start Redis in Docker:
+
 ```shell
 docker run --name redis_instance -d -p 6379:6379 redis
 ```
 
+Start HAProxy in Docker:
+
+```shell
+docker run -d --name haproxy_lb -p 8080:8080 -v $(pwd)/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg haproxy
+```
+
+Start all the MediaApp instances (see the launchSettings.json).
+
+Start the Watchdog.
+
 ## Testing
 
 ```shell
-curl -X PUT "http://localhost:5032/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:8080/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 
-curl -X DELETE "http://localhost:5032/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+curl -v -X DELETE "http://localhost:8080/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 ```
 
 ## Assumptions
