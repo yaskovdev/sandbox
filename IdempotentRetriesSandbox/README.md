@@ -42,3 +42,19 @@ curl -v -X DELETE "http://localhost:8080/sessions/123e4567-e89b-12d3-a456-426614
 3. If the `/calls/{callId}` responds with a 200, then the call will be eventually assigned a worker. A call is assigned
    a worker if one or more of its sessions is assigned a worker.
 4. If the `/calls/{callId}` responds with a code other than 200, then the call may or may not be assigned a worker.
+
+## Considerations
+
+For each session, an instance can periodically check if there is another instance that is handling a session of the same call.
+
+If it is, the instance can *inactivate the session* and stop session processing.
+
+If the instance can't check, for example, because it is partitioned from Redis, it has two options:
+
+1. Keep processing the session and extending the lease. In this case, there is a chance that a call will multiple
+   parallel sessions.
+2. Inactivate the session and stop processing it. In this case, there is a chance that the call will not be processed at
+   all.
+
+There is a risk though that the other instance will do the same. As a result, both the sessions will be stopped, which
+is not desired. We probably need a way to order instances.

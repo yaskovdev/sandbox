@@ -25,9 +25,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         _timer = new Timer(ExtendSessionsLease, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
-    // TODO: start recording, check onincomingcallreceived, remove the bot, start recording again, compare onincomingcallreceived-s. What should we use to deduplicate?
-    // Call ID doesn't fit most likely: if someone removes the bot manually, how can it be then added to the same call?
-    // The "deduplicating" field should stay the same between retries, by the way.
+    // Call ID is used as the idempotency token.
     public Outcome CreateCall(string callId)
     {
         var newSessionId = Guid.NewGuid().ToString();
