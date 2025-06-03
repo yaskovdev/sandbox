@@ -121,7 +121,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         if (session == null)
             return;
 
-        var updatedSession = session with { UpdatedAt = DateTime.Now };
+        var updatedSession = session with { LeaseExpiresAt = DateTime.Now + TimeSpan.FromSeconds(6) };
         database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
         _logger.LogInformation("Extended a lease for the session with ID: {SessionId}", sessionId);
         // ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0)

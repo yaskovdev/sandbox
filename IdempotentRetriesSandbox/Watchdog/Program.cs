@@ -18,18 +18,18 @@ internal static class Program
 
     private static void ReassignStaleSessions(object? state)
     {
-        Console.WriteLine("Checking for stale sessions...");
+        Console.WriteLine("Checking for sessions with expired leases...");
         var redis = (ConnectionMultiplexer)state;
         foreach (var session in GetStaleSessions(redis))
         {
-            Console.WriteLine("Found stale session: " + session);
+            Console.WriteLine("Found session with expired lease: " + session);
             var httpClient = new HttpClient();
             var requestUri = $"http://localhost:5032/calls/{session.CallId}/sessions/{session.Id}/transfer";
             var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
             try
             {
                 var response = httpClient.PostAsync(requestUri, content).GetAwaiter().GetResult();
-                Console.WriteLine(response.IsSuccessStatusCode ? $"Successfully assigned session {session.Id}" : $"Failed to assign session {session.Id}: {response.StatusCode}");
+                Console.WriteLine(response.IsSuccessStatusCode ? $"Successfully transferred session {session.Id}" : $"Failed to transfer session {session.Id}: {response.StatusCode}");
             }
             catch (HttpRequestException e)
             {
@@ -48,9 +48,9 @@ internal static class Program
             var sessionJson = database.StringGet(sessionKey);
             var session = JsonSerializer.Deserialize<SessionEntity>(sessionJson);
             // TODO: in reality we additionally check if the assigned instance is processing this session, why?
-            if (session.State == SessionState.Active && now - session.UpdatedAt >= TimeSpan.FromSeconds(6))
+            if (session.State == SessionState.Active && now >= session.LeaseExpiresAt)
             {
-                yield return new Session(sessionKey.Split(':')[1], session.CallId, session.CreatedAt, session.UpdatedAt);
+                yield return new Session(sessionKey.Split(':')[1], session.CallId, session.CreatedAt, session.LeaseExpiresAt);
             }
         }
     }
