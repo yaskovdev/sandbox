@@ -8,7 +8,8 @@ using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
-    private readonly string _getAndActivateSessionOrCreate = ReadResource("GetAndActivateSessionOrCreate.lua");
+    private readonly string _createCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
+    private readonly string _transferSession = ReadResource("TransferSession.lua");
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
@@ -20,49 +21,60 @@ public class SessionService : ISessionService, IAsyncDisposable
         _redis = redis;
         _sessionFactory = sessionFactory;
         _logger = logger;
-        _timer = new Timer(UpdateSessions, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        _timer = new Timer(ExtendSessionsLease, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
     // TODO: start recording, check onincomingcallreceived, remove the bot, start recording again, compare onincomingcallreceived-s. What should we use to deduplicate?
     // Call ID doesn't fit most likely: if someone removes the bot manually, how can it be then added to the same call?
+    // The "deduplicating" field should stay the same between retries, by the way.
     public Outcome CreateCall(string callId)
     {
-        var sessionId = Guid.NewGuid().ToString();
+        var newSessionId = Guid.NewGuid().ToString();
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
-        var newSession = new SessionEntity(SessionState.Active, now, now);
-        var result = (int)database.ScriptEvaluate(_getAndActivateSessionOrCreate, ["call:" + callId, "session:" + sessionId], [JsonSerializer.Serialize(newSession)]);
+        var newSession = new SessionEntity(callId, SessionState.Active, now, now);
+        var result = (int)database.ScriptEvaluate(_createCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
 
         if (result == 0)
         {
             return Outcome.Unchanged;
         }
 
-        var session = _sessionFactory.CreateSession(sessionId);
-        if (_sessions.TryAdd(sessionId, session))
+        var session = _sessionFactory.CreateSession(newSessionId);
+        if (_sessions.TryAdd(newSessionId, session))
         {
             session.Start();
         }
         else
         {
-            Debug.Fail("Session with ID " + sessionId + " already exists in the dictionary. This should never happen, because the session ID is a GUID");
+            Debug.Fail("Session with ID " + newSessionId + " already exists in the dictionary. This should never happen, because the session ID is a GUID");
             session.Dispose();
         }
 
         return Outcome.Created;
     }
 
-    public void AssignSession(string sessionId)
+    /// <summary>
+    /// Transactionally inactivates the existing session (to make it not eligible for Watchdog) and creates a new one.
+    /// </summary>
+    public void TransferSession(string callId, string sessionId)
     {
         // TODO: create a session with a new ID
-        var session = _sessionFactory.CreateSession(sessionId);
-        if (_sessions.TryAdd(sessionId, session))
+        var newSessionId = Guid.NewGuid().ToString();
+        var now = DateTime.Now;
+        var newSession = new SessionEntity(callId, SessionState.Active, now, now);
+
+        var database = _redis.GetDatabase();
+        database.ScriptEvaluate(_transferSession, ["call:" + callId, "session:" + sessionId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
+
+        var session = _sessionFactory.CreateSession(newSessionId);
+        if (_sessions.TryAdd(newSessionId, session))
         {
             session.Start();
         }
         else
         {
-            // This may happen if the instance failed to extend the session lease and then Watchdog reassigned it to the same instance.
+            // This may happen if the instance fails to extend the session lease and then Watchdog transfer it to the same instance.
             session.Dispose();
         }
     }
@@ -84,20 +96,22 @@ public class SessionService : ISessionService, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void UpdateSessions(object? state)
+    private void ExtendSessionsLease(object? state)
     {
         IDictionary<string, Session>? sessions = (ConcurrentDictionary<string, Session>?)state;
         var sessionIds = (sessions ?? ImmutableDictionary<string, Session>.Empty).Keys.ToImmutableArray();
         foreach (var sessionId in sessionIds)
         {
-            UpdateSession(sessionId);
+            ExtendSessionLease(sessionId);
         }
     }
 
     // TODO: should it be atomic?
-    private void UpdateSession(string sessionId)
+    // TODO: should the timer wait for the previous execution to finish? If it does not wait, then we may overwhelm the Redis server with requests.
+    // If it waits, then there is a bigger chance for Watchdog to falsely declare the session stale, if, say, only 50% of Redis requests have a long latency.
+    private void ExtendSessionLease(string sessionId)
     {
-        _logger.LogInformation("Updating session with ID: {SessionId}", sessionId);
+        _logger.LogInformation("Extending a lease for the session with ID: {SessionId}", sessionId);
         var database = _redis.GetDatabase();
         var value = database.StringGet("session:" + sessionId);
         if (value.IsNull)
@@ -108,8 +122,12 @@ public class SessionService : ISessionService, IAsyncDisposable
             return;
 
         var updatedSession = session with { UpdatedAt = DateTime.Now };
-        ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0.9)
-            .Execute(() => database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession)));
+        database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
+        _logger.LogInformation("Extended a lease for the session with ID: {SessionId}", sessionId);
+        // ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0)
+        //     .Execute(() =>
+        //     {
+        //     });
     }
 
     private static string ReadResource(string resourceName)

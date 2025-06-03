@@ -25,8 +25,8 @@ app.MapPut("/calls/{callId}",
     .WithName("CreateCall")
     .WithOpenApi();
 
-app.MapPatch("/sessions/{sessionId}",
-        (string sessionId, ISessionService service) => service.AssignSession(sessionId))
+app.MapPost("/calls/{callId}/sessions/{sessionId}/transfer",
+        (string callId, string sessionId, ISessionService service) => service.TransferSession(callId, sessionId))
     .WithName("AssignSession")
     .WithOpenApi();
 
