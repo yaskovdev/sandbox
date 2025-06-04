@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watchdog", "Watchdog\Watchdog.csproj", "{6C8F4808-70D5-427E-986E-71ECE0944E41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadBalancer", "LoadBalancer\LoadBalancer.csproj", "{FDD0F450-7412-4442-B31A-F2FDFDE2B71F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{6C8F4808-70D5-427E-986E-71ECE0944E41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C8F4808-70D5-427E-986E-71ECE0944E41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C8F4808-70D5-427E-986E-71ECE0944E41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDD0F450-7412-4442-B31A-F2FDFDE2B71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDD0F450-7412-4442-B31A-F2FDFDE2B71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDD0F450-7412-4442-B31A-F2FDFDE2B71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDD0F450-7412-4442-B31A-F2FDFDE2B71F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
