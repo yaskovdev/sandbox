@@ -2,11 +2,14 @@ namespace LoadBalancer;
 
 using System.Collections.Immutable;
 using Ardalis.GuardClauses;
+using NeoSmart.AsyncLock;
 
-public class WorkerPool : IWorkerPool, IDisposable
+public class WorkerPool : IWorkerPool, IAsyncDisposable
 {
     private class Worker(Uri uri, WorkerStatus status)
     {
+        public AsyncLock Lock { get; } = new();
+
         public Uri Uri { get; } = uri;
 
         // The property should be accessed in a thread-safe manner.
@@ -14,7 +17,9 @@ public class WorkerPool : IWorkerPool, IDisposable
     }
 
     private readonly HttpClient _httpClient;
-    private readonly Timer _timer;
+    private readonly PeriodicTimer _timer;
+    private readonly CancellationTokenSource _cancellationToken = new();
+    private readonly Task _poller;
     private readonly ILogger<WorkerPool> _logger;
 
     // Initialize workers as busy for safety, until the poller updates their actual status.
@@ -27,15 +32,16 @@ public class WorkerPool : IWorkerPool, IDisposable
     public WorkerPool(ILogger<WorkerPool> logger)
     {
         _httpClient = new HttpClient();
-        _timer = new Timer(UpdateWorkersStatus, _workers, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+        _timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
         _logger = logger;
+        _poller = UpdateWorkersStatus();
     }
 
-    public Uri? ReserveWorker()
+    public async Task<Uri?> ReserveWorker()
     {
         foreach (var worker in _workers)
         {
-            lock (worker)
+            using (await worker.Lock.LockAsync())
             {
                 if (worker.Status == WorkerStatus.Idle)
                 {
@@ -49,20 +55,17 @@ public class WorkerPool : IWorkerPool, IDisposable
         return null;
     }
 
-    public void ReleaseWorker(Uri workerUri, WorkerStatus newStatus)
+    public async Task ReleaseWorker(Uri workerUri, WorkerStatus newStatus)
     {
         Guard.Against.InvalidInput(newStatus, nameof(newStatus), c => c is WorkerStatus.Idle or WorkerStatus.Busy, $"New status must be either {WorkerStatus.Idle} or {WorkerStatus.Busy}");
 
-        foreach (var worker in _workers)
+        foreach (var worker in _workers.Where(worker => worker.Uri.Equals(workerUri)))
         {
-            if (worker.Uri.Equals(workerUri))
+            using (await worker.Lock.LockAsync())
             {
-                lock (worker)
-                {
-                    worker.Status = newStatus;
-                    _logger.LogInformation("Released worker: {Uri} with status: {Status}", worker.Uri, newStatus);
-                    return;
-                }
+                worker.Status = newStatus;
+                _logger.LogInformation("Released worker: {Uri} with status: {Status}", worker.Uri, newStatus);
+                return;
             }
         }
 
@@ -70,33 +73,44 @@ public class WorkerPool : IWorkerPool, IDisposable
         _logger.LogWarning("Attempted to release unknown worker: {Uri}", workerUri);
     }
 
-    private void UpdateWorkersStatus(object? state)
+    private async Task UpdateWorkersStatus()
     {
-        var workers = (ImmutableArray<Worker>)state;
-        foreach (var worker in workers)
+        try
         {
-            lock (worker)
+            do
             {
-                if (worker.Status != WorkerStatus.Reserved)
+                _logger.LogInformation("Updating workers status...");
+                foreach (var worker in _workers)
                 {
-                    try
+                    using (await worker.Lock.LockAsync())
                     {
-                        var response = _httpClient.GetAsync(new Uri(worker.Uri, "/health")).GetAwaiter().GetResult();
-                        worker.Status = response.IsSuccessStatusCode ? WorkerStatus.Idle : WorkerStatus.Busy;
-                    }
-                    catch (HttpRequestException)
-                    {
-                        worker.Status = WorkerStatus.Busy;
+                        if (worker.Status != WorkerStatus.Reserved)
+                        {
+                            try
+                            {
+                                var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/health"));
+                                worker.Status = response.IsSuccessStatusCode ? WorkerStatus.Idle : WorkerStatus.Busy;
+                            }
+                            catch (HttpRequestException)
+                            {
+                                worker.Status = WorkerStatus.Busy;
+                            }
+                        }
                     }
                 }
-            }
+            } while (await _timer.WaitForNextTickAsync(_cancellationToken.Token));
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        await _cancellationToken.CancelAsync();
+        await _poller;
+        _cancellationToken.Dispose();
         _httpClient.Dispose();
-        _timer.Dispose();
         GC.SuppressFinalize(this);
     }
 }

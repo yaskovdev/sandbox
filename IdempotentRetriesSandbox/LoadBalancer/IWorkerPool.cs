@@ -2,7 +2,7 @@ namespace LoadBalancer;
 
 public interface IWorkerPool
 {
-    Uri? ReserveWorker();
+    Task<Uri?> ReserveWorker();
 
-    void ReleaseWorker(Uri workerUri, WorkerStatus newStatus);
+    Task ReleaseWorker(Uri workerUri, WorkerStatus newStatus);
 }

@@ -7,6 +7,7 @@ using Yarp.ReverseProxy.Forwarder;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IWorkerPool, WorkerPool>();
+builder.Services.AddHostedService<WorkerPoolService>();
 builder.Services.AddHttpForwarder();
 
 var httpClient = new HttpMessageInvoker(new SocketsHttpHandler
@@ -26,18 +27,18 @@ app.UseRouting();
 app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forwarder) =>
 {
     var workerPool = app.Services.GetRequiredService<IWorkerPool>();
-    var workerUri = workerPool.ReserveWorker();
+    var workerUri = await workerPool.ReserveWorker();
     var error = await forwarder.SendAsync(httpContext, workerUri.ToString(), httpClient);
     if (error == ForwarderError.None)
     {
         // TODO: if the worker replied with outcome Unchanged, release the worker as Idle
-        workerPool.ReleaseWorker(workerUri, WorkerStatus.Busy);
+        await workerPool.ReleaseWorker(workerUri, WorkerStatus.Busy);
     }
     else
     {
         // TODO: you should probably retry here, until the job is submitted. Or, likely better, the caller should retry.
         // TODO: you may want to use Idle if you are sure the job wasn't submitted to the worker
-        workerPool.ReleaseWorker(workerUri, WorkerStatus.Busy);
+        await workerPool.ReleaseWorker(workerUri, WorkerStatus.Busy);
         var errorFeature = httpContext.GetForwarderErrorFeature();
         var exception = errorFeature?.Exception;
     }
