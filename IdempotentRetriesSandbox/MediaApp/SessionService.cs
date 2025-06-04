@@ -25,6 +25,8 @@ public class SessionService : ISessionService, IAsyncDisposable
         _timer = new Timer(ExtendSessionsLease, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
+    public int SessionCount => _sessions.Count;
+
     // Call ID is used as the idempotency token.
     public Outcome CreateCall(string callId)
     {

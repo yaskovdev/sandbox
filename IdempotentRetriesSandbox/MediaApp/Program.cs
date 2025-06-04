@@ -20,6 +20,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/health",
+        (ISessionService service) => service.SessionCount == 0 ? Results.StatusCode(200) : Results.StatusCode(503))
+    .WithName("Health")
+    .WithOpenApi();
+
 app.MapPut("/calls/{callId}",
         (string callId, ISessionService service) => service.CreateCall(callId))
     .WithName("CreateCall")
