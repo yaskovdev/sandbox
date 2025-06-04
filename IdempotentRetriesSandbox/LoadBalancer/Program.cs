@@ -7,7 +7,7 @@ using Yarp.ReverseProxy.Forwarder;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IWorkerPool, WorkerPool>();
-builder.Services.AddHostedService<WorkerPoolService>();
+builder.Services.AddHostedService<EagerInstantiationHostedService<IWorkerPool>>();
 builder.Services.AddHttpForwarder();
 
 var httpClient = new HttpMessageInvoker(new SocketsHttpHandler

@@ -16,10 +16,11 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         public WorkerStatus Status { get; set; } = status;
     }
 
+    private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(10);
     private readonly HttpClient _httpClient;
     private readonly PeriodicTimer _timer;
     private readonly CancellationTokenSource _cancellationToken = new();
-    private readonly Task _poller;
+    private readonly Task _pollerTask;
     private readonly ILogger<WorkerPool> _logger;
 
     // Initialize workers as busy for safety, until the poller updates their actual status.
@@ -32,9 +33,9 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
     public WorkerPool(ILogger<WorkerPool> logger)
     {
         _httpClient = new HttpClient();
-        _timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        _timer = new PeriodicTimer(PollerPeriod);
         _logger = logger;
-        _poller = UpdateWorkersStatus();
+        _pollerTask = UpdateWorkersStatus();
     }
 
     public async Task<Uri?> ReserveWorker()
@@ -46,7 +47,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
                 if (worker.Status == WorkerStatus.Idle)
                 {
                     worker.Status = WorkerStatus.Reserved;
-                    _logger.LogInformation("Reserved worker: {Uri}", worker.Uri);
+                    LogWorkerStatusChange(worker.Uri, WorkerStatus.Idle, worker.Status);
                     return worker.Uri;
                 }
             }
@@ -63,14 +64,24 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         {
             using (await worker.Lock.LockAsync())
             {
+                var status = worker.Status;
                 worker.Status = newStatus;
-                _logger.LogInformation("Released worker: {Uri} with status: {Status}", worker.Uri, newStatus);
+                LogWorkerStatusChange(worker.Uri, status, worker.Status);
                 return;
             }
         }
 
         // ReSharper disable once InconsistentlySynchronizedField, since logger is thread-safe
         _logger.LogWarning("Attempted to release unknown worker: {Uri}", workerUri);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _cancellationToken.CancelAsync();
+        await _pollerTask;
+        _cancellationToken.Dispose();
+        _httpClient.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private async Task UpdateWorkersStatus()
@@ -80,12 +91,14 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
             do
             {
                 _logger.LogInformation("Updating workers status...");
+                // TODO: probably faster to run it in parallel
                 foreach (var worker in _workers)
                 {
                     using (await worker.Lock.LockAsync())
                     {
-                        if (worker.Status != WorkerStatus.Reserved)
+                        if (worker.Status is WorkerStatus.Idle or WorkerStatus.Busy)
                         {
+                            var status = worker.Status;
                             try
                             {
                                 var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/health"));
@@ -95,6 +108,8 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
                             {
                                 worker.Status = WorkerStatus.Busy;
                             }
+
+                            LogWorkerStatusChange(worker.Uri, status, worker.Status);
                         }
                     }
                 }
@@ -105,12 +120,11 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         }
     }
 
-    public async ValueTask DisposeAsync()
+    private void LogWorkerStatusChange(Uri workerUri, WorkerStatus oldStatus, WorkerStatus newStatus)
     {
-        await _cancellationToken.CancelAsync();
-        await _poller;
-        _cancellationToken.Dispose();
-        _httpClient.Dispose();
-        GC.SuppressFinalize(this);
+        if (oldStatus != newStatus)
+        {
+            _logger.LogInformation("Worker {Uri} status changed from {OldStatus} to {NewStatus}", workerUri, oldStatus, newStatus);
+        }
     }
 }
