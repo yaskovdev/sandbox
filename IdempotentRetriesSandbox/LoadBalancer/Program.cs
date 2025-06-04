@@ -1,25 +1,11 @@
 using LoadBalancer;
-using Yarp.ReverseProxy.LoadBalancing;
+using Yarp.ReverseProxy.Forwarder;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddSingleton<ILoadBalancingPolicy, SessionAwareLoadBalancer>();
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+builder.Services.AddHttpForwarder();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-app.MapReverseProxy();
-
+app.UseRouting();
+app.MapForwarder("/{**catch-all}", "http://localhost:5032", ForwarderRequestConfig.Empty, new CustomTransformer());
 app.Run();
