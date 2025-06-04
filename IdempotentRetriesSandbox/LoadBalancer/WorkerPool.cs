@@ -16,7 +16,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         public WorkerStatus Status { get; set; } = status;
     }
 
-    private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(5);
     private readonly HttpClient _httpClient;
     private readonly PeriodicTimer _timer;
     private readonly CancellationTokenSource _cancellationToken = new();
@@ -28,7 +28,6 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         ImmutableArray<Worker>.Empty
             .Add(new Worker(new Uri("http://localhost:5032"), WorkerStatus.Busy))
             .Add(new Worker(new Uri("http://localhost:5033"), WorkerStatus.Busy));
-
 
     public WorkerPool(ILogger<WorkerPool> logger)
     {
@@ -90,12 +89,12 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         {
             do
             {
-                _logger.LogInformation("Updating workers status...");
                 // TODO: probably faster to run it in parallel
                 foreach (var worker in _workers)
                 {
                     using (await worker.Lock.LockAsync())
                     {
+                        // TODO: you should probably poll the busy workers less often.
                         if (worker.Status is WorkerStatus.Idle or WorkerStatus.Busy)
                         {
                             var status = worker.Status;

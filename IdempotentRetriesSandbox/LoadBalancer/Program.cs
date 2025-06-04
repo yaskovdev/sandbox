@@ -18,7 +18,7 @@ var httpClient = new HttpMessageInvoker(new SocketsHttpHandler
     UseCookies = false,
     EnableMultipleHttp2Connections = true,
     ActivityHeadersPropagator = new ReverseProxyPropagator(DistributedContextPropagator.Current),
-    ConnectTimeout = TimeSpan.FromSeconds(15),
+    ConnectTimeout = TimeSpan.FromSeconds(15)
 });
 
 var app = builder.Build();
@@ -28,6 +28,13 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
 {
     var workerPool = app.Services.GetRequiredService<IWorkerPool>();
     var workerUri = await workerPool.ReserveWorker();
+    if (workerUri == null)
+    {
+        // TODO: the existing implementation requires a free worker to even check if the job has already been submitted. Probably not a big deal, need to check.
+        // One option is to use a busy worker to check if the job has already been submitted.
+        return Results.StatusCode(503);
+    }
+
     var error = await forwarder.SendAsync(httpContext, workerUri.ToString(), httpClient);
     if (error == ForwarderError.None)
     {
@@ -42,5 +49,7 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
         var errorFeature = httpContext.GetForwarderErrorFeature();
         var exception = errorFeature?.Exception;
     }
+
+    return Results.Empty;
 });
 app.Run();

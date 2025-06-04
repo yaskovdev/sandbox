@@ -6,11 +6,7 @@ Start Redis in Docker:
 docker run --name redis_instance -d -p 6379:6379 redis
 ```
 
-Start HAProxy in Docker:
-
-```shell
-docker run -d --name haproxy_lb -p 8080:8080 -v $(pwd)/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg haproxy
-```
+Start the LoadBalancer.
 
 Start all the MediaApp instances (see the launchSettings.json).
 
@@ -19,9 +15,9 @@ Start the Watchdog.
 ## Testing
 
 ```shell
-curl -v -X PUT "http://localhost:8080/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 
-curl -v -X DELETE "http://localhost:8080/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+curl -v -X DELETE "http://localhost:5110/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 ```
 
 ## Assumptions
@@ -45,7 +41,8 @@ curl -v -X DELETE "http://localhost:8080/sessions/123e4567-e89b-12d3-a456-426614
 
 ## Considerations
 
-For each session, an instance can periodically check if there is another instance that is handling a session of the same call.
+For each session, an instance can periodically check if there is another instance that is handling a session of the same
+call.
 
 If it is, the instance can *inactivate the session* and stop session processing.
 

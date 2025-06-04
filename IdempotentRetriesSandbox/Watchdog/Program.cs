@@ -24,7 +24,7 @@ internal static class Program
         {
             Console.WriteLine("Found session with expired lease: " + session);
             var httpClient = new HttpClient();
-            var requestUri = $"http://localhost:8080/calls/{session.CallId}/sessions/{session.Id}/transfer";
+            var requestUri = $"http://localhost:5110/calls/{session.CallId}/sessions/{session.Id}/transfer";
             var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
             try
             {
