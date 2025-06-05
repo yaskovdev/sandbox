@@ -38,9 +38,13 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
     var error = await forwarder.SendAsync(httpContext, worker.WorkerUri.ToString(), httpClient);
     if (error == ForwarderError.None)
     {
-        // If the worker responded with a 200 OK, it means the call already existed, therefore the session was not submitted,
-        // so we release the worker with the same number of available slots.
-        await workerPool.ReleaseWorker(worker.WorkerUri, httpContext.Response.StatusCode == StatusCodes.Status200OK ? worker.AvailableSlotCount : worker.AvailableSlotCount - 1);
+        var newAvailableSlotCount = httpContext.Response.StatusCode switch
+        {
+            StatusCodes.Status200OK => worker.AvailableSlotCount, // The call already existed, therefore the session was not submitted
+            StatusCodes.Status201Created => worker.AvailableSlotCount - 1, // The job was submitted, so we decrease the available slot count.
+            _ => 0u // For other statuses, we assume something is wrong with the worker, so we make it unavailable, until the poller actualizes its state.
+        };
+        await workerPool.ReleaseWorker(worker.WorkerUri, newAvailableSlotCount);
     }
     else
     {

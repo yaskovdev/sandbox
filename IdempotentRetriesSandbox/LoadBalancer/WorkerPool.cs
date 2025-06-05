@@ -18,6 +18,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         /// </summary>
         public bool IsReserved { get; set; } = reserved;
 
+        // We may want to distinguish between a healthy worker with 0 available slots and a faulty worker in the future.
         // The property should be accessed in a thread-safe manner.
         public uint AvailableSlotCount { get; set; } = availableSlotCount;
     }
