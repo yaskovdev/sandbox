@@ -7,7 +7,7 @@ public class Session(string id, ILogger<Session> logger) : IDisposable
 
     public void Start()
     {
-        ChaosMonkeyPolicies.LatencyFaultPolicy(TimeSpan.FromSeconds(4), 0.7, new InvalidOperationException("Cannot start session, Media Platform is down"), 0.4)
+        ChaosMonkeyPolicies.LatencyFaultPolicy(TimeSpan.FromSeconds(4), 0.2, new InvalidOperationException("Cannot start session, Media Platform is down"), 0.1)
             .Execute(() => logger.LogInformation("Session with ID: {SessionId} started", id));
     }
 

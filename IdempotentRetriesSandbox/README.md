@@ -16,6 +16,12 @@ Start the Watchdog.
 
 ```shell
 curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174001" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174002" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174003" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174004" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174005" -H "Content-Type: application/json"
+curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174007" -H "Content-Type: application/json"
 
 curl -v -X DELETE "http://localhost:5110/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
 ```
@@ -27,17 +33,19 @@ curl -v -X DELETE "http://localhost:5110/sessions/123e4567-e89b-12d3-a456-426614
     1. All the MediaApp instances share the same Redis cluster.
     2. A change to one Redis node is synchronously replicated to all other nodes in the Redis cluster.
 2. Lua scripts are atomic (TODO: check consequences of that they are not true ACID transactions).
+3. All the requests that may lead to a new session creation are routed through the LoadBalancer. If a session was
+   actually created, the MediaApp instance returns a 201 Created response.
 
 ## Guarantees
 
-1. Each session will be eventually assigned a worker.
+1. Each session will be eventually assigned a worker, as long as the workers have available slots.
 2. More than one worker may be assigned to a session. For example:
     - Worker A is assigned to session S1.
     - Worker A gets partitioned from Redis, which prevents it from extending the lease of the session.
     - Watchdog detects that S1 is not owned by any worker and assigns it to Worker B.
-3. If the `/calls/{callId}` responds with a 200, then the call will be eventually assigned a worker. A call is assigned
+3. If the `/calls/{callId}` responds with a 2**, then the call will be eventually assigned a worker. A call is assigned
    a worker if one or more of its sessions is assigned a worker.
-4. If the `/calls/{callId}` responds with a code other than 200, then the call may or may not be assigned a worker.
+4. If the `/calls/{callId}` responds with a code other than 2**, then the call may or may not be assigned a worker.
 
 ## Considerations
 

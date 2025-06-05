@@ -35,8 +35,8 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
         return Results.StatusCode(503);
     }
 
-    var error = await forwarder.SendAsync(httpContext, worker.WorkerUri.ToString(), httpClient);
-    if (error == ForwarderError.None)
+    var forwarderError = await forwarder.SendAsync(httpContext, worker.WorkerUri.ToString(), httpClient);
+    if (forwarderError == ForwarderError.None)
     {
         var newAvailableSlotCount = httpContext.Response.StatusCode switch
         {

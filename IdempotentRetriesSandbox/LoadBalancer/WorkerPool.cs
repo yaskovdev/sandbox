@@ -96,20 +96,19 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
     {
         do
         {
-            // TODO: probably faster to run it in parallel
-            foreach (var worker in _workers)
+            await Parallel.ForEachAsync(_workers, async (worker, cancellationToken) =>
             {
-                using (await worker.Lock.LockAsync())
+                using (await worker.Lock.LockAsync(cancellationToken))
                 {
                     if (worker is { IsReserved: false })
                     {
                         var availableSlotCount = worker.AvailableSlotCount;
                         try
                         {
-                            var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/status"));
+                            var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/status"), cancellationToken);
                             if (response.IsSuccessStatusCode)
                             {
-                                var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>();
+                                var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>(cancellationToken: cancellationToken);
                                 worker.AvailableSlotCount = statusResponse?.AvailableSlotCount ?? 0;
                             }
                             else
@@ -128,7 +127,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
                         }
                     }
                 }
-            }
+            });
         } while (await _timer.WaitForNextTickAsync());
     }
 }

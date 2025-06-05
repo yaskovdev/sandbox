@@ -1,7 +1,7 @@
 using MediaApp;
 using StackExchange.Redis;
 
-const uint TotalSlotCount = 3;
+const uint totalSlotCount = 3;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +23,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGet("/status",
-        (ISessionService service) => new MediaAppStatusResponse(TotalSlotCount - service.SessionCount))
+        (ISessionService service) => new MediaAppStatusResponse(totalSlotCount - service.SessionCount))
     .WithName("Status")
     .WithOpenApi();
 
@@ -40,7 +40,11 @@ app.MapPut("/calls/{callId}",
     .WithOpenApi();
 
 app.MapPost("/calls/{callId}/sessions/{sessionId}/transfer",
-        (string callId, string sessionId, ISessionService service) => service.TransferSession(callId, sessionId))
+        (string callId, string sessionId, ISessionService service) =>
+        {
+            var newSessionId = service.TransferSession(callId, sessionId);
+            return Results.Created($"/calls/{callId}/sessions/{newSessionId}", new SessionResponse(callId, sessionId));
+        })
     .WithName("TransferSession")
     .WithOpenApi();
 

@@ -61,7 +61,7 @@ public class SessionService : ISessionService, IAsyncDisposable
     /// <summary>
     /// Transactionally inactivates the existing session (to make it not eligible for Watchdog) and creates a new one.
     /// </summary>
-    public void TransferSession(string callId, string sessionId)
+    public string TransferSession(string callId, string sessionId)
     {
         // TODO: create a session with a new ID
         var newSessionId = Guid.NewGuid().ToString();
@@ -81,6 +81,8 @@ public class SessionService : ISessionService, IAsyncDisposable
             // This may happen if the instance fails to extend the session lease and then Watchdog transfer it to the same instance.
             session.Dispose();
         }
+
+        return newSessionId;
     }
 
     public void DeleteSession(string sessionId)
