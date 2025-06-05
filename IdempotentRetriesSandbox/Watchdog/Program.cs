@@ -7,35 +7,40 @@ using StackExchange.Redis;
 
 internal static class Program
 {
-    public static void Main(string[] args)
+    private static readonly PeriodicTimer Timer = new(TimeSpan.FromSeconds(5));
+    private static readonly HttpClient HttpClient = new();
+
+    public static async Task Main(string[] args)
     {
-        var redis = ConnectionMultiplexer.Connect("localhost");
-        var timer = new Timer(ReassignStaleSessions, redis, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+        var redis = await ConnectionMultiplexer.ConnectAsync("localhost");
+        var pollerTask = ReassignStaleSessions(redis);
         Console.WriteLine("Watchdog started. Press any key to exit...");
         Console.ReadKey();
-        timer.Dispose();
+        Timer.Dispose();
+        await pollerTask;
     }
 
-    private static void ReassignStaleSessions(object? state)
+    private static async Task ReassignStaleSessions(ConnectionMultiplexer redis)
     {
-        Console.WriteLine("Checking for sessions with expired leases...");
-        var redis = (ConnectionMultiplexer)state;
-        foreach (var session in GetStaleSessions(redis))
+        do
         {
-            Console.WriteLine("Found session with expired lease: " + session);
-            var httpClient = new HttpClient();
-            var requestUri = $"http://localhost:5110/calls/{session.CallId}/sessions/{session.Id}/transfer";
-            var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
-            try
+            Console.WriteLine("Checking for sessions with expired leases...");
+            foreach (var session in GetStaleSessions(redis))
             {
-                var response = httpClient.PostAsync(requestUri, content).GetAwaiter().GetResult();
-                Console.WriteLine(response.IsSuccessStatusCode ? $"Successfully transferred session {session.Id}" : $"Failed to transfer session {session.Id}: {response.StatusCode}");
+                Console.WriteLine("Found session with expired lease: " + session);
+                var requestUri = $"http://localhost:5110/calls/{session.CallId}/sessions/{session.Id}/transfer";
+                var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
+                try
+                {
+                    var response = HttpClient.PostAsync(requestUri, content).GetAwaiter().GetResult();
+                    Console.WriteLine(response.IsSuccessStatusCode ? $"Successfully transferred session {session.Id}" : $"Failed to transfer session {session.Id}: {response.StatusCode}");
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"Failed to assign session {session.Id}: {e.Message}");
+                }
             }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"Failed to assign session {session.Id}: {e.Message}");
-            }
-        }
+        } while (await Timer.WaitForNextTickAsync());
     }
 
     // TODO: read stale sessions from Redis right away, do not read all the keys

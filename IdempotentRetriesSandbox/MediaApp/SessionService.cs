@@ -17,7 +17,6 @@ public class SessionService : ISessionService, IAsyncDisposable
     private readonly ISessionFactory _sessionFactory;
     private readonly ILogger<SessionService> _logger;
     private readonly PeriodicTimer _timer;
-    private readonly CancellationTokenSource _cancellationToken = new();
     private readonly Task _pollerTask;
 
     public SessionService(IConnectionMultiplexer redis, ISessionFactory sessionFactory, ILogger<SessionService> logger)
@@ -97,28 +96,21 @@ public class SessionService : ISessionService, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _cancellationToken.CancelAsync();
+        _timer.Dispose();
         await _pollerTask;
-        _cancellationToken.Dispose();
         GC.SuppressFinalize(this);
     }
 
     private async Task ExtendSessionsLease()
     {
-        try
+        do
         {
-            do
+            var sessionIds = _sessions.Keys.ToImmutableArray();
+            foreach (var sessionId in sessionIds)
             {
-                var sessionIds = _sessions.Keys.ToImmutableArray();
-                foreach (var sessionId in sessionIds)
-                {
-                    ExtendSessionLease(sessionId);
-                }
-            } while (await _timer.WaitForNextTickAsync(_cancellationToken.Token));
-        }
-        catch (OperationCanceledException)
-        {
-        }
+                ExtendSessionLease(sessionId);
+            }
+        } while (await _timer.WaitForNextTickAsync());
     }
 
     // TODO: should it be atomic?

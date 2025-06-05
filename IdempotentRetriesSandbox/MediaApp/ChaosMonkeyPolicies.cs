@@ -22,6 +22,6 @@ public static class ChaosMonkeyPolicies
                 .Enabled(true)
         );
 
-    public static PolicyWrap FaultLatencyPolicy(Exception fault, double faultProbability, TimeSpan latency, double latencyProbability) =>
-        Policy.Wrap(FaultPolicy(fault, faultProbability), LatencyPolicy(latency, latencyProbability));
+    public static PolicyWrap LatencyFaultPolicy(Exception fault, double faultProbability, TimeSpan latency, double latencyProbability) =>
+        Policy.Wrap(LatencyPolicy(latency, latencyProbability), FaultPolicy(fault, faultProbability));
 }

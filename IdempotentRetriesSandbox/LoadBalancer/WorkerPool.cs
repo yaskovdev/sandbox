@@ -19,7 +19,6 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
     private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(5);
     private readonly HttpClient _httpClient;
     private readonly PeriodicTimer _timer;
-    private readonly CancellationTokenSource _cancellationToken = new();
     private readonly Task _pollerTask;
     private readonly ILogger<WorkerPool> _logger;
 
@@ -76,55 +75,48 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _cancellationToken.CancelAsync();
+        _timer.Dispose();
         await _pollerTask;
-        _cancellationToken.Dispose();
         _httpClient.Dispose();
         GC.SuppressFinalize(this);
     }
 
     private async Task UpdateWorkersStatus()
     {
-        try
+        do
         {
-            do
+            // TODO: probably faster to run it in parallel
+            foreach (var worker in _workers)
             {
-                // TODO: probably faster to run it in parallel
-                foreach (var worker in _workers)
+                using (await worker.Lock.LockAsync())
                 {
-                    using (await worker.Lock.LockAsync())
+                    // TODO: you should probably poll the busy workers less often.
+                    if (worker.Status is WorkerStatus.Idle or WorkerStatus.Busy)
                     {
-                        // TODO: you should probably poll the busy workers less often.
-                        if (worker.Status is WorkerStatus.Idle or WorkerStatus.Busy)
+                        var status = worker.Status;
+                        try
                         {
-                            var status = worker.Status;
-                            try
+                            var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/status"));
+                            if (response.IsSuccessStatusCode)
                             {
-                                var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/status"));
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>();
-                                    worker.Status = statusResponse?.SessionCount == 0 ? WorkerStatus.Idle : WorkerStatus.Busy;
-                                }
-                                else
-                                {
-                                    worker.Status = WorkerStatus.Busy;
-                                }
+                                var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>();
+                                worker.Status = statusResponse?.SessionCount == 0 ? WorkerStatus.Idle : WorkerStatus.Busy;
                             }
-                            catch (HttpRequestException)
+                            else
                             {
                                 worker.Status = WorkerStatus.Busy;
                             }
-
-                            LogWorkerStatusChange(worker.Uri, status, worker.Status);
                         }
+                        catch (HttpRequestException)
+                        {
+                            worker.Status = WorkerStatus.Busy;
+                        }
+
+                        LogWorkerStatusChange(worker.Uri, status, worker.Status);
                     }
                 }
-            } while (await _timer.WaitForNextTickAsync(_cancellationToken.Token));
-        }
-        catch (OperationCanceledException)
-        {
-        }
+            }
+        } while (await _timer.WaitForNextTickAsync());
     }
 
     private void LogWorkerStatusChange(Uri workerUri, WorkerStatus oldStatus, WorkerStatus newStatus)
