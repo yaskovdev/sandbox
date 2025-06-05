@@ -100,8 +100,16 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
                             var status = worker.Status;
                             try
                             {
-                                var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/health"));
-                                worker.Status = response.IsSuccessStatusCode ? WorkerStatus.Idle : WorkerStatus.Busy;
+                                var response = await _httpClient.GetAsync(new Uri(worker.Uri, "/status"));
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>();
+                                    worker.Status = statusResponse?.SessionCount == 0 ? WorkerStatus.Idle : WorkerStatus.Busy;
+                                }
+                                else
+                                {
+                                    worker.Status = WorkerStatus.Busy;
+                                }
                             }
                             catch (HttpRequestException)
                             {

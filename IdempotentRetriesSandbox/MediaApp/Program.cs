@@ -20,9 +20,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/health",
-        (ISessionService service) => service.SessionCount == 0 ? Results.StatusCode(200) : Results.StatusCode(503))
-    .WithName("Health")
+app.MapGet("/status",
+        (ISessionService service) => new MediaAppStatusResponse(service.SessionCount))
+    .WithName("Status")
     .WithOpenApi();
 
 app.MapPut("/calls/{callId}",
