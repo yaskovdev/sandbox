@@ -28,7 +28,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         _pollerTask = ExtendSessionsLease();
     }
 
-    public int SessionCount => _sessions.Count;
+    public uint SessionCount => (uint)_sessions.Count;
 
     // Call ID is used as the idempotency token.
     public Outcome CreateCall(string callId)

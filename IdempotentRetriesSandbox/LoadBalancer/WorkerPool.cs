@@ -5,7 +5,7 @@ using NeoSmart.AsyncLock;
 
 public class WorkerPool : IWorkerPool, IAsyncDisposable
 {
-    private class Worker(Uri uri, bool reserved, int availableSlotCount)
+    private class Worker(Uri uri, bool reserved, uint availableSlotCount)
     {
         public AsyncLock Lock { get; } = new();
 
@@ -19,7 +19,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         public bool IsReserved { get; set; } = reserved;
 
         // The property should be accessed in a thread-safe manner.
-        public int AvailableSlotCount { get; set; } = availableSlotCount;
+        public uint AvailableSlotCount { get; set; } = availableSlotCount;
     }
 
     private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(5);
@@ -60,7 +60,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         return null;
     }
 
-    public async Task ReleaseWorker(Uri workerUri, int newAvailableSlotCount)
+    public async Task ReleaseWorker(Uri workerUri, uint newAvailableSlotCount)
     {
         foreach (var worker in _workers.Where(worker => worker.Uri.Equals(workerUri)))
         {
@@ -86,6 +86,11 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Actualizes the available slot count of each worker in the pool by polling their status endpoint.
+    /// Actualization is required for workers that were previously declared unavailable (because job submit to them failed,
+    /// or they recently joined the pool) and for those that have finished their jobs.
+    /// </summary>
     private async Task UpdateWorkersStatus()
     {
         do
@@ -95,8 +100,6 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
             {
                 using (await worker.Lock.LockAsync())
                 {
-                    // TODO: you should probably only poll workers that were previously declared unavailable because you failed to submit a job to them
-                    // or because they recently joined the pool (though joining the pool is not implemented currently).
                     if (worker is { IsReserved: false })
                     {
                         var availableSlotCount = worker.AvailableSlotCount;

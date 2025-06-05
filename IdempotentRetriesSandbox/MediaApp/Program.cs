@@ -1,7 +1,7 @@
 using MediaApp;
 using StackExchange.Redis;
 
-const int TotalSlotCount = 3;
+const uint TotalSlotCount = 3;
 
 var builder = WebApplication.CreateBuilder(args);
 

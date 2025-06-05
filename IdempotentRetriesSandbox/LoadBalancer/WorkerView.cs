@@ -1,3 +1,3 @@
 namespace LoadBalancer;
 
-public record WorkerView(Uri WorkerUri, int AvailableSlotCount);
+public record WorkerView(Uri WorkerUri, uint AvailableSlotCount);

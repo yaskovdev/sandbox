@@ -2,7 +2,7 @@ namespace MediaApp;
 
 public interface ISessionService
 {
-    int SessionCount { get; }
+    uint SessionCount { get; }
 
     Outcome CreateCall(string callId);
 
