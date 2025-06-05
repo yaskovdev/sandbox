@@ -1,6 +1,8 @@
 using MediaApp;
 using StackExchange.Redis;
 
+const int TotalSlotCount = 3;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,7 +23,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGet("/status",
-        (ISessionService service) => new MediaAppStatusResponse(service.SessionCount))
+        (ISessionService service) => new MediaAppStatusResponse(TotalSlotCount - service.SessionCount))
     .WithName("Status")
     .WithOpenApi();
 

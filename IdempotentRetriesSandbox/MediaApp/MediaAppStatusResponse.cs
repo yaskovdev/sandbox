@@ -1,3 +1,3 @@
 namespace MediaApp;
 
-public record MediaAppStatusResponse(int SessionCount);
+public record MediaAppStatusResponse(int AvailableSlotCount);
