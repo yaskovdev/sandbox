@@ -25,8 +25,15 @@ app.MapGet("/status",
     .WithName("Status")
     .WithOpenApi();
 
+// TODO: can it be that the endpoint is called, the session is not yet added to the _sessions dictionary, and then the status is called that returns 0?
+// In that case, the instance may be submitted more sessions than it can handle.
 app.MapPut("/calls/{callId}",
-        (string callId, ISessionService service) => service.CreateCall(callId))
+        (string callId, ISessionService service) =>
+        {
+            var outcome = service.CreateCall(callId);
+            var response = new CallResponse(callId);
+            return outcome == Outcome.Created ? Results.Created($"/calls/{callId}", response) : Results.Ok(response);
+        })
     .WithName("CreateCall")
     .WithOpenApi();
 

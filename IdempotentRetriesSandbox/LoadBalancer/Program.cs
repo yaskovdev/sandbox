@@ -38,8 +38,8 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
     var error = await forwarder.SendAsync(httpContext, workerUri.ToString(), httpClient);
     if (error == ForwarderError.None)
     {
-        // TODO: if the worker replied with outcome Unchanged, release the worker as Idle
-        await workerPool.ReleaseWorker(workerUri, WorkerStatus.Busy);
+        // If the worker responded with a 200 OK, it means the call already existed, therefore the session was not submitted, so we release the worker as Idle.
+        await workerPool.ReleaseWorker(workerUri, httpContext.Response.StatusCode == StatusCodes.Status200OK ? WorkerStatus.Idle : WorkerStatus.Busy);
     }
     else
     {
