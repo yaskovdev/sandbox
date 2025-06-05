@@ -31,7 +31,7 @@ app.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forward
     if (workerUri == null)
     {
         // TODO: the existing implementation requires a free worker to even check if the job has already been submitted. Probably not a big deal, need to check.
-        // One option is to use a busy worker to check if the job has already been submitted.
+        // One option is to use a busy worker to check if the job has already been submitted, or even check by yourself.
         return Results.StatusCode(503);
     }
 

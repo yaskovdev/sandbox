@@ -9,20 +9,24 @@ using StackExchange.Redis;
 public class SessionService : ISessionService, IAsyncDisposable
 {
     private static readonly TimeSpan LeaseExtensionPeriod = TimeSpan.FromSeconds(6);
-    private readonly string _createCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
-    private readonly string _transferSession = ReadResource("TransferSession.lua");
+    private static readonly string ScripCreateCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
+    private static readonly string ScriptTransferSession = ReadResource("TransferSession.lua");
+
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
     private readonly ILogger<SessionService> _logger;
-    private readonly Timer _timer;
+    private readonly PeriodicTimer _timer;
+    private readonly CancellationTokenSource _cancellationToken = new();
+    private readonly Task _pollerTask;
 
     public SessionService(IConnectionMultiplexer redis, ISessionFactory sessionFactory, ILogger<SessionService> logger)
     {
         _redis = redis;
         _sessionFactory = sessionFactory;
         _logger = logger;
-        _timer = new Timer(ExtendSessionsLease, _sessions, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        _pollerTask = ExtendSessionsLease();
     }
 
     public int SessionCount => _sessions.Count;
@@ -34,7 +38,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
         var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
-        var result = (int)database.ScriptEvaluate(_createCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
+        var result = (int)database.ScriptEvaluate(ScripCreateCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
 
         if (result == 0)
         {
@@ -66,7 +70,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
 
         var database = _redis.GetDatabase();
-        database.ScriptEvaluate(_transferSession, ["call:" + callId, "session:" + sessionId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
+        database.ScriptEvaluate(ScriptTransferSession, ["call:" + callId, "session:" + sessionId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
 
         var session = _sessionFactory.CreateSession(newSessionId);
         if (_sessions.TryAdd(newSessionId, session))
@@ -93,17 +97,27 @@ public class SessionService : ISessionService, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _timer.DisposeAsync();
+        await _cancellationToken.CancelAsync();
+        await _pollerTask;
+        _cancellationToken.Dispose();
         GC.SuppressFinalize(this);
     }
 
-    private void ExtendSessionsLease(object? state)
+    private async Task ExtendSessionsLease()
     {
-        IDictionary<string, Session>? sessions = (ConcurrentDictionary<string, Session>?)state;
-        var sessionIds = (sessions ?? ImmutableDictionary<string, Session>.Empty).Keys.ToImmutableArray();
-        foreach (var sessionId in sessionIds)
+        try
         {
-            ExtendSessionLease(sessionId);
+            do
+            {
+                var sessionIds = _sessions.Keys.ToImmutableArray();
+                foreach (var sessionId in sessionIds)
+                {
+                    ExtendSessionLease(sessionId);
+                }
+            } while (await _timer.WaitForNextTickAsync(_cancellationToken.Token));
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 
