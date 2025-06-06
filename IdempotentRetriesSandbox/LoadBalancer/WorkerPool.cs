@@ -5,11 +5,15 @@ using NeoSmart.AsyncLock;
 
 public class WorkerPool : IWorkerPool, IAsyncDisposable
 {
-    private class Worker(Uri uri, bool reserved, uint availableSlotCount)
+    private class Worker(Uri uri, uint availableSlotCount, bool reserved)
     {
         public AsyncLock Lock { get; } = new();
 
         public Uri Uri { get; } = uri;
+
+        // We may want to distinguish between a healthy worker with 0 available slots and a faulty worker in the future.
+        // The property should be accessed in a thread-safe manner.
+        public uint AvailableSlotCount { get; set; } = availableSlotCount;
 
         /// <summary>
         /// Indicates that a worker is temporarily reserved. In this state, the worker is neither available 
@@ -17,10 +21,6 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         /// The property should be accessed in a thread-safe manner.
         /// </summary>
         public bool IsReserved { get; set; } = reserved;
-
-        // We may want to distinguish between a healthy worker with 0 available slots and a faulty worker in the future.
-        // The property should be accessed in a thread-safe manner.
-        public uint AvailableSlotCount { get; set; } = availableSlotCount;
     }
 
     private static readonly TimeSpan PollerPeriod = TimeSpan.FromSeconds(5);
@@ -32,8 +32,8 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
     // Initialize workers with 0 available slots for safety, until the poller updates their actual slot count.
     private readonly ImmutableArray<Worker> _workers =
         ImmutableArray<Worker>.Empty
-            .Add(new Worker(new Uri("http://localhost:5032"), false, 0))
-            .Add(new Worker(new Uri("http://localhost:5033"), false, 0));
+            .Add(new Worker(new Uri("http://localhost:5032"), 0, false))
+            .Add(new Worker(new Uri("http://localhost:5033"), 0, false));
 
     public WorkerPool(ILogger<WorkerPool> logger)
     {
@@ -49,7 +49,7 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         {
             using (await worker.Lock.LockAsync())
             {
-                if (worker is { IsReserved: false, AvailableSlotCount: > 0 })
+                if (worker is { AvailableSlotCount: > 0, IsReserved: false })
                 {
                     worker.IsReserved = true;
                     _logger.LogInformation("Worker {Uri} with available slots {AvailableSlotCount} was reserved", worker.Uri, worker.AvailableSlotCount);
@@ -68,8 +68,8 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
             using (await worker.Lock.LockAsync())
             {
                 var availableSlotCount = worker.AvailableSlotCount;
-                worker.IsReserved = false;
                 worker.AvailableSlotCount = newAvailableSlotCount;
+                worker.IsReserved = false;
                 _logger.LogInformation("Worker {Uri} with available slots {OldAvailableSlotCount} was released with new available slots count {NewAvailableSlotsCount}", worker.Uri, availableSlotCount, worker.AvailableSlotCount);
                 return;
             }

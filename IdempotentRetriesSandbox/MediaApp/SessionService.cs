@@ -12,6 +12,8 @@ public class SessionService : ISessionService, IAsyncDisposable
     private static readonly string ScripCreateCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
     private static readonly string ScriptTransferSession = ReadResource("TransferSession.lua");
 
+    // TODO: problem, the session that was transferred away still stays in the dictionary and occupies a slot.
+    // Need a reliable mechanism to remove the session from the dictionary eventually.
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
     private readonly IConnectionMultiplexer _redis;
     private readonly ISessionFactory _sessionFactory;
@@ -25,7 +27,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         _sessionFactory = sessionFactory;
         _logger = logger;
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-        _pollerTask = ExtendSessionsLease();
+        _pollerTask = ExtendSessionsLeaseSafe();
     }
 
     public uint SessionCount => (uint)_sessions.Count;
@@ -103,14 +105,14 @@ public class SessionService : ISessionService, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    private async Task ExtendSessionsLease()
+    private async Task ExtendSessionsLeaseSafe()
     {
         do
         {
             var sessionIds = _sessions.Keys.ToImmutableArray();
             foreach (var sessionId in sessionIds)
             {
-                ExtendSessionLease(sessionId);
+                ExtendSessionLeaseSafe(sessionId);
             }
         } while (await _timer.WaitForNextTickAsync());
     }
@@ -118,24 +120,27 @@ public class SessionService : ISessionService, IAsyncDisposable
     // TODO: should it be atomic?
     // TODO: should the timer wait for the previous execution to finish? If it does not wait, then we may overwhelm the Redis server with requests.
     // If it waits, then there is a bigger chance for Watchdog to falsely declare the session stale, if, say, only 50% of Redis requests have a long latency.
-    private void ExtendSessionLease(string sessionId)
+    private void ExtendSessionLeaseSafe(string sessionId)
     {
-        _logger.LogInformation("Extending a lease for the session with ID: {SessionId}", sessionId);
-        var database = _redis.GetDatabase();
-        var value = database.StringGet("session:" + sessionId);
-        if (value.IsNull)
-            return;
+        try
+        {
+            _logger.LogInformation("Extending a lease for the session with ID: {SessionId}", sessionId);
+            var database = _redis.GetDatabase();
+            var value = database.StringGet("session:" + sessionId);
+            if (value.IsNull)
+                return;
 
-        var session = JsonSerializer.Deserialize<SessionEntity>((string)value);
-        if (session == null)
-            return;
+            var session = JsonSerializer.Deserialize<SessionEntity>((string)value);
+            if (session == null)
+                return;
 
-        var updatedSession = session with { LeaseExpiresAt = DateTime.Now + LeaseExtensionPeriod };
-        database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
-        // ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0)
-        //     .Execute(() =>
-        //     {
-        //     });
+            var updatedSession = session with { LeaseExpiresAt = DateTime.Now + LeaseExtensionPeriod };
+            database.StringSet("session:" + sessionId, JsonSerializer.Serialize(updatedSession));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to extend lease for session with ID: {SessionId}", sessionId);
+        }
     }
 
     private static string ReadResource(string resourceName)

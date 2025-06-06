@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect("localhost"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ => new FaultyConnectionMultiplexerDecorator(ConnectionMultiplexer.Connect("localhost")));
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<ISessionFactory, SessionFactory>();
 
