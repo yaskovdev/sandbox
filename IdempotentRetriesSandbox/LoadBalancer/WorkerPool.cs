@@ -33,7 +33,8 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
     private readonly ImmutableArray<Worker> _workers =
         ImmutableArray<Worker>.Empty
             .Add(new Worker(new Uri("http://localhost:5032"), 0, false))
-            .Add(new Worker(new Uri("http://localhost:5033"), 0, false));
+            .Add(new Worker(new Uri("http://localhost:5033"), 0, false))
+            .Add(new Worker(new Uri("http://localhost:5034"), 0, false));
 
     public WorkerPool(ILogger<WorkerPool> logger)
     {

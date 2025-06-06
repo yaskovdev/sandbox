@@ -27,6 +27,7 @@ app.MapGet("/status",
     .WithName("Status")
     .WithOpenApi();
 
+// TODO: it should respond with 2** if created the call and session in Redis successfully. Otherwise there will be a retry rejected as duplicate, which does not makes sense.
 // TODO: can it be that the endpoint is called, the session is not yet added to the _sessions dictionary, and then the status is called that returns 0?
 // In that case, the instance may be submitted more sessions than it can handle.
 app.MapPut("/calls/{callId}",

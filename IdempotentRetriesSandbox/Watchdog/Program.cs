@@ -7,7 +7,7 @@ using StackExchange.Redis;
 
 internal static class Program
 {
-    private static readonly PeriodicTimer Timer = new(TimeSpan.FromSeconds(5));
+    private static readonly PeriodicTimer Timer = new(TimeSpan.FromSeconds(30));
     private static readonly HttpClient HttpClient = new();
 
     public static async Task Main(string[] args)
@@ -25,9 +25,15 @@ internal static class Program
         do
         {
             Console.WriteLine("Checking for sessions with expired leases...");
-            foreach (var session in GetStaleSessions(redis))
+            var sessions = GetStaleSessions(redis).ToImmutableArray();
+            if (sessions.IsEmpty)
             {
-                Console.WriteLine("Found session with expired lease: " + session);
+                continue;
+            }
+
+            Console.WriteLine("Transferring " + sessions.Length + " sessions with expired leases: [" + string.Join(", ", sessions) + "]");
+            Parallel.ForEach(sessions, session =>
+            {
                 var requestUri = $"http://localhost:5110/calls/{session.CallId}/sessions/{session.Id}/transfer";
                 var content = new StringContent(JsonSerializer.Serialize(session), Encoding.UTF8, "application/json");
                 try
@@ -39,7 +45,7 @@ internal static class Program
                 {
                     Console.WriteLine($"Failed to assign session {session.Id}: {e.Message}");
                 }
-            }
+            });
         } while (await Timer.WaitForNextTickAsync());
     }
 

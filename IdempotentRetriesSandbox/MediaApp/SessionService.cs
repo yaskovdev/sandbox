@@ -8,7 +8,7 @@ using StackExchange.Redis;
 
 public class SessionService : ISessionService, IAsyncDisposable
 {
-    private static readonly TimeSpan LeaseExtensionPeriod = TimeSpan.FromSeconds(6);
+    private static readonly TimeSpan LeaseExtensionPeriod = TimeSpan.FromSeconds(30);
     private static readonly string ScripCreateCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
     private static readonly string ScriptTransferSession = ReadResource("TransferSession.lua");
 
@@ -26,7 +26,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         _redis = redis;
         _sessionFactory = sessionFactory;
         _logger = logger;
-        _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        _timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
         _pollerTask = ExtendSessionsLeaseSafe();
     }
 
@@ -139,7 +139,14 @@ public class SessionService : ISessionService, IAsyncDisposable
         }
         catch (Exception e)
         {
+            // If the worker fails to extend the lease, it should stop processing the session to free the processing slot.
+            // In the meantime, Watchdog will reassign the session to another worker.
+            // TODO: what are the other options? Should the worker go offline?
             _logger.LogError(e, "Failed to extend lease for session with ID: {SessionId}", sessionId);
+            if (_sessions.TryRemove(sessionId, out var session))
+            {
+                session.Dispose();
+            }
         }
     }
 
