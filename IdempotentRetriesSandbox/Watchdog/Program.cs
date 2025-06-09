@@ -20,6 +20,7 @@ internal static class Program
         await pollerTask;
     }
 
+    // TODO: what if it takes more than 30 seconds to reassign stale sessions? Then one session can be reassigned multiple times.
     private static async Task ReassignStaleSessions(ConnectionMultiplexer redis)
     {
         do

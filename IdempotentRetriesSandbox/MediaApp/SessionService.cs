@@ -9,7 +9,7 @@ using StackExchange.Redis;
 public class SessionService : ISessionService, IAsyncDisposable
 {
     private static readonly TimeSpan LeaseExtensionPeriod = TimeSpan.FromSeconds(30);
-    private static readonly string ScripCreateCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
+    private static readonly string ScriptCreateCallWithSessionIfNotExists = ReadResource("CreateCallWithSessionIfNotExists.lua");
     private static readonly string ScriptTransferSession = ReadResource("TransferSession.lua");
 
     // TODO: problem, the session that was transferred away still stays in the dictionary and occupies a slot.
@@ -39,7 +39,7 @@ public class SessionService : ISessionService, IAsyncDisposable
         var database = _redis.GetDatabase();
         var now = DateTime.Now;
         var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
-        var result = (int)database.ScriptEvaluate(ScripCreateCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
+        var result = (int)database.ScriptEvaluate(ScriptCreateCallWithSessionIfNotExists, ["call:" + callId, "session:" + newSessionId], [JsonSerializer.Serialize(newSession)]);
 
         if (result == 0)
         {
