@@ -13,11 +13,14 @@ public class Session(string id, ILogger<Session> logger) : IDisposable
 
     public void Dispose()
     {
-        if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 0)
+        ChaosMonkeyPolicies.LatencyPolicy(TimeSpan.FromSeconds(10), 0.3).Execute(() =>
         {
-            logger.LogInformation("Session with ID: {SessionId} disposed", id);
-        }
+            if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 0)
+            {
+                logger.LogInformation("Session with ID: {SessionId} disposed", id);
+            }
 
-        GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
+        });
     }
 }

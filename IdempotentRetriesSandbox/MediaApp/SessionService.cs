@@ -65,7 +65,6 @@ public class SessionService : ISessionService, IAsyncDisposable
     /// </summary>
     public string TransferSession(string callId, string sessionId)
     {
-        // TODO: create a session with a new ID
         var newSessionId = Guid.NewGuid().ToString();
         var now = DateTime.Now;
         var newSession = new SessionEntity(callId, SessionState.Active, now, now + LeaseExtensionPeriod);
@@ -87,17 +86,6 @@ public class SessionService : ISessionService, IAsyncDisposable
         return newSessionId;
     }
 
-    public void DeleteSession(string sessionId)
-    {
-        if (_sessions.TryRemove(sessionId, out var session))
-        {
-            session.Dispose();
-            var database = _redis.GetDatabase();
-            // TODO: probably should change state to Finished instead of deleting the session
-            database.KeyDelete("session:" + sessionId);
-        }
-    }
-
     public async ValueTask DisposeAsync()
     {
         _timer.Dispose();
@@ -109,11 +97,7 @@ public class SessionService : ISessionService, IAsyncDisposable
     {
         do
         {
-            var sessionIds = _sessions.Keys.ToImmutableArray();
-            foreach (var sessionId in sessionIds)
-            {
-                ExtendSessionLeaseSafe(sessionId);
-            }
+            Parallel.ForEach(_sessions.Keys.ToImmutableArray(), ExtendSessionLeaseSafe);
         } while (await _timer.WaitForNextTickAsync());
     }
 

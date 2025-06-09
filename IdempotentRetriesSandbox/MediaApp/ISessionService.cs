@@ -7,6 +7,4 @@ public interface ISessionService
     Outcome CreateCall(string callId);
 
     string TransferSession(string callId, string sessionId);
-
-    void DeleteSession(string sessionId);
 }

@@ -1,6 +1,7 @@
 namespace LoadBalancer;
 
 using System.Collections.Immutable;
+using System.Diagnostics;
 using NeoSmart.AsyncLock;
 
 public class WorkerPool : IWorkerPool, IAsyncDisposable
@@ -34,7 +35,9 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
         ImmutableArray<Worker>.Empty
             .Add(new Worker(new Uri("http://localhost:5032"), 0, false))
             .Add(new Worker(new Uri("http://localhost:5033"), 0, false))
-            .Add(new Worker(new Uri("http://localhost:5034"), 0, false));
+            .Add(new Worker(new Uri("http://localhost:5034"), 0, false))
+            .Add(new Worker(new Uri("http://localhost:5035"), 0, false))
+            .Add(new Worker(new Uri("http://localhost:5036"), 0, false));
 
     public WorkerPool(ILogger<WorkerPool> logger)
     {
@@ -110,7 +113,10 @@ public class WorkerPool : IWorkerPool, IAsyncDisposable
                             if (response.IsSuccessStatusCode)
                             {
                                 var statusResponse = await response.Content.ReadFromJsonAsync<StatusResponse>(cancellationToken: cancellationToken);
-                                worker.AvailableSlotCount = statusResponse?.AvailableSlotCount ?? 0;
+                                var newAvailableSlotCount = statusResponse?.AvailableSlotCount ?? 0;
+                                Debug.Assert(newAvailableSlotCount >= worker.AvailableSlotCount,
+                                    "Poller received a successful response with a lower available slot count than the current one. This should not happen");
+                                worker.AvailableSlotCount = newAvailableSlotCount;
                             }
                             else
                             {

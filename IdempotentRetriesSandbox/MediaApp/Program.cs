@@ -49,9 +49,4 @@ app.MapPost("/calls/{callId}/sessions/{sessionId}/transfer",
     .WithName("TransferSession")
     .WithOpenApi();
 
-app.MapDelete("/sessions/{sessionId}",
-        (string sessionId, ISessionService service) => service.DeleteSession(sessionId))
-    .WithName("DeleteSession")
-    .WithOpenApi();
-
 app.Run();

@@ -15,15 +15,7 @@ Start the Watchdog.
 ## Testing
 
 ```shell
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174001" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174002" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174003" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174004" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174005" -H "Content-Type: application/json"
-curl -v -X PUT "http://localhost:5110/calls/123e4567-e89b-12d3-a456-426614174007" -H "Content-Type: application/json"
-
-curl -v -X DELETE "http://localhost:5110/sessions/123e4567-e89b-12d3-a456-426614174000" -H "Content-Type: application/json"
+./submit_calls.sh
 ```
 
 ## Assumptions
