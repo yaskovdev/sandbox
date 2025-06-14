@@ -4,6 +4,8 @@ from functools import total_ordering
 from heapq import heappush, heappop
 from queue import Queue
 
+from util import calculate_composition_end_time
+
 
 class EventType(Enum):
     SESSION_START = 0
@@ -57,11 +59,7 @@ class CompositionEnd(Event):
         super().__init__(time, EventType.COMPOSITION_END)
 
 
-def calculate_composition_end_time(session_start_time, session_end_time, composition_start_time):
-    print('calculating composition end time for ' + str(session_start_time) + ' ' + str(session_end_time) + ' ' + str(
-        composition_start_time))
-    return session_end_time  # TODO: it's not always session end time, implement properly
-
+faster_than_real_time_coefficient = 2
 
 sessions = [
     (datetime(2024, 1, 1, 9, 0), datetime(2024, 1, 1, 9, 7)),
@@ -91,10 +89,8 @@ while len(timeline):
     # start composition if possible
     while not composition_queue.empty() and available_composers:
         available_composers -= 1
-        composition_request = composition_queue.get()
-        session_start_time = composition_request[0]
-        session_end_time = composition_request[1]
-        composition_end_time = calculate_composition_end_time(session_start_time, session_end_time, event.time)
+        session_start_time, session_end_time = composition_queue.get()
+        composition_end_time = calculate_composition_end_time(faster_than_real_time_coefficient, session_start_time, session_end_time, event.time)
         heappush(timeline, CompositionEnd(composition_end_time))
         delay = composition_end_time - session_end_time
         delays.append(delay)
