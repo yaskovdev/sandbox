@@ -1,4 +1,3 @@
-from datetime import datetime
 from enum import Enum
 from functools import total_ordering
 from heapq import heappush, heappop
@@ -59,41 +58,33 @@ class CompositionEnd(Event):
         super().__init__(time, EventType.COMPOSITION_END)
 
 
-faster_than_real_time_coefficient = 2
+def calculate_delays(sessions, total_composers, faster_than_real_time_coefficient):
+    available_composers = total_composers
+    timeline = []
+    composition_queue = Queue()
 
-sessions = [
-    (datetime(2024, 1, 1, 9, 0), datetime(2024, 1, 1, 9, 7)),
-    (datetime(2024, 1, 1, 9, 3), datetime(2024, 1, 1, 9, 10)),
-    (datetime(2024, 1, 1, 9, 9), datetime(2024, 1, 1, 9, 17)),
-    (datetime(2024, 1, 1, 9, 6), datetime(2024, 1, 1, 9, 19)),
-]
+    delays = []
 
-timeline = []
-composition_queue = Queue()
-available_composers = 2
+    for session_start_time, session_end_time in sessions:
+        heappush(timeline, SessionStart(session_start_time, session_end_time))
+        heappush(timeline, SessionEnd(session_end_time))
 
-delays = []
+    while len(timeline):
+        event = heappop(timeline)
+        if event.event_type == EventType.SESSION_START:
+            composition_queue.put((event.time, event.session_end_time))
+        elif event.event_type == EventType.COMPOSITION_END:
+            available_composers += 1
 
-for session_start_time, session_end_time in sessions:
-    heappush(timeline, SessionStart(session_start_time, session_end_time))
-    heappush(timeline, SessionEnd(session_end_time))
+        # start composition if possible
+        while not composition_queue.empty() and available_composers:
+            available_composers -= 1
+            session_start_time, session_end_time = composition_queue.get()
+            composition_end_time = calculate_composition_end_time(faster_than_real_time_coefficient, session_start_time, session_end_time, event.time)
+            heappush(timeline, CompositionEnd(composition_end_time))
+            delay = composition_end_time - session_end_time
+            delays.append(delay.total_seconds())
 
-while len(timeline):
-    event = heappop(timeline)
-    if event.event_type == EventType.SESSION_START:
-        composition_queue.put((event.time, event.session_end_time))
-    elif event.event_type == EventType.COMPOSITION_END:
-        print(event)
-        available_composers += 1
+    assert available_composers == total_composers, f"Expected {total_composers} available composers at the end of the simulation, got {available_composers}"
 
-    # start composition if possible
-    while not composition_queue.empty() and available_composers:
-        available_composers -= 1
-        session_start_time, session_end_time = composition_queue.get()
-        composition_end_time = calculate_composition_end_time(faster_than_real_time_coefficient, session_start_time, session_end_time, event.time)
-        heappush(timeline, CompositionEnd(composition_end_time))
-        delay = composition_end_time - session_end_time
-        delays.append(delay)
-
-print(delays)
-print(available_composers)
+    return delays

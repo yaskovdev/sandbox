@@ -1,4 +1,7 @@
 def calculate_composition_end_time(faster_than_real_time_coefficient, session_start_time, session_end_time, composition_start_time):
+    assert session_start_time <= session_end_time, f"Session start time cannot be bigger than session end time"
+    assert session_start_time <= composition_start_time, f"Session start time cannot be bigger than composition start time"
+    assert faster_than_real_time_coefficient >= 1, f"Faster than real time coefficient should be bigger or equal to 1"
     session_duration = session_end_time - session_start_time
 
     producing_speed = 1  # real time speed is always 1
