@@ -40,25 +40,13 @@ class SessionStart(Event):
         self.session_end_time = session_end_time
 
 
-class SessionEnd(Event):
-
-    def __init__(self, time):
-        super().__init__(time, EventType.SESSION_END)
-
-
-class CompositionStart(Event):
-
-    def __init__(self, time):
-        super().__init__(time, EventType.COMPOSITION_START)
-
-
 class CompositionEnd(Event):
 
     def __init__(self, time):
         super().__init__(time, EventType.COMPOSITION_END)
 
 
-def calculate_delays(sessions, total_composers, composition_speed):
+def calculate_delays_s(sessions, total_composers, composition_speed):
     available_composers = total_composers
     timeline = []
     composition_queue = Queue()
@@ -67,7 +55,6 @@ def calculate_delays(sessions, total_composers, composition_speed):
 
     for session_start_time, session_end_time in sessions:
         heappush(timeline, SessionStart(session_start_time, session_end_time))
-        heappush(timeline, SessionEnd(session_end_time))
 
     while len(timeline) > 0:
         event = heappop(timeline)
