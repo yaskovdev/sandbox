@@ -58,7 +58,7 @@ class CompositionEnd(Event):
         super().__init__(time, EventType.COMPOSITION_END)
 
 
-def calculate_delays(sessions, total_composers, faster_than_real_time_coefficient):
+def calculate_delays(sessions, total_composers, composition_speed):
     available_composers = total_composers
     timeline = []
     composition_queue = Queue()
@@ -69,7 +69,7 @@ def calculate_delays(sessions, total_composers, faster_than_real_time_coefficien
         heappush(timeline, SessionStart(session_start_time, session_end_time))
         heappush(timeline, SessionEnd(session_end_time))
 
-    while len(timeline):
+    while len(timeline) > 0:
         event = heappop(timeline)
         if event.event_type == EventType.SESSION_START:
             composition_queue.put((event.time, event.session_end_time))
@@ -77,10 +77,10 @@ def calculate_delays(sessions, total_composers, faster_than_real_time_coefficien
             available_composers += 1
 
         # start composition if possible
-        while not composition_queue.empty() and available_composers:
+        while not composition_queue.empty() and available_composers > 0:
             available_composers -= 1
             session_start_time, session_end_time = composition_queue.get()
-            composition_end_time = calculate_composition_end_time(faster_than_real_time_coefficient, session_start_time, session_end_time, event.time)
+            composition_end_time = calculate_composition_end_time(composition_speed, session_start_time, session_end_time, event.time)
             heappush(timeline, CompositionEnd(composition_end_time))
             delay = composition_end_time - session_end_time
             delays.append(delay.total_seconds())
