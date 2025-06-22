@@ -73,6 +73,6 @@ def calculate_delays_s(sessions, total_composers, composition_speed):
     assert available_composers == total_composers, f"Expected {total_composers} available composers at the end of simulation, got {available_composers}"
     assert len(timeline) == 0, f"Expected timeline to be empty at the end of simulation, got {len(timeline)} elements"
     assert composition_queue.empty(), f"Expected composition queue to be empty at the end of simulation, got {composition_queue.qsize()} elements"
-    assert len(delays) == len(sessions), f"Expected the number of delays to be the number of sessions, got delays {len(delays)}, sessions {len(sessions)}"
+    assert len(delays) == len(sessions), f"Expected the number of delays to be the number of sessions, got {len(delays)} delays, {len(sessions)} sessions"
 
     return delays

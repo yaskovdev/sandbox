@@ -8,7 +8,7 @@ def calculate_composition_end_time(composition_speed, session_start_time, sessio
 
     produced_at_composition_start_time = (min(composition_start_time, session_end_time) - session_start_time) * producing_speed
 
-    # at this moment either the session is ended, or it is ongoing, but we caught up
+    # At this moment either the session has ended, or it is ongoing, but we've caught up with production
     catchup_or_session_end_time = session_end_time if closing_speed == 0 else min(composition_start_time + produced_at_composition_start_time / closing_speed, session_end_time)
 
     composition_duration = catchup_or_session_end_time - composition_start_time
@@ -16,4 +16,6 @@ def calculate_composition_end_time(composition_speed, session_start_time, sessio
     total_amount = (session_end_time - session_start_time) * producing_speed
     remaining_amount = total_amount - composed_amount
 
-    return catchup_or_session_end_time + remaining_amount / (composition_speed if catchup_or_session_end_time == session_end_time else producing_speed)
+    composition_end_time = catchup_or_session_end_time + remaining_amount / (composition_speed if catchup_or_session_end_time == session_end_time else producing_speed)
+    assert session_end_time <= composition_end_time, f"Composition cannot end before session"
+    return composition_end_time
