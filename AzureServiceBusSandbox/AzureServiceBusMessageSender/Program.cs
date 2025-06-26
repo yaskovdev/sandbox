@@ -5,6 +5,7 @@ using Azure.Messaging.ServiceBus;
 internal static class Program
 {
     private const string ServiceBusEnvironmentVariable = "AZURE_SERVICE_BUS_CONNECTION_STRING";
+    private const string QueueName = "session-composition-queue";
 
     public static async Task Main(string[] args)
     {
@@ -15,9 +16,8 @@ internal static class Program
             return;
         }
 
-        var queueName = "session-composition-queue";
-        var client = new ServiceBusClient(connectionString);
-        var sender = client.CreateSender(queueName);
+        await using var client = new ServiceBusClient(connectionString);
+        await using var sender = client.CreateSender(QueueName);
 
         var uuid = Guid.NewGuid().ToString();
         var message = new ServiceBusMessage(uuid);
