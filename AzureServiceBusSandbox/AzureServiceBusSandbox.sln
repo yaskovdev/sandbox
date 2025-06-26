@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureServiceBusSandbox", "AzureServiceBusSandbox\AzureServiceBusSandbox.csproj", "{F7727285-719C-4A5D-86EE-598F3090D8D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureServiceBusMessageSender", "AzureServiceBusMessageSender\AzureServiceBusMessageSender.csproj", "{F7727285-719C-4A5D-86EE-598F3090D8D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureServiceBusMessageReceiver", "AzureServiceBusMessageReceiver\AzureServiceBusMessageReceiver.csproj", "{395D5D41-7693-4881-8668-83125FAE2213}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +14,9 @@ Global
 		{F7727285-719C-4A5D-86EE-598F3090D8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7727285-719C-4A5D-86EE-598F3090D8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7727285-719C-4A5D-86EE-598F3090D8D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{395D5D41-7693-4881-8668-83125FAE2213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{395D5D41-7693-4881-8668-83125FAE2213}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{395D5D41-7693-4881-8668-83125FAE2213}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{395D5D41-7693-4881-8668-83125FAE2213}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
