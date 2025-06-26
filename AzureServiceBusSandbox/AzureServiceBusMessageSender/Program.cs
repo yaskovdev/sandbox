@@ -20,7 +20,10 @@ internal static class Program
         await using var sender = client.CreateSender(QueueName);
 
         var uuid = Guid.NewGuid().ToString();
-        var message = new ServiceBusMessage(uuid);
+        var message = new ServiceBusMessage(uuid)
+        {
+            TimeToLive = TimeSpan.FromSeconds(600)
+        };
 
         await sender.SendMessageAsync(message);
 

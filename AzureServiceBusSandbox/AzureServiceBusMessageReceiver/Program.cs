@@ -21,7 +21,7 @@ internal static class Program
         {
             AutoCompleteMessages = false,
             MaxConcurrentCalls = 1,
-            MaxAutoLockRenewalDuration = TimeSpan.FromSeconds(35)
+            MaxAutoLockRenewalDuration = Timeout.InfiniteTimeSpan
         });
 
         processor.ProcessMessageAsync += MessageHandler;
@@ -37,8 +37,8 @@ internal static class Program
     {
         var body = args.Message.Body.ToString();
         Console.WriteLine($"Received: {body}");
-        // Simulate processing for 30 seconds (lock will be auto-renewed)
-        await Task.Delay(TimeSpan.FromSeconds(30));
+        // Simulate processing (lock will be auto-renewed)
+        await Task.Delay(TimeSpan.FromSeconds(300));
         await args.CompleteMessageAsync(args.Message);
         Console.WriteLine("Message processed and completed");
     }
