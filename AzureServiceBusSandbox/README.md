@@ -1,0 +1,1 @@
+Make sure that the `AZURE_SERVICE_BUS_CONNECTION_STRING` environment variable is set to the connection string of your Azure Service Bus instance.
