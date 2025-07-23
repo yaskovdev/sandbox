@@ -1,37 +1,30 @@
 # escape=`
 
-# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2019 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy source code
 COPY . .
 
-# Restore NuGet packages
 RUN dotnet restore
 
-# Build the application
 RUN dotnet publish -c Release WindowsContainerFontsSandbox/WindowsContainerFontsSandbox.csproj -o /app/out
 
+# Comment out this line
 FROM mcr.microsoft.com/windows:1809 AS fonts
 
-# Copy below stuff
+# Comment out this line
 RUN powershell -NoProfile -Command "Copy-Item -Path C:\Windows\Fonts -Exclude lucon.ttf -Destination c:\Fonts -Recurse"
 
-# Runtime stage
 FROM mcr.microsoft.com/dotnet/framework/runtime:4.7.2-windowsservercore-ltsc2019
 
+# Comment out this line
 COPY --from=fonts /Fonts/ /Windows/Fonts/
 
 RUN mkdir C:\image
 
-# Set working directory
 WORKDIR /app
 
-# Copy built application from build stage
 COPY --from=build /app/out .
 
-# Run the application
 ENTRYPOINT ["WindowsContainerFontsSandbox.exe"]
