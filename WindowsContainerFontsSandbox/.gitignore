@@ -1,0 +1,21 @@
+# Rider
+.idea/
+
+*.suo
+*.user
+.vs/
+[Bb]in/
+[Oo]bj/
+x64/
+_UpgradeReport_Files/
+[Pp]ackages/
+
+Thumbs.db
+Desktop.ini
+.DS_Store
+GPUCache
+
+appsettings.Local.json
+appsettings.Local.json.hack
+appsettings.Local.json.final
+cache/
