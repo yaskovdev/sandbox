@@ -19,7 +19,7 @@ public class Drawer
             using (var font = new Font("Segoe UI", 24))
             using (var brush = new SolidBrush(Color.Black))
             {
-                graphics.DrawString("The quick brown fox jumps over the lazy dog.", font, brush, 10, 30);
+                graphics.DrawString("𮯰𮯱𮯲𮯳𮯴𮯵𮯶𮯷𮯸𮯹𮯺𮯻𮯼𮯽", font, brush, 10, 30);
             }
 
             return bitmap;
