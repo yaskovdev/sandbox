@@ -19,3 +19,9 @@ Note that now the font is not Segoe UI, since it's not installed in the containe
 The size of the image with the fonts is 6.35GB.
 The size of the image without the fonts is 5.98GB.
 The size of the full Windows image (mcr.microsoft.com/windows:1809) is 9.74GB.
+
+## Troubleshooting
+
+```powershell
+docker login mcr.microsoft.com
+```
