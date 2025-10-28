@@ -1,11 +1,15 @@
 namespace StreamingSandbox;
 
+using System.Net;
+
 public class BufferedInputStream(DocumentId documentId, IStreamableClient client, IStopwatch stopwatch, ILogger logger) : Stream
 {
+    // this should be configurable
     private static readonly TimeSpan NoDataTimeout = TimeSpan.FromSeconds(60);
     private long _offset;
     private long _totalBytesCount = long.MaxValue;
-    private StreamableResponse? _response;
+    private StreamableResponse _response = new(new HttpResponseMessage(HttpStatusCode.OK), Null, long.MaxValue);
+    private bool _reset = true;
 
     public override bool CanRead => true;
 
@@ -31,19 +35,22 @@ public class BufferedInputStream(DocumentId documentId, IStreamableClient client
     {
         if (_offset >= _totalBytesCount)
         {
-            logger.Info("All content has been read, returning 0 bytes");
+            logger.Verbose("All content has been read, returning 0 bytes");
             return 0;
         }
 
-        if (_response is null)
+        if (_reset)
         {
-            logger.Info($"Current response is null, getting a new one for document ID {documentId} with offset {_offset}");
+            logger.Info($"Current network stream needs to be reset, getting a new one for document ID {documentId} with offset {_offset}");
+            _response.Dispose();
             _response = await client.GetDownloadStream(documentId, _offset, cancellationToken);
             _totalBytesCount = _response.FullContentLengthInBytes;
             stopwatch.Restart(); // stopwatch.Start() doesn't work here, because after reset it doesn't give the new request the 1 minute window to receive data 
+            _reset = false;
         }
 
         var bytesRead = await _response.Stream.ReadAsync(buffer, cancellationToken);
+        // here can also add configurable verbose logging to log how many bytes were read in each call
         if (bytesRead > 0)
         {
             _offset += bytesRead;
@@ -51,12 +58,11 @@ public class BufferedInputStream(DocumentId documentId, IStreamableClient client
         }
         else
         {
-            var timeSinceLastDataReceived = stopwatch.Elapsed;
-            if (timeSinceLastDataReceived >= NoDataTimeout)
+            var timeWithoutDataFromCurrentResponseStream = stopwatch.Elapsed;
+            if (timeWithoutDataFromCurrentResponseStream >= NoDataTimeout)
             {
-                logger.Info($"No data received for {timeSinceLastDataReceived}, closing the network stream");
-                _response.Dispose();
-                _response = null;
+                logger.Info($"No data received for {timeWithoutDataFromCurrentResponseStream}, the network stream will be reset");
+                _reset = true;
             }
         }
 
@@ -76,7 +82,7 @@ public class BufferedInputStream(DocumentId documentId, IStreamableClient client
     {
         if (disposing)
         {
-            _response?.Dispose();
+            _response.Dispose();
         }
 
         base.Dispose(disposing);

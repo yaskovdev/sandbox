@@ -4,6 +4,8 @@ using Shouldly;
 
 namespace StreamingSandbox.Tests;
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 [TestClass]
 public class BufferedInputStreamTests
 {
@@ -53,7 +55,7 @@ public class BufferedInputStreamTests
         await using var instanceUnderTest = new BufferedInputStream(DocumentId, asyncMediaStorageClient, stopwatch, Substitute.For<ILogger>());
         await ReadAndAssertExpectedBytes(instanceUnderTest, bytesToRead: 6, [0, 1, 2, 3, 4, 5]);
         stopwatch.Elapsed = TimeSpan.FromSeconds(120);
-        await ReadAndAssertExpectedBytes(instanceUnderTest, bytesToRead: 6, []); // closes the stream
+        await ReadAndAssertExpectedBytes(instanceUnderTest, bytesToRead: 6, []); // sets _reset to true
         await ReadAndAssertExpectedBytes(instanceUnderTest, bytesToRead: 6, []); // opens new one and updates total bytes count
         await ReadAndAssertExpectedBytes(instanceUnderTest, bytesToRead: 6, []); // returns 0 as all content has been read
 

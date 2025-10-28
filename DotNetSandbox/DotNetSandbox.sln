@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetSandboxConsumer", "NuG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Record", "Record\Record.csproj", "{C46B3296-79DB-4BDF-8FFC-010CBAC789D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageExtSandbox", "LanguageExtSandbox\LanguageExtSandbox.csproj", "{545692BE-0E36-424C-95A2-379E4CF92250}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,5 +158,9 @@ Global
 		{C46B3296-79DB-4BDF-8FFC-010CBAC789D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C46B3296-79DB-4BDF-8FFC-010CBAC789D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C46B3296-79DB-4BDF-8FFC-010CBAC789D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{545692BE-0E36-424C-95A2-379E4CF92250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{545692BE-0E36-424C-95A2-379E4CF92250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{545692BE-0E36-424C-95A2-379E4CF92250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{545692BE-0E36-424C-95A2-379E4CF92250}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
