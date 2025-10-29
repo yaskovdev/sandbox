@@ -1,6 +1,5 @@
 import argparse
 import ctypes
-import getpass
 import os
 import subprocess
 import sys
@@ -90,19 +89,9 @@ def classify_certs(all_certs: List[x509.Certificate], private_key) -> (x509.Cert
     return end_entity, ordered_chain
 
 
-def build_pfx(name: str, private_key, cert: x509.Certificate, cas: List[x509.Certificate], password: Optional[str], out_path: str):
-    # Choose encryption algorithm: empty password => NoEncryption (creates unprotected PFX)
-    if password:
-        enc = serialization.BestAvailableEncryption(password.encode('utf-8'))
-    else:
-        enc = serialization.NoEncryption()
-    pfx_bytes = pkcs12.serialize_key_and_certificates(
-        name.encode('utf-8'),
-        private_key,
-        cert,
-        cas if cas else None,
-        enc,
-    )
+def build_pfx(name: str, private_key, cert: x509.Certificate, cas: List[x509.Certificate], out_path: str):
+    enc = serialization.NoEncryption()
+    pfx_bytes = pkcs12.serialize_key_and_certificates(name.encode('utf-8'), private_key, cert, cas if cas else None, enc)
     with open(out_path, 'wb') as f:
         f.write(pfx_bytes)
 
@@ -132,7 +121,7 @@ def download_bundle(porkbun_api_key, porkbun_secret_api_key):
                       json={"apikey": porkbun_api_key, "secretapikey": porkbun_secret_api_key})
     print(r.status_code)
     response_body = r.json()
-    return response_body['privatekey'], response_body['certificatechain']
+    return bytes(response_body['privatekey'], 'utf-8'), bytes(response_body['certificatechain'], 'utf-8')
 
 
 def main():
@@ -140,32 +129,16 @@ def main():
     parser.add_argument("--porkbun-api-key", required=True, help="Porkbun API key.")
     parser.add_argument("--porkbun-api-secret-key", required=True, help="Porkbun API secret key.")
     parser.add_argument("--import-pfx", default=False, help="Import PFX into Windows LocalMachine store.")
-    # parser.add_argument("--cert", required=True, help="Path to domain.cert.pem (may contain leaf & chain).")
-    # parser.add_argument("--key", required=True, help="Path to private.key.pem.")
-    # parser.add_argument("--extra", nargs="*", help="Optional extra PEM files (e.g., public.key.pem or intermediates).")
-    # parser.add_argument("--out", default="certificate.pfx", help="Output PFX filename.")
-    # parser.add_argument("--password", help="Password to protect PFX (omit for empty / no password).")
-    # parser.add_argument("--store", default="Cert:\\LocalMachine\\My", help="PowerShell store path (if PowerShell import used).")
-    # parser.add_argument("--friendly-name", default="ServerCert", help="Friendly name for PFX.")
-    # parser.add_argument("--no-elevate", action="store_true", help="Do not auto-elevate; fail if not admin.")
-    # parser.add_argument("--powershell", action="store_true", help="Use PowerShell Import-PfxCertificate instead of certutil.")
     args = parser.parse_args()
-    private_key_str, certificate_chain_str = download_bundle(args.porkbun_api_key, args.porkbun_api_secret_key)
+    private_key, certificate_chain = download_bundle(args.porkbun_api_key, args.porkbun_api_secret_key)
 
     if args.import_pfx and not is_admin():
-        print("Administrator privileges required. Re-run in elevated shell.")
+        print("To import PFX, administrator privileges are required. Re-run in elevated shell.")
         sys.exit(1)
 
-    # for path in [args.cert, args.key, *(args.extra or [])]:
-    #     if not os.path.isfile(path):
-    #         print(f"File not found: {path}")
-    #         sys.exit(1)
+    private_key = read_private_key(private_key, password=None)
 
-    # No auto-generation; empty string if not supplied
-
-    private_key = read_private_key(bytes(private_key_str, 'utf-8'), password=None)
-
-    all_certs: List[x509.Certificate] = read_pem_certificates(bytes(certificate_chain_str, 'utf-8'))
+    all_certs: List[x509.Certificate] = read_pem_certificates(certificate_chain)
 
     if not all_certs:
         print("No certificates parsed. Check PEM files.")
@@ -173,15 +146,17 @@ def main():
 
     end_entity, chain = classify_certs(all_certs, private_key)
 
+    cert_out_path = "domain.cert.pem"
+    with open(cert_out_path, "wb") as binary_file:
+        binary_file.write(certificate_chain)
+    print(f"Cert written to {cert_out_path}. Upload it to the bot Enterprise App to be able to use the TLS cert as an application cert as well")
+
     out_path = 'certificate.pfx'
-    build_pfx('ServerCert', private_key, end_entity, chain, None, out_path)
-    print(f"PFX written to {out_path}")
+    build_pfx('ServerCert', private_key, end_entity, chain, out_path)
+    print(f"PFX written to {out_path}. {'Importing it to the LocalMachine store' if args.import_pfx else 'Import it to the LocalMachine store manually'}")
 
     if args.import_pfx:
-        import_pfx(os.path.abspath(args.out), "", args.store, use_certutil=not args.powershell)
-
-    # TODO: instruct the user to upload domain.cert.pem (the value of the --cert param) to the bot enterprise app
-    # to be able to use the TLS certificate as an application certificate as well.
+        import_pfx(os.path.abspath(out_path), "", args.store, use_certutil=not args.powershell)
 
 
 if __name__ == "__main__":
