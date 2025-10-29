@@ -117,9 +117,9 @@ def import_pfx(out_path: str, password: str, store: str, use_certutil: bool = Tr
 
 
 def download_bundle(porkbun_api_key, porkbun_secret_api_key):
-    r = requests.post('https://api.porkbun.com/api/json/v3/ssl/retrieve/yaskov.dev',
-                      json={"apikey": porkbun_api_key, "secretapikey": porkbun_secret_api_key})
-    print(r.status_code)
+    request_body = {"apikey": porkbun_api_key, "secretapikey": porkbun_secret_api_key}
+    r = requests.post('https://api.porkbun.com/api/json/v3/ssl/retrieve/yaskov.dev', json=request_body)
+    print(f"Porkbun response status code: {r.status_code}")
     response_body = r.json()
     return bytes(response_body['privatekey'], 'utf-8'), bytes(response_body['certificatechain'], 'utf-8')
 
@@ -158,6 +158,7 @@ def main():
     if args.import_pfx:
         import_pfx(os.path.abspath(out_path), "", args.store, use_certutil=not args.powershell)
 
+    # TODO: automatically upload the domain.cert.pem to the Enterprise App.
 
 if __name__ == "__main__":
     main()
