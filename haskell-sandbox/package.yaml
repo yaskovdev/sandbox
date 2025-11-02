@@ -25,7 +25,7 @@ dependencies:
 - http-conduit
 - bytestring
 - aeson
-- yaml
+- utf8-string
 
 ghc-options:
 - -Wall

@@ -3,8 +3,11 @@
 module Main (main) where
 
 import Data.Aeson
+import Data.ByteString as B
+import Data.ByteString.UTF8 (fromString)
 import Network.HTTP.Simple
 import System.Environment (getArgs)
+import Text.Printf (printf)
 
 data Auth = Auth String String
 
@@ -23,16 +26,23 @@ instance FromJSON Bundle where
         return (Bundle privateKey certificateChain)
       _ -> fail "Expected an object for Bundle"
 
-authFromArgs :: [String] -> Auth
-authFromArgs [apiKey, secretApiKey] = Auth apiKey secretApiKey
-authFromArgs _ = error "Expected two arguments: apiKey and secretApiKey"
+parseArgs :: [String] -> (String, Auth)
+parseArgs [domain, apiKey, secretApiKey] = (domain, Auth apiKey secretApiKey)
+parseArgs _ = error "Expected three arguments: domain, API key and secret API key"
+
+certChain :: Bundle -> String
+certChain (Bundle _ certificateChain) = certificateChain
 
 main :: IO ()
 main = do
   args <- getArgs
-  let auth = authFromArgs args
-  let request = setRequestBodyJSON auth "POST https://api.porkbun.com/api/json/v3/ssl/retrieve/yaskov.dev"
+  let (domain, auth) = parseArgs args
+  let url = printf "https://api.porkbun.com/api/json/v3/ssl/retrieve/%s" domain
+  let request = setRequestBodyJSON auth (parseRequest_ $ "POST " ++ url)
   response <- httpJSON request
   putStrLn $ "The status code was: " ++ show (getResponseStatusCode response)
-  let body = getResponseBody response :: Bundle
-  print body
+  let bundle = getResponseBody response :: Bundle
+  let certificateChain = certChain bundle
+  let certificateChainBytes = fromString certificateChain
+  B.writeFile "domain.cert.pem" certificateChainBytes
+  print certificateChainBytes
