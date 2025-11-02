@@ -3,3 +3,4 @@
 
 *.pfx
 domain.cert.pem
+*.log
