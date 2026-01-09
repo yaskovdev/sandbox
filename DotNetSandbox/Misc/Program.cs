@@ -190,12 +190,13 @@ Console.WriteLine($"The size of the cache is {cache.Count}");
 
 // ----
 
-File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [10, 11, 12]);
-var stream = new FileStream("/Users/yaskovdev/dev/test.bin", FileMode.Open);
-var buffer = new byte[10];
-await stream.ReadExactlyAsync(buffer, 0, 1);
-await stream.ReadExactlyAsync(buffer, 0, 1);
-Console.WriteLine("Stop");
+// File.WriteAllBytes("/Users/yaskovdev/dev/test.bin", [10, 11, 12]);
+// var stream = new FileStream("/Users/yaskovdev/dev/test.bin", FileMode.Open);
+// var buffer = new byte[10];
+// await stream.ReadExactlyAsync(buffer, 0, 1);
+// await stream.ReadExactlyAsync(buffer, 0, 1);
+// Console.WriteLine("Stop");
+
 // var buffer2 = new byte[10];
 // try
 // {
@@ -218,3 +219,9 @@ Console.WriteLine(dateTimeHolder.ChunkCreationDateTime);
 // ----
 
 Console.WriteLine(new Chunk(1));
+
+// ---
+
+var bufferedStream = new BufferedStream(new FileStream(@"c:\dev\output.bin", FileMode.Create), 4 * 1024 * 1024);
+await bufferedStream.WriteAsync(new byte[] {0, 1, 2});
+Console.WriteLine(bufferedStream.Position);
