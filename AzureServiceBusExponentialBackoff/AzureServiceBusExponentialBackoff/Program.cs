@@ -16,13 +16,13 @@ internal static class Program
         var sender = client.CreateSender("post_processing_queue");
         Console.WriteLine("Sending message with ID " + MessageId);
 
-        var messageJson = JsonSerializer.Serialize(new MessagePayload(1, "Hello World!"));
+        var messageJson = JsonSerializer.Serialize(new MessageBody(1, "Hello World!"));
         await sender.SendMessageAsync(new ServiceBusMessage(messageJson)
         {
             MessageId = MessageId,
             ApplicationProperties =
             {
-                ["ZeroBasedAttemptNumber"] = 0 // TODO: check if DeliveryCount can be used directly instead (probably not, as it is only increased when the message is explicitly abandoned)
+                ["ZeroBasedAttemptNumber"] = 0 // TODO: check if DeliveryCount can be used directly instead (probably not, as it is only increased when the message is explicitly abandoned or the lock expires)
             }
         });
 
@@ -37,9 +37,13 @@ internal static class Program
                 {
                     Console.WriteLine("Waiting for messages...");
                 }
+                else if (message.MessageId.Contains("_ref_"))
+                {
+                    await ProcessRefMessage(sender, receiver, message);
+                }
                 else
                 {
-                    await ProcessMessage(sender, receiver, message.MessageId.Contains("_ref_") ? await RetrieveDeferredMessage(receiver, message) : message);
+                    await ProcessMessage(sender, receiver, message);
                 }
             }
         });
@@ -49,14 +53,14 @@ internal static class Program
         t.Join();
     }
 
-    private static async Task<ServiceBusReceivedMessage> RetrieveDeferredMessage(ServiceBusReceiver receiver, ServiceBusReceivedMessage refMessage)
+    private static async Task ProcessRefMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage refMessage)
     {
         Console.WriteLine("Processing reference message with ID " + refMessage.MessageId + " and body " + refMessage.Body);
-        var payload = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
-        var deferredMessage = await receiver.ReceiveDeferredMessageAsync(payload.ReferencedMessageSequenceNumber); // TODO: what if the original message is not found?
+        var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
+        var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber); // TODO: what if the original message is not found?
         Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + " and body " + deferredMessage.Body);
-        await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here? What if you later fail to handle the original message?
-        return deferredMessage;
+        await ProcessMessage(sender, receiver, deferredMessage);
+        await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here?
     }
 
     private static async Task ProcessMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
@@ -65,12 +69,12 @@ internal static class Program
         {
             var applicationProperties = message.ApplicationProperties;
             Console.WriteLine("Processing message with ID " + message.MessageId + ", body " + message.Body + " and properties " + string.Join(", ", applicationProperties.Select(kvp => kvp.Key + "=" + kvp.Value)));
-            var payload = JsonSerializer.Deserialize<MessagePayload>(message.Body);
-            if (message.DeliveryCount < 5)
+            var body = JsonSerializer.Deserialize<MessageBody>(message.Body);
+            if (message.DeliveryCount < 4)
             {
                 throw new Exception("Simulated processing failure");
             }
-            Console.WriteLine("Successfully processed message with payload: " + payload.Content);
+            Console.WriteLine("Successfully processed message with payload: " + body.Content);
             await receiver.CompleteMessageAsync(message);
         }
         catch (Exception ex)
@@ -83,6 +87,8 @@ internal static class Program
                 MessageId = message.MessageId + "_ref_" + zeroBasedAttemptNumber,
                 ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(Math.Pow(2, zeroBasedAttemptNumber))
             };
+
+            // The order is important: only after the reference message is successfully sent, we defer the original message
             await sender.SendMessageAsync(reference);
             await receiver.DeferMessageAsync(message, ImmutableDictionary<string, object>.Empty.Add("ZeroBasedAttemptNumber", zeroBasedAttemptNumber + 1));
         }
