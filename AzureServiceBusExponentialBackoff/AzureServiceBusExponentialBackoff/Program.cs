@@ -19,11 +19,7 @@ internal static class Program
         var messageJson = JsonSerializer.Serialize(new MessageBody(1, "Hello World!"));
         await sender.SendMessageAsync(new ServiceBusMessage(messageJson)
         {
-            MessageId = MessageId,
-            ApplicationProperties =
-            {
-                ["ZeroBasedAttemptNumber"] = 0 // TODO: check if DeliveryCount can be used directly instead (probably not, as it is only increased when the message is explicitly abandoned or the lock expires)
-            }
+            MessageId = MessageId
         });
 
         var t = new Thread(async () =>
@@ -58,7 +54,7 @@ internal static class Program
         Console.WriteLine("Processing reference message with ID " + refMessage.MessageId + " and body " + refMessage.Body);
         var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
         var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber); // TODO: what if the original message is not found?
-        Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + " and body " + deferredMessage.Body);
+        Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + ", delivery count " + deferredMessage.DeliveryCount + " and body " + deferredMessage.Body);
         await ProcessMessage(sender, receiver, deferredMessage);
         await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here?
     }
@@ -79,18 +75,17 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            var zeroBasedAttemptNumber = (int)message.ApplicationProperties["ZeroBasedAttemptNumber"];
             Console.WriteLine("Exception occurred: " + ex.Message + ". Deferring the original message and sending a reference to it");
             var reference = new ServiceBusMessage(JsonSerializer.Serialize(new MessageReference(message.SequenceNumber)))
             {
                 // Schedule the message with exponential backoff: 2^n seconds
-                MessageId = message.MessageId + "_ref_" + zeroBasedAttemptNumber,
-                ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(Math.Pow(2, zeroBasedAttemptNumber))
+                MessageId = message.MessageId + "_ref_" + message.DeliveryCount,
+                ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(Math.Pow(2, message.DeliveryCount))
             };
 
             // The order is important: only after the reference message is successfully sent, we defer the original message
             await sender.SendMessageAsync(reference);
-            await receiver.DeferMessageAsync(message, ImmutableDictionary<string, object>.Empty.Add("ZeroBasedAttemptNumber", zeroBasedAttemptNumber + 1));
+            await receiver.DeferMessageAsync(message);
         }
     }
 }
