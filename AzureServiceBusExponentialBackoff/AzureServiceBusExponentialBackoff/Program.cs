@@ -51,20 +51,33 @@ internal static class Program
 
     private static async Task ProcessRefMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage refMessage)
     {
-        Console.WriteLine("Processing reference message with ID " + refMessage.MessageId + " and body " + refMessage.Body);
-        var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
-        var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber); // TODO: what if the original message is not found?
-        Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + ", delivery count " + deferredMessage.DeliveryCount + " and body " + deferredMessage.Body);
-        await ProcessMessage(sender, receiver, deferredMessage);
-        await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here?
+        try
+        {
+            Console.WriteLine("Processing reference message with ID " + refMessage.MessageId + " and body " + refMessage.Body);
+            var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
+            var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber);
+            Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + ", delivery count " + deferredMessage.DeliveryCount + " and body " + deferredMessage.Body);
+            await ProcessMessage(sender, receiver, deferredMessage);
+            await receiver.CompleteMessageAsync(refMessage);
+        }
+        catch (ServiceBusException e) when (e.Reason == ServiceBusFailureReason.MessageNotFound)
+        {
+            Console.WriteLine("The original deferred message was not found: " + e.Message + ". Most likely it expired. Completing the ref message to stop further retries");
+            await receiver.CompleteMessageAsync(refMessage);
+        }
+        catch (Exception e)
+        {
+            // ProcessMessage handles its own exceptions, so if we are here, something unexpected happened, and we hope another instance will be more lucky
+            Console.WriteLine("Exception occurred while handling the ref message: " + e.Message + ". Abandoning the ref message to let another instance to retry");
+            await receiver.AbandonMessageAsync(refMessage);
+        }
     }
 
     private static async Task ProcessMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
     {
         try
         {
-            var applicationProperties = message.ApplicationProperties;
-            Console.WriteLine("Processing message with ID " + message.MessageId + ", body " + message.Body + " and properties " + string.Join(", ", applicationProperties.Select(kvp => kvp.Key + "=" + kvp.Value)));
+            Console.WriteLine("Processing message with ID " + message.MessageId + ", body " + message.Body);
             var body = JsonSerializer.Deserialize<MessageBody>(message.Body);
             if (message.DeliveryCount < 4)
             {
@@ -73,9 +86,9 @@ internal static class Program
             Console.WriteLine("Successfully processed message with payload: " + body.Content);
             await receiver.CompleteMessageAsync(message);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Console.WriteLine("Exception occurred: " + ex.Message + ". Deferring the original message and sending a reference to it");
+            Console.WriteLine("Exception occurred: " + e.Message + ". Deferring the original message and sending a reference to it");
             var reference = new ServiceBusMessage(JsonSerializer.Serialize(new MessageReference(message.SequenceNumber)))
             {
                 // Schedule the message with exponential backoff: 2^n seconds
@@ -85,6 +98,7 @@ internal static class Program
 
             // The order is important: only after the reference message is successfully sent, we defer the original message
             await sender.SendMessageAsync(reference);
+            // Once this returns, the message will stay in the queue, but will never be delivered unless we explicitly retrieve it by sequence number
             await receiver.DeferMessageAsync(message);
         }
     }
