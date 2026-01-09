@@ -1,0 +1,3 @@
+namespace AzureServiceBusExponentialBackoff;
+
+public record MessageReference(long ReferencedMessageSequenceNumber);
