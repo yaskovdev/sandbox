@@ -53,9 +53,9 @@ internal static class Program
     {
         Console.WriteLine("Processing reference message with ID " + refMessage.MessageId + " and body " + refMessage.Body);
         var payload = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
-        var deferredMessage = await receiver.ReceiveDeferredMessageAsync(payload.ReferencedMessageSequenceNumber); // TODO: what if the message is not found?
+        var deferredMessage = await receiver.ReceiveDeferredMessageAsync(payload.ReferencedMessageSequenceNumber); // TODO: what if the original message is not found?
         Console.WriteLine("Retrieved deferred message with ID " + deferredMessage.MessageId + " and body " + deferredMessage.Body);
-        await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here? What if you later fail to handle the message?
+        await receiver.CompleteMessageAsync(refMessage); // TODO: isn't it too early to complete it here? What if you later fail to handle the original message?
         return deferredMessage;
     }
 
