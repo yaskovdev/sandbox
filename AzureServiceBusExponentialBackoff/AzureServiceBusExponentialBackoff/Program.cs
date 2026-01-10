@@ -1,8 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿namespace AzureServiceBusExponentialBackoff;
 
-namespace AzureServiceBusExponentialBackoff;
-
-using System.Collections.Immutable;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 
@@ -16,7 +13,7 @@ internal static class Program
         var sender = client.CreateSender("post_processing_queue");
         Console.WriteLine($"Sending message with ID {MessageId}");
 
-        var messageJson = JsonSerializer.Serialize(new MessageBody(1, "Hello World!"));
+        var messageJson = JsonSerializer.Serialize(new MessageBody("Hello World!"));
         await sender.SendMessageAsync(new ServiceBusMessage(messageJson)
         {
             MessageId = MessageId

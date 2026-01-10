@@ -1,3 +1,3 @@
 namespace AzureServiceBusExponentialBackoff;
 
-public record MessageBody(int Attempt, string Content);
+public record MessageBody(string Content);
