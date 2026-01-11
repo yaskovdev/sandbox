@@ -5,38 +5,45 @@ using Azure.Messaging.ServiceBus;
 
 internal static class Program
 {
-    private const string MessageId = "163";
+    private const string QueueName = "sandbox_queue";
 
     public static async Task Main(string[] args)
     {
-        var client = new ServiceBusClient("Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;");
-        var sender = client.CreateSender("post_processing_queue");
-        Console.WriteLine($"Sending message with ID {MessageId}");
+        var client = new ServiceBusClient("");
+        var sender = client.CreateSender(QueueName);
 
-        var messageJson = JsonSerializer.Serialize(new MessageBody("Hello World!"));
-        await sender.SendMessageAsync(new ServiceBusMessage(messageJson)
+        var config = GetConfiguration();
+        var scenario = config.Scenarios[2];
+
+        for (var i = 0; i < scenario.MessageCount; i++)
         {
-            MessageId = MessageId
-        });
+            var messageId = $"PostProcessing_{i}";
+            Console.WriteLine($"Sending message with ID {messageId}");
+            var messageJson = JsonSerializer.Serialize(new MessageBody("Hello World!"));
+            await sender.SendMessageAsync(new ServiceBusMessage(messageJson)
+            {
+                MessageId = messageId
+            });
+        }
 
         var t = new Thread(async () =>
         {
             Console.WriteLine("Starting receiver");
-            var receiver = client.CreateReceiver("post_processing_queue");
+            var receiver = client.CreateReceiver(QueueName);
             while (true)
             {
-                var message = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(2));
+                var message = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(1));
                 if (message is null)
                 {
                     Console.WriteLine("Waiting for messages...");
                 }
                 else if (message.MessageId.Contains("_ref_"))
                 {
-                    await ProcessRefMessage(sender, receiver, message);
+                    await ProcessRefMessage(scenario, sender, receiver, message);
                 }
                 else
                 {
-                    await ProcessMessage(sender, receiver, message);
+                    await ProcessMessage(scenario, sender, receiver, message);
                 }
             }
         });
@@ -46,7 +53,7 @@ internal static class Program
         t.Join();
     }
 
-    private static async Task ProcessRefMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage refMessage)
+    private static async Task ProcessRefMessage(Scenario scenario, ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage refMessage)
     {
         try
         {
@@ -54,12 +61,12 @@ internal static class Program
             var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
             var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber);
             Console.WriteLine($"Retrieved deferred message with ID {deferredMessage.MessageId}, delivery count {deferredMessage.DeliveryCount} and body {deferredMessage.Body}");
-            await ProcessMessage(sender, receiver, deferredMessage);
+            await ProcessMessage(scenario, sender, receiver, deferredMessage);
             await receiver.CompleteMessageAsync(refMessage);
         }
         catch (ServiceBusException e) when (e.Reason == ServiceBusFailureReason.MessageNotFound)
         {
-            Console.WriteLine($"The original deferred message was not found: {e.Message}. Most likely it expired, or the instance sent the ref message, then crashed before deferring the original message. Completing the ref message to stop further retries");
+            Console.WriteLine($"The original deferred message was not found: {e.Message}. Most likely it expired, got processed, or the instance that sent the ref message failed to defer the original (referenced) message. Completing the ref message to stop further retries");
             await receiver.CompleteMessageAsync(refMessage);
         }
         catch (Exception e)
@@ -70,13 +77,13 @@ internal static class Program
         }
     }
 
-    private static async Task ProcessMessage(ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
+    private static async Task ProcessMessage(Scenario scenario, ServiceBusSender sender, ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
     {
         try
         {
             Console.WriteLine($"Processing message with ID {message.MessageId}, body {message.Body}");
             var body = JsonSerializer.Deserialize<MessageBody>(message.Body);
-            if (message.DeliveryCount < 4)
+            if (message.DeliveryCount < scenario.FirstSuccessDeliveryCount)
             {
                 throw new Exception("Simulated processing failure");
             }
@@ -90,7 +97,7 @@ internal static class Program
             {
                 // Schedule the message with exponential backoff: 2^n seconds
                 MessageId = $"{message.MessageId}_ref_{message.DeliveryCount}",
-                ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(Math.Pow(2, message.DeliveryCount))
+                ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(scenario.ExponentialBackoffBase.TotalSeconds + Math.Pow(2, message.DeliveryCount))
             };
 
             // The order is important: only after the reference message is successfully sent, we defer the original message.
@@ -98,8 +105,19 @@ internal static class Program
             // But it is not an issue, because the original message will be redelivered and processed again, but the reference message will be completed
             // without any action.
             await sender.SendMessageAsync(reference);
+            if (scenario.CrashStopAfterImmediatelyAfterSendingRefMessage)
+            {
+                throw new Exception("Simulated crash-stop after sending the reference message before deferring the original message");
+            }
             // Once this returns, the message will stay in the queue, but will never be delivered unless we explicitly retrieve it by sequence number
             await receiver.DeferMessageAsync(message);
         }
+    }
+
+    private static Config GetConfiguration()
+    {
+        var configFilePath = Path.Combine(AppContext.BaseDirectory, "Configuration.json");
+        var json = File.ReadAllText(configFilePath);
+        return JsonSerializer.Deserialize<Config>(json);
     }
 }

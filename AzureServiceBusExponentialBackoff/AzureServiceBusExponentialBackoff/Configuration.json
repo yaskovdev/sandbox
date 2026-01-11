@@ -1,0 +1,46 @@
+{
+  "Scenarios": [
+    {
+      "Description": "Empty the queue",
+      "MessageCount": 0,
+      "ExponentialBackoffBase": "00:00:00",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": false,
+      "FirstSuccessDeliveryCount": 1
+    },
+    {
+      "Description": "One message, schedule a reference message to after 2 seconds, then immediately crash-stop",
+      "MessageCount": 1,
+      "ExponentialBackoffBase": "00:00:00",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": true,
+      "FirstSuccessDeliveryCount": 4
+    },
+    {
+      "Description": "Recovering from the above crash-stop",
+      "MessageCount": 0,
+      "ExponentialBackoffBase": "00:00:00",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": false,
+      "FirstSuccessDeliveryCount": 3
+    },
+    {
+      "Description": "One message, schedule a reference message to after 32 seconds, then immediately crash-stop",
+      "MessageCount": 1,
+      "ExponentialBackoffBase": "00:00:30",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": true,
+      "FirstSuccessDeliveryCount": 4
+    },
+    {
+      "Description": "Recovering from the above crash-stop",
+      "MessageCount": 0,
+      "ExponentialBackoffBase": "00:00:00",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": false,
+      "FirstSuccessDeliveryCount": 1
+    },
+    {
+      "Description": "Exponential backoff with two messages",
+      "MessageCount": 2,
+      "ExponentialBackoffBase": "00:00:00",
+      "CrashStopAfterImmediatelyAfterSendingRefMessage": false,
+      "FirstSuccessDeliveryCount": 4
+    }
+  ]
+}
