@@ -3,6 +3,7 @@ namespace AzureServiceBusExponentialBackoff.Tests;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 [TestClass]
 public class AzureServiceBusExponentialBackoffIntegrationTests
@@ -21,7 +22,7 @@ public class AzureServiceBusExponentialBackoffIntegrationTests
         // {
         //     var m = await receiver.ReceiveMessageAsync();
         //     await receiver.CompleteMessageAsync(m);
-        //     // var receiveDeferredMessageAsync = await receiver.ReceiveDeferredMessageAsync(184);
+        //     // var receiveDeferredMessageAsync = await receiver.ReceiveDeferredMessageAsync(194);
         //     // await receiver.CompleteMessageAsync(receiveDeferredMessageAsync);
         // }
 
@@ -30,8 +31,8 @@ public class AzureServiceBusExponentialBackoffIntegrationTests
 
         var reference = new ServiceBusMessage(JsonSerializer.Serialize(new MessageReference(message.SequenceNumber)))
         {
-            MessageId = $"{message.MessageId}_ref_{message.DeliveryCount}",
-            ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(5)
+            MessageId = $"{message.MessageId}_ref_0",
+            ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(2)
         };
 
         await sender.SendMessageAsync(reference);
@@ -40,44 +41,37 @@ public class AzureServiceBusExponentialBackoffIntegrationTests
         var originalMessageAgain = await receiver.ReceiveMessageAsync();
         var anotherReference = new ServiceBusMessage(JsonSerializer.Serialize(new MessageReference(originalMessageAgain.SequenceNumber)))
         {
-            MessageId = $"{message.MessageId}_ref_{message.DeliveryCount}",
-            ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(5)
+            MessageId = $"{message.MessageId}_ref_1",
+            ScheduledEnqueueTime = DateTimeOffset.UtcNow.AddSeconds(2)
         };
         await sender.SendMessageAsync(anotherReference);
         await receiver.DeferMessageAsync(originalMessageAgain);
 
-        var t1 = new Thread(async () =>
+        var counter = new Counter();
+        await Task.WhenAll(ProcessMessage(1, counter), ProcessMessage(2, counter));
+        counter.Value.ShouldBe(1, "The original message should be processed only once");
+    }
+
+    private async Task ProcessMessage(int threadIndex, Counter counter)
+    {
+        var client = new ServiceBusClient(ServiceBusConnectionString);
+        var receiver = client.CreateReceiver(QueueName);
+        try
         {
-            var c = new ServiceBusClient(ServiceBusConnectionString);
-            var r = c.CreateReceiver(QueueName);
-            var refMessage = await r.ReceiveMessageAsync();
+            var refMessage = await receiver.ReceiveMessageAsync();
             var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
-            Console.WriteLine("Thread 1 received ref message with body: " + refMessage.Body);
+            Console.WriteLine($"Thread {threadIndex} received ref message with body: {refMessage.Body}");
             var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber);
-            Console.WriteLine("Thread 1 started processing deferred message");
+            Console.WriteLine($"Thread {threadIndex} started processing deferred message");
+            counter.Increment();
             Thread.Sleep(5000);
-            Console.WriteLine("Thread 1 finished processing deferred message");
-            await r.CompleteMessageAsync(deferredMessage);
-            await r.CompleteMessageAsync(refMessage);
-        });
-        var t2 = new Thread(async () =>
+            Console.WriteLine($"Thread {threadIndex} finished processing deferred message");
+            await receiver.CompleteMessageAsync(deferredMessage);
+            await receiver.CompleteMessageAsync(refMessage);
+        }
+        catch
         {
-            var c = new ServiceBusClient(ServiceBusConnectionString);
-            var r = c.CreateReceiver(QueueName);
-            var refMessage = await r.ReceiveMessageAsync();
-            var body = JsonSerializer.Deserialize<MessageReference>(refMessage.Body);
-            Console.WriteLine("Thread 2 received ref message with body: " + refMessage.Body);
-            var deferredMessage = await receiver.ReceiveDeferredMessageAsync(body.ReferencedMessageSequenceNumber);
-            Console.WriteLine("Thread 2 started processing deferred message");
-            Thread.Sleep(5000);
-            Console.WriteLine("Thread 2 finished processing deferred message");
-            await r.CompleteMessageAsync(deferredMessage);
-            await r.CompleteMessageAsync(refMessage);
-        });
-        t1.Start();
-        t2.Start();
-        Thread.Sleep(Timeout.Infinite);
-        t1.Join();
-        t2.Join();
+            // ignored
+        }
     }
 }
