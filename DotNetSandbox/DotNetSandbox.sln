@@ -54,6 +54,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageExtSandbox", "Langu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GarbageCollectorSandbox", "GarbageCollectorSandbox\GarbageCollectorSandbox.csproj", "{68D4ECA4-3F62-4425-BFBA-2C5302557227}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlowHttpServer", "SlowHttpServer\SlowHttpServer.csproj", "{8894B4D8-22C7-4563-8555-12DB3456FE1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -168,5 +170,9 @@ Global
 		{68D4ECA4-3F62-4425-BFBA-2C5302557227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68D4ECA4-3F62-4425-BFBA-2C5302557227}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68D4ECA4-3F62-4425-BFBA-2C5302557227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

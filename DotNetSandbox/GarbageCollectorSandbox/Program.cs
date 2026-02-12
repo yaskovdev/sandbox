@@ -5,19 +5,20 @@ internal static class Program
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting");
-        const int iterations = 500_000_000;
+        AllocateManyObjects();
+        Console.WriteLine("Done");
+    }
+
+    private static void AllocateManyObjects()
+    {
+        const int iterations = 20_000;
         for (var i = 0; i < iterations; i++)
         {
-            // Allocate a small object and let it go out of scope immediately
-            var arr = new byte[128];
-            // Optionally, force GC every 1 million allocations
-            if (i % 10_000_000 == 0)
+            var arr = new byte[64 * 1024 * 1024];
+            if (i % 1_000 == 0)
             {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                Console.WriteLine($"GC forced at iteration {i}");
+                Console.WriteLine($"Allocated array of size {arr.Length}, with element 0 being {arr[0]} at iteration {i}");
             }
         }
-        Console.WriteLine("Done");
     }
 }

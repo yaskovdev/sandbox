@@ -225,3 +225,11 @@ Console.WriteLine(new Chunk(1));
 var bufferedStream = new BufferedStream(new FileStream(@"c:\dev\output.bin", FileMode.Create), 4 * 1024 * 1024);
 await bufferedStream.WriteAsync(new byte[] {0, 1, 2});
 Console.WriteLine(bufferedStream.Position);
+
+// ----
+
+var totalPostProcessingDelayMs = Enumerable
+    .Range(1, 10)
+    .Select(it => ExponentialBackoff.ExponentialBackoffRetryDelay(new ServiceBusConsumerConfig(TimeSpan.FromSeconds(1), 3, TimeSpan.Parse("05:30:00"), TimeSpan.Zero), it))
+    .Sum(it => it.TotalMilliseconds);
+Console.WriteLine(TimeSpan.FromMilliseconds(totalPostProcessingDelayMs));
