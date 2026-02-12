@@ -30,7 +30,7 @@ internal static class Program
             listener.Prefixes.Add(s);
         }
         listener.Start();
-        Console.WriteLine("Listening...");
+        Console.WriteLine("Waiting for an incoming request...");
         // Note: The GetContext method blocks while waiting for a request.
         HttpListenerContext context = await listener.GetContextAsync();
         HttpListenerRequest request = context.Request;
@@ -41,7 +41,14 @@ internal static class Program
         // Get a response stream and write the response to it.
         response.ContentLength64 = buffer.Length;
         var output = response.OutputStream;
-        await output.WriteAsync(buffer, 0, buffer.Length);
+
+        var firstChunkLength = buffer.Length / 2;
+        var secondChunkLength = buffer.Length - firstChunkLength;
+        Console.WriteLine($"Writing {firstChunkLength} bytes immediately. The remaining {secondChunkLength} bytes will never be written because the server will get stuck after writing the first chunk");
+        await output.WriteAsync(buffer, 0, firstChunkLength);
+        
+        Console.WriteLine("Getting stuck here...");
+        await Task.Delay(-1);
         // You must close the output stream.
         output.Close();
         listener.Stop();
