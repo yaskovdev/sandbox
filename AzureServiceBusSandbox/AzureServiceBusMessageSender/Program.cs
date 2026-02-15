@@ -1,4 +1,4 @@
-﻿namespace AzureServiceBusMessageSender;
+namespace AzureServiceBusMessageSender;
 
 using Azure.Messaging.ServiceBus;
 
@@ -27,6 +27,6 @@ internal static class Program
 
         await sender.SendMessageAsync(message);
 
-        Console.WriteLine($"Sent message with UUID: {uuid}");
+        Console.WriteLine($"Sent message with UUID (test for L.): {uuid}");
     }
 }
