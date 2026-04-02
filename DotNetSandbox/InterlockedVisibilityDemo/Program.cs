@@ -9,7 +9,7 @@ internal class Program
 
     private void Run()
     {
-        Task.Factory.StartNew(ResetFlagAfter1S);
+        Task.Run(ResetFlagAfter1S);
         var x = 0;
 
         // To fix, replace "_flag" with "Interlocked.CompareExchange(ref _flag, 0, 0)"
@@ -22,7 +22,7 @@ internal class Program
     private void ResetFlagAfter1S()
     {
         Thread.Sleep(1000);
-        Interlocked.Add(ref _flag, 1);
+        Interlocked.Exchange(ref _flag, 1);
     }
 
     private static void Main()
