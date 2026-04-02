@@ -56,6 +56,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GarbageCollectorSandbox", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlowHttpServer", "SlowHttpServer\SlowHttpServer.csproj", "{8894B4D8-22C7-4563-8555-12DB3456FE1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlowTcpServer", "SlowTcpServer\SlowTcpServer.csproj", "{FAD8D0B8-97E5-429A-9DE4-FBE060F09F9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterlockedVisibilityDemo", "InterlockedVisibilityDemo\InterlockedVisibilityDemo.csproj", "{32F0164D-CF57-4291-9DEA-7FD161A888E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,5 +178,13 @@ Global
 		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8894B4D8-22C7-4563-8555-12DB3456FE1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAD8D0B8-97E5-429A-9DE4-FBE060F09F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAD8D0B8-97E5-429A-9DE4-FBE060F09F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAD8D0B8-97E5-429A-9DE4-FBE060F09F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAD8D0B8-97E5-429A-9DE4-FBE060F09F9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32F0164D-CF57-4291-9DEA-7FD161A888E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32F0164D-CF57-4291-9DEA-7FD161A888E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32F0164D-CF57-4291-9DEA-7FD161A888E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32F0164D-CF57-4291-9DEA-7FD161A888E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
