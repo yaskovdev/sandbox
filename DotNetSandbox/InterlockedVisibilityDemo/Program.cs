@@ -5,7 +5,7 @@
 // Run the Release config to reproduce.
 internal class Program
 {
-    private int _flag;
+    private int _flag = 1;
 
     private void Run()
     {
@@ -13,7 +13,7 @@ internal class Program
         var x = 0;
 
         // To fix, replace "_flag" with "Interlocked.CompareExchange(ref _flag, 0, 0)"
-        while (_flag == 0)
+        while (_flag == 1)
             ++x;
 
         Console.WriteLine("Done");
@@ -22,7 +22,7 @@ internal class Program
     private void ResetFlagAfter1S()
     {
         Thread.Sleep(1000);
-        Interlocked.Exchange(ref _flag, 1);
+        Interlocked.Exchange(ref _flag, 0);
     }
 
     private static void Main()
