@@ -9,7 +9,7 @@ import requests
 
 try:
     from cryptography import x509
-    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.serialization import pkcs12
 except ImportError:
     print("cryptography package not found. Install with: pip install cryptography")
@@ -153,6 +153,7 @@ def main():
 
     out_path = 'certificate.pfx'
     build_pfx('ServerCert', private_key, end_entity, chain, out_path)
+    print(f"Certificate thumbprint (SHA-1): {end_entity.fingerprint(hashes.SHA1()).hex().upper()}")
     print(f"PFX written to {out_path}. {'Importing it to the LocalMachine store' if args.import_pfx else 'Import it to the LocalMachine store manually'}")
 
     if args.import_pfx:

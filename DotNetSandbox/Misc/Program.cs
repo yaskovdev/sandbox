@@ -233,3 +233,9 @@ var totalPostProcessingDelayMs = Enumerable
     .Select(it => ExponentialBackoff.ExponentialBackoffRetryDelay(new ServiceBusConsumerConfig(TimeSpan.FromSeconds(1), 3, TimeSpan.Parse("05:30:00"), TimeSpan.Zero), it))
     .Sum(it => it.TotalMilliseconds);
 Console.WriteLine(TimeSpan.FromMilliseconds(totalPostProcessingDelayMs));
+
+// ----
+
+var deadlock = new AsyncDeadlock();
+deadlock.GetData();
+Console.WriteLine("Got data");
