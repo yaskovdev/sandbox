@@ -114,12 +114,137 @@ register values and for `q = 0`.
 
 There are five possible program symbols.
 
-**Case 1: `a i`.**
+#### Stack rules used in the first case
 
-The interpreter reads the next symbol `i`, reads register `i`, adds one, and
-writes the result back to the same slot. It then moves `q` past `a i`.
-No other register or code slot is changed. Thus it performs exactly the
-register-machine operation `a i` and restores the invariant.
+Write an integer stack from top to bottom. For example,
+
+$$
+u :: v :: S
+$$
+
+means that `u` is on top, `v` is immediately below it, and `S` is the
+remainder of the stack.
+
+The first case uses these Psh rules:
+
+- a literal places its value on top;
+- `integer.dup` duplicates the top value;
+- `integer.swap` exchanges the top two values;
+- `integer.pop` removes the top value;
+- `integer.+` replaces `a :: b :: S` by `(b+a) :: S`;
+- `integer.yank` removes a top index `k`, then moves the value at depth `k`
+  to the top;
+- `integer.yankdup` removes a top index `k`, then copies the value at depth
+  `k` to the top;
+- `integer.shove` removes a top index `k`, then moves the new top value to
+  depth `k`.
+
+Depth zero means the top of the stack. These descriptions assume that the
+required values exist and that `k` is in range; the proof below establishes
+those conditions for every index it uses.
+
+For register values `R`, program counter `q`, depth value `d`, and encoded
+code `c_0,...,c_{m-1}`, define
+
+$$
+\operatorname{Mem}(R,q,d,C)
+=
+R_0 :: R_1 :: R_2 :: R_3 :: R_4 :: R_5
+:: q :: d :: c_0 :: \cdots :: c_{m-1}.
+$$
+
+Thus `q` is at depth 6, `d` is at depth 7, and `c_j` is at depth `8+j`.
+
+#### Case 1: `a i`
+
+Assume:
+
+- the interpreter invariant holds;
+- `c_q` is the encoding of `a`;
+- `c_{q+1} = i`, where `1 <= i <= 5`;
+- the dispatcher has fetched `c_q` and selected the `a` handler.
+
+At entry to the handler, the integer stack is
+
+$$
+-1 :: \operatorname{Mem}(R,q,0,C).
+$$
+
+For the planned memory layout, the handler is:
+
+```text
+(1 6 integer.+) integer.yank
+1 integer.+
+(1 6 integer.+) integer.shove
+
+1 6 integer.+ integer.yankdup
+1 (8 integer.+) integer.+ integer.yankdup
+integer.dup
+(2 integer.+) integer.yank
+1 integer.+
+integer.swap
+(1 integer.+) integer.shove
+```
+
+First, `(1 6 integer.+)` produces 7. Because the fetched opcode occupies
+depth 0, `q` is temporarily at depth 7. The first three lines therefore move
+`q` to the top, increment it, and return it to its slot. The resulting stack
+is
+
+$$
+-1 :: \operatorname{Mem}(R,q+1,0,C).
+$$
+
+Next, `1 6 integer.+ integer.yankdup` copies the new value `q+1`.
+The expression `1 (8 integer.+) integer.+` then produces `(q+1)+9`.
+After that expression is consumed by `integer.yankdup`, the opcode is the
+only value above memory. Consequently, encoded code item `c_{q+1}` is at
+depth
+
+$$
+1+8+(q+1)=(q+1)+9.
+$$
+
+The copied value is therefore `i`, and the stack becomes
+
+$$
+i :: -1 :: \operatorname{Mem}(R,q+1,0,C).
+$$
+
+`integer.dup` preserves one copy of `i` and uses the other to produce the
+index `i+2`. After that index is consumed, one copy of `i` and the fetched
+opcode are above memory. Register `R_i` is therefore at depth `i+2`.
+`integer.yank` moves `R_i` to the top, and `1 integer.+` changes it to
+`R_i+1`.
+
+After `integer.swap`, the preserved `i` is again on top.
+`(1 integer.+)` changes it to `i+1`. Once that index is consumed,
+the fetched opcode is the only value above the register area, so depth
+`i+1` is exactly the original location of `R_i`. `integer.shove` writes the
+incremented value there. Thus the handler finishes with
+
+$$
+-1 :: \operatorname{Mem}(R[i \mapsto R_i+1],q+1,0,C).
+$$
+
+The remaining false dispatcher tests preserve this integer stack.
+`integer.pop` then removes the fetched opcode. The common interpreter
+epilogue moves the value at depth 6 to the top, increments it, and shoves it
+back to depth 6. Therefore the cycle ends with
+
+$$
+\operatorname{Mem}(R[i \mapsto R_i+1],q+2,0,C).
+$$
+
+This is exactly the URM-5 transition for `a i`: register `i` is incremented,
+all other registers and code cells are unchanged, and `q` advances past both
+symbols. The handler does not touch the Boolean, code, or name stacks; each
+dispatcher comparison consumes its Boolean result; and the continuation
+created by `exec.y` schedules the next cycle. Hence the complete interpreter
+invariant is restored, and the one-step simulation lemma holds in the `a i`
+case.
+
+#### Remaining cases (proof sketches)
 
 **Case 2: `s i`.**
 
@@ -157,7 +282,8 @@ show directly that each read and write above accesses the intended stack
 slot. Their temporary values are removed before the next interpreter cycle.
 Thus the invariant is restored in every non-halting case.
 
-This proves the lemma.
+The `a i` case above is formalized. The remaining four cases must be expanded
+to the same level before the complete simulation lemma is proved.
 
 ## Correctness of the complete simulation
 
